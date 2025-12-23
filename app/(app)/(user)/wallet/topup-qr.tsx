@@ -1,18 +1,50 @@
 import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
+import { useLocalSearchParams } from 'expo-router'
+import QRCode from 'react-native-qrcode-svg'
+import { useAuthStore } from '../../../../src/stores/authStore'
+import { useTranslation } from '../../../../src/lib/i18n'
 
 export default function TopupQr() {
-  const payload = 'cashin'
+  const { amount } = useLocalSearchParams<{ amount?: string }>()
+  const profile = useAuthStore((s) => s.profile)
+  const { t } = useTranslation()
+  
+  // Generate QR payload with user info for cash-in
+  const payload = JSON.stringify({
+    type: 'cashin',
+    userId: profile?.id,
+    phone: profile?.phone,
+    amount: amount ? parseInt(amount) : 0,
+    timestamp: Date.now(),
+  })
+  
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Présentez ce code</Text>
-      <View style={styles.qr}><Text>{payload}</Text></View>
+      <Text style={styles.title}>{t('present_qr_code')}</Text>
+      <Text style={styles.subtitle}>Montant: {amount || 0} XOF</Text>
+      <View style={styles.qrWrapper}>
+        <QRCode value={payload} size={200} />
+      </View>
+      <Text style={styles.info}>Présentez ce code à l'hôte pour recharger</Text>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16 },
-  title: { fontSize: 18, fontWeight: '700' },
-  qr: { width: 200, height: 200, borderWidth: 1, borderColor: '#e5e7eb', alignItems: 'center', justifyContent: 'center', borderRadius: 12 },
+  container: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16, padding: 24 },
+  title: { fontSize: 20, fontWeight: '700' },
+  subtitle: { fontSize: 18, color: '#2563eb', fontWeight: '600' },
+  qrWrapper: { 
+    padding: 20, 
+    backgroundColor: '#fff', 
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+    marginVertical: 16,
+  },
+  info: { fontSize: 14, color: '#6b7280', textAlign: 'center', marginTop: 12 },
 })

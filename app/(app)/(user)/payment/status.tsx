@@ -1,47 +1,112 @@
 import React, { useEffect, useState } from 'react'
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native'
-import { useLocalSearchParams, Link } from 'expo-router'
+import { useLocalSearchParams, useRouter } from 'expo-router'
 import { usePurchasesStore } from '../../../../src/stores/purchasesStore'
 import { useWalletStore } from '../../../../src/stores/walletStore'
 import { Button } from '../../../../src/components/ui/Button'
+import { useTranslation } from '../../../../src/lib/i18n'
 
 export default function PaymentStatus() {
   const { planId, hotspotId, provider } = useLocalSearchParams<{
     planId: string
     hotspotId: string
-    provider: 'wallet' | 'wave'
+    provider: 'wallet' | 'wave' | 'orange' | 'moov'
   }>()
-  const [purchaseId, setPurchaseId] = useState<string | null>(null)
-  const { startPurchase, purchases } = usePurchasesStore()
+  const [processing, setProcessing] = useState(true)
+  const { startPurchase, currentPurchase, simulatePayment } = usePurchasesStore()
   const wallet = useWalletStore()
+  const router = useRouter()
+  const { t } = useTranslation()
 
   useEffect(() => {
-    const run = async () => {
+    const processPurchase = async () => {
       if (!planId || !hotspotId) return
+      
+      // Create purchase record
       const purchase = await startPurchase(hotspotId, planId, provider ?? 'wallet')
-      if (purchase) {
-        setPurchaseId(purchase.id)
-        if (provider === 'wallet') {
-          wallet.createVoucher(planId, hotspotId)
-          wallet.refresh()
-        }
+      if (!purchase) {
+        setProcessing(false)
+        return
       }
+
+      // Simulate payment processing
+      await simulatePayment(purchase.id)
+      
+      // If wallet payment and successful, create voucher
+      if (provider === 'wallet' && purchase.payment_status === 'success') {
+        await wallet.createVoucher(planId, hotspotId)
+        await wallet.refresh()
+      }
+      
+      setProcessing(false)
     }
-    run()
-  }, [hotspotId, planId, provider, startPurchase, wallet])
+    
+    processPurchase()
+  }, [hotspotId, planId, provider, startPurchase, simulatePayment, wallet])
 
-  if (!purchaseId) return <ActivityIndicator style={{ flex: 1 }} />
-  const current = purchases.find((p) => p.id === purchaseId)
+  if (processing) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#2563eb" />
+        <Text style={styles.processing}>{t('payment_pending')}</Text>
+      </View>
+    )
+  }
 
+  const success = currentPurchase?.payment_status === 'success'
+  
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Statut du paiement</Text>
-      <Text>{current?.payment_status ?? 'pending'}</Text>
-      <Link href={{ pathname: '/(app)/(user)/payment/success', params: { purchaseId } }} asChild>
-        <Button label="Continuer" />
-      </Link>
+      <View style={[styles.statusIcon, success ? styles.successIcon : styles.errorIcon]}>
+        <Text style={styles.statusEmoji}>{success ? '✓' : '✗'}</Text>
+      </View>
+      
+      <Text style={styles.title}>
+        {success ? t('payment_success') : t('payment_failed')}
+      </Text>
+      
+      <Text style={styles.status}>
+        {t('status')}: {currentPurchase?.payment_status || 'unknown'}
+      </Text>
+      
+      {success && (
+        <Button 
+          label={t('continue')} 
+          onPress={() => router.push('/(app)/(user)/wallet')}
+        />
+      )}
+      
+      {!success && (
+        <Button 
+          label={t('retry')} 
+          onPress={() => router.back()}
+        />
+      )}
     </View>
   )
 }
 
-const styles = StyleSheet.create({ container: { flex: 1, padding: 24, gap: 12 }, title: { fontSize: 18, fontWeight: '700' } })
+const styles = StyleSheet.create({ 
+  container: { flex: 1, padding: 24, gap: 16, alignItems: 'center', justifyContent: 'center' }, 
+  title: { fontSize: 22, fontWeight: '700', textAlign: 'center' },
+  processing: { fontSize: 16, color: '#6b7280', marginTop: 12 },
+  status: { fontSize: 14, color: '#6b7280' },
+  statusIcon: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  successIcon: {
+    backgroundColor: '#dcfce7',
+  },
+  errorIcon: {
+    backgroundColor: '#fee2e2',
+  },
+  statusEmoji: {
+    fontSize: 40,
+    fontWeight: 'bold',
+  },
+})
