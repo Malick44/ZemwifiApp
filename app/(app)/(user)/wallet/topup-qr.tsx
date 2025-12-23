@@ -26,7 +26,7 @@ export default function TopupQr() {
       <View style={styles.qrWrapper}>
         <QRCode value={payload} size={200} />
       </View>
-      <Text style={styles.info}>Présentez ce code à l'hôte pour recharger</Text>
+      <Text style={styles.info}>Présentez ce code à l&apos;hôte pour recharger</Text>
     </View>
   )
 }
