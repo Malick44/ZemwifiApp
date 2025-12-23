@@ -10,8 +10,15 @@ type Props = {
 
 export const Button: React.FC<Props> = ({ label, onPress, disabled, loading }) => {
   return (
-    <Pressable style={[styles.button, (disabled || loading) && styles.disabled]} onPress={onPress} disabled={disabled || loading}>
-      {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.label}>{label}</Text>}
+    <Pressable 
+      style={[styles.button, (disabled || loading) && styles.disabled]} 
+      onPress={onPress} 
+      disabled={disabled || loading}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityState={{ disabled: disabled || loading, busy: loading }}
+    >
+      {loading ? <ActivityIndicator color="#fff" accessibilityLabel="Loading" /> : <Text style={styles.label}>{label}</Text>}
     </Pressable>
   )
 }

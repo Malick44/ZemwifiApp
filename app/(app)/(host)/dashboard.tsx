@@ -88,14 +88,14 @@ export default function HostDashboard() {
 
   if (loading) {
     return (
-      <View style={styles.loading}>
-        <ActivityIndicator size="large" color="#2563eb" />
+      <View style={styles.loading} accessibilityLabel="Loading dashboard">
+        <ActivityIndicator size="large" color="#2563eb" accessibilityLabel="Loading indicator" />
       </View>
     )
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} accessibilityLabel="Host dashboard">
       <Text style={styles.title}>{t('host_dashboard')}</Text>
       
       {/* Earnings Overview */}

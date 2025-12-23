@@ -1,3 +1,6 @@
+// This is a manual smoke test, run with: node --loader ts-node/register tests/cashin-expiry.test.ts
+// Skipped by Jest
+
 import assert from 'node:assert'
 import { isoNow } from '../src/lib/time'
 

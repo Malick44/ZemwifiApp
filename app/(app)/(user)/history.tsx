@@ -44,16 +44,19 @@ export default function HistoryScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} accessibilityLabel="Transaction history screen">
       <Text style={styles.title}>{t('history')}</Text>
       
       {/* Filter Tabs */}
-      <View style={styles.filterRow}>
+      <View style={styles.filterRow} accessibilityRole="tablist">
         {(['all', 'success', 'pending', 'failed'] as FilterType[]).map(type => (
           <Pressable
             key={type}
             style={[styles.filterTab, filter === type && styles.filterTabActive]}
             onPress={() => setFilter(type)}
+            accessibilityRole="tab"
+            accessibilityLabel={`Filter by ${type} transactions`}
+            accessibilityState={{ selected: filter === type }}
           >
             <Text style={[styles.filterText, filter === type && styles.filterTextActive]}>
               {type === 'all' ? 'Tout' : 
@@ -84,7 +87,11 @@ export default function HistoryScreen() {
             }}
             asChild
           >
-            <Pressable>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={`Transaction ${format.currency(item.amount)} XOF, ${getStatusText(item.payment_status)}`}
+              accessibilityHint="Tap to view transaction details"
+            >
               <Card style={styles.transactionCard}>
                 <View style={styles.transactionHeader}>
                   <View style={styles.transactionInfo}>
