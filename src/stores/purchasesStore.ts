@@ -1,58 +1,48 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
 import { supabase } from '../lib/supabase'
-import { getErrorMessage } from '../lib/errors'
-import { zustandStorage } from '../lib/storeStorage'
-import type { Purchase } from '../types/domain'
+import { Purchase, UUID } from '../types/domain'
 
-type PurchasesState = {
-  lastRefreshedAt: string | null
-  isLoading: boolean
-  error: string | null
-
+export type PurchasesState = {
   purchases: Purchase[]
-
-  refresh: (userId: string) => Promise<void>
+  loading: boolean
+  error: string | null
+  startPurchase: (hotspotId: UUID, planId: UUID, provider: Purchase['payment_provider']) => Promise<Purchase | null>
+  refreshPurchases: () => Promise<void>
+  updateStatus: (id: UUID, status: Purchase['payment_status']) => void
 }
 
-export const usePurchasesStore = create<PurchasesState>()(
-  persist(
-    (set) => ({
-      lastRefreshedAt: null,
-      isLoading: false,
-      error: null,
-
-      purchases: [],
-
-      refresh: async (userId) => {
-        set({ isLoading: true, error: null })
-        try {
-          const { data, error } = await supabase
-            .from('purchases')
-            .select('*')
-            .eq('user_id', userId)
-            .order('created_at', { ascending: false })
-
-          if (error) throw error
-
-          set({
-            purchases: (data ?? []) as Purchase[],
-            lastRefreshedAt: new Date().toISOString(),
-            isLoading: false,
-          })
-        } catch (e) {
-          set({ isLoading: false, error: getErrorMessage(e) })
-        }
-      },
-    }),
-    {
-      name: 'zemwifi/purchases',
-      version: 1,
-      storage: zustandStorage,
-      partialize: (state) => ({
-        purchases: state.purchases,
-        lastRefreshedAt: state.lastRefreshedAt,
-      }) as PurchasesState,
+export const usePurchasesStore = create<PurchasesState>((set) => ({
+  purchases: [],
+  loading: false,
+  error: null,
+  startPurchase: async (hotspotId, planId, provider) => {
+    set({ loading: true, error: null })
+    const { data, error } = await supabase
+      .from('purchases')
+      .insert({ hotspot_id: hotspotId, plan_id: planId, payment_provider: provider, amount: 0 })
+      .select()
+      .single()
+    if (error) {
+      set({ error: error.message, loading: false })
+      return null
     }
-  )
-)
+    set((state) => ({ purchases: [data, ...state.purchases], loading: false }))
+    return data
+  },
+  refreshPurchases: async () => {
+    const { data, error } = await supabase
+      .from('purchases')
+      .select('*')
+      .order('created_at', { ascending: false })
+    if (error) {
+      set({ error: error.message })
+      return
+    }
+    set({ purchases: data ?? [] })
+  },
+  updateStatus: (id, status) => {
+    set((state) => ({
+      purchases: state.purchases.map((p) => (p.id === id ? { ...p, payment_status: status } : p)),
+    }))
+  },
+}))

@@ -1,80 +1,64 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { createJSONStorage, persist } from 'zustand/middleware'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { supabase } from '../lib/supabase'
-import { getErrorMessage } from '../lib/errors'
-import { zustandStorage } from '../lib/storeStorage'
-import type { Voucher } from '../types/domain'
+import { Voucher, UUID } from '../types/domain'
 
-type WalletState = {
-  lastRefreshedAt: string | null
-  isLoading: boolean
-  error: string | null
-
-  walletBalanceXof: number
+export type WalletState = {
+  balance: number
   vouchers: Voucher[]
-
-  refresh: (userId: string) => Promise<void>
-  upsertVoucherLocal: (voucher: Voucher) => void
-  setWalletBalanceLocal: (balanceXof: number) => void
+  loading: boolean
+  error: string | null
+  refresh: () => Promise<void>
+  redeemVoucher: (code: string) => Promise<void>
+  createVoucher: (planId: UUID, hotspotId: UUID) => Promise<Voucher | null>
 }
+
+const storage = createJSONStorage(() => AsyncStorage)
 
 export const useWalletStore = create<WalletState>()(
   persist(
-    (set, get) => ({
-      lastRefreshedAt: null,
-      isLoading: false,
-      error: null,
-
-      walletBalanceXof: 0,
+    (set) => ({
+      balance: 0,
       vouchers: [],
-
-      setWalletBalanceLocal: (balanceXof) => set({ walletBalanceXof: balanceXof }),
-
-      upsertVoucherLocal: (voucher) => {
-        const existing = get().vouchers
-        const idx = existing.findIndex((v) => v.id === voucher.id)
-        const next = [...existing]
-        if (idx >= 0) next[idx] = voucher
-        else next.unshift(voucher)
-        set({ vouchers: next })
+      loading: false,
+      error: null,
+      refresh: async () => {
+        set({ loading: true, error: null })
+        const { data: wallet } = await supabase.from('wallets').select('balance').single()
+        if (wallet) set({ balance: wallet.balance })
+        const { data: vouchers, error } = await supabase
+          .from('vouchers')
+          .select('*')
+          .order('created_at', { ascending: false })
+        if (error) set({ error: error.message })
+        if (vouchers) set({ vouchers })
+        set({ loading: false })
       },
-
-      refresh: async (userId) => {
-        set({ isLoading: true, error: null })
-        try {
-          const [{ data: userRow, error: userError }, { data: vouchers, error: voucherError }] =
-            await Promise.all([
-              supabase.from('users').select('wallet_balance').eq('id', userId).single(),
-              supabase
-                .from('vouchers')
-                .select('*')
-                .eq('user_id', userId)
-                .order('created_at', { ascending: false }),
-            ])
-
-          if (userError) throw userError
-          if (voucherError) throw voucherError
-
-          set({
-            walletBalanceXof: Number(userRow?.wallet_balance ?? 0),
-            vouchers: (vouchers ?? []) as Voucher[],
-            lastRefreshedAt: new Date().toISOString(),
-            isLoading: false,
-          })
-        } catch (e) {
-          set({ isLoading: false, error: getErrorMessage(e) })
+      redeemVoucher: async (code) => {
+        const { error } = await supabase.rpc('redeem_voucher', { voucher_code: code })
+        if (error) throw error
+        await useWalletStore.getState().refresh()
+      },
+      createVoucher: async (planId, hotspotId) => {
+        const { data, error } = await supabase
+          .from('vouchers')
+          .insert({ plan_id: planId, hotspot_id: hotspotId })
+          .select()
+          .single()
+        if (error) {
+          set({ error: error.message })
+          return null
         }
+        set((state) => ({ vouchers: [data, ...state.vouchers] }))
+        return data
       },
     }),
     {
       name: 'zemwifi/wallet',
       version: 1,
-      storage: zustandStorage,
-      partialize: (state) => ({
-        walletBalanceXof: state.walletBalanceXof,
-        vouchers: state.vouchers,
-        lastRefreshedAt: state.lastRefreshedAt,
-      }) as WalletState,
+      storage,
+      partialize: (state) => ({ balance: state.balance, vouchers: state.vouchers } as WalletState),
     }
   )
 )
