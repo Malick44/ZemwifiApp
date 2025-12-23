@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react'
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import { usePurchasesStore } from '../../../../src/stores/purchasesStore'
-import { useWalletStore } from '../../../../src/stores/walletStore'
+import React, { useEffect, useState } from 'react'
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
 import { Button } from '../../../../src/components/ui/Button'
 import { useTranslation } from '../../../../src/lib/i18n'
+import { usePurchasesStore } from '../../../../src/stores/purchasesStore'
+import { useWalletStore } from '../../../../src/stores/walletStore'
 
 export default function PaymentStatus() {
   const { planId, hotspotId, provider } = useLocalSearchParams<{

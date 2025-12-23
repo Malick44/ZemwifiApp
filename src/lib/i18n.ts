@@ -1,4 +1,4 @@
-import { useAuthStore } from '../stores/authStore'
+import { useAuthStore } from '../stores/authStore';
 
 type Messages = Record<string, { en: string; fr: string }>
 

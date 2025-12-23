@@ -1,13 +1,13 @@
-import React, { useEffect } from 'react'
-import { View, Text, FlatList, StyleSheet, Pressable } from 'react-native'
 import { Link, useRouter } from 'expo-router'
-import { useWalletStore } from '../../../../src/stores/walletStore'
+import React, { useEffect } from 'react'
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
+import { Badge } from '../../../../src/components/ui/Badge'
 import { Button } from '../../../../src/components/ui/Button'
 import { Card } from '../../../../src/components/ui/Card'
-import { Badge } from '../../../../src/components/ui/Badge'
 import { EmptyState } from '../../../../src/components/ui/EmptyState'
-import { useTranslation } from '../../../../src/lib/i18n'
 import { format } from '../../../../src/lib/format'
+import { useTranslation } from '../../../../src/lib/i18n'
+import { useWalletStore } from '../../../../src/stores/walletStore'
 
 export default function WalletScreen() {
   const { vouchers, balance, refresh, loading } = useWalletStore()

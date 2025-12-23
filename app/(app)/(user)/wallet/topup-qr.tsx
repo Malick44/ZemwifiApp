@@ -1,9 +1,9 @@
-import React from 'react'
-import { View, Text, StyleSheet } from 'react-native'
 import { useLocalSearchParams } from 'expo-router'
+import React from 'react'
+import { StyleSheet, Text, View } from 'react-native'
 import QRCode from 'react-native-qrcode-svg'
-import { useAuthStore } from '../../../../src/stores/authStore'
 import { useTranslation } from '../../../../src/lib/i18n'
+import { useAuthStore } from '../../../../src/stores/authStore'
 
 export default function TopupQr() {
   const { amount } = useLocalSearchParams<{ amount?: string }>()
