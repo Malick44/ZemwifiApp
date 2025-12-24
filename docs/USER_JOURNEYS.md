@@ -17,6 +17,12 @@
 7. [Admin Journey](#admin-journey)
 8. [Route Structure](#route-structure)
 9. [Key Features by Role](#key-features-by-role)
+10. [Data Persistence & Offline Support](#data-persistence--offline-support)
+11. [Technical Architecture](#technical-architecture)
+12. [Comparison: Expo App vs Web App](#comparison-expo-app-vs-web-app)
+13. [Testing the User Journeys](#testing-the-user-journeys)
+14. [Future Enhancements](#future-enhancements)
+15. [Appendix](#appendix)
 
 ---
 
