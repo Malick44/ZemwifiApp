@@ -108,7 +108,24 @@ ZemwifiApp/
 │   └── components/          # Reusable UI components
 ├── Prompt-repo/supabase/    # Database migrations
 └── docs/                    # Documentation
+    └── USER_JOURNEYS.md     # Complete user journey documentation
 ```
+
+---
+
+## 📚 Documentation
+
+### User Journeys & Roles
+
+The app supports multiple user roles, each with distinct capabilities:
+
+- **Guest**: Browse hotspots without authentication
+- **User**: Purchase WiFi plans and manage vouchers
+- **Host**: Create hotspots, manage plans, accept cash deposits
+- **Technician**: Handle service requests and technical support
+- **Admin**: Platform management (web-only, planned for mobile)
+
+**📖 Complete documentation:** See [docs/USER_JOURNEYS.md](docs/USER_JOURNEYS.md) for detailed user flows, screen-by-screen navigation, and feature descriptions for each role.
 
 ---
 
