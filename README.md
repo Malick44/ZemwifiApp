@@ -119,13 +119,24 @@ ZemwifiApp/
 
 The app supports multiple user roles, each with distinct capabilities:
 
-- **Guest**: Browse hotspots without authentication
-- **User**: Purchase WiFi plans and manage vouchers
-- **Host**: Create hotspots, manage plans, accept cash deposits
-- **Technician**: Handle service requests and technical support
-- **Admin**: Platform management (web-only, planned for mobile)
+| Role | Description | Key Features |
+|------|-------------|--------------|
+| **Guest** | Unauthenticated visitor | Browse hotspots, view plans |
+| **User** | Authenticated consumer | Purchase plans, manage vouchers, wallet |
+| **Host** | WiFi provider | Create hotspots, manage plans, accept cash (2% commission) |
+| **Technician** | Technical support | Handle service requests, diagnostics |
+| **Admin** | Platform admin | User management, KYC approval (web-only) |
 
-**📖 Complete documentation:** See [docs/USER_JOURNEYS.md](docs/USER_JOURNEYS.md) for detailed user flows, screen-by-screen navigation, and feature descriptions for each role.
+### 📖 Documentation Library
+
+| Document | Description | Best For |
+|----------|-------------|----------|
+| **[USER_JOURNEYS.md](docs/USER_JOURNEYS.md)** | Complete detailed documentation (30KB, ~25 min read) | Developers, PM, QA |
+| **[QUICK_REFERENCE.md](docs/QUICK_REFERENCE.md)** | Quick lookup guide (7.8KB, ~5 min read) | Quick reference, new team members |
+| **[USER_JOURNEY_SUMMARY.md](docs/USER_JOURNEY_SUMMARY.md)** | Overview & status (11KB) | High-level overview, stakeholders |
+| **[SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md)** | Backend configuration | DevOps, setup |
+
+**Coverage:** 5 user roles ✅ | 52 screens ✅ | All routes documented ✅
 
 ---
 
