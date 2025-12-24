@@ -1,6 +1,6 @@
-import { renderHook, act } from '@testing-library/react-native';
-import { useDiscoveryStore } from '../src/stores/discoveryStore';
+import { act, renderHook } from '@testing-library/react-native';
 import { supabase } from '../src/lib/supabase';
+import { useDiscoveryStore } from '../src/stores/discoveryStore';
 import type { Hotspot } from '../src/types/domain';
 
 // Mock Supabase

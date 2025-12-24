@@ -1,173 +1,306 @@
+import { Colors } from '@/constants/theme'
+import { Ionicons } from '@expo/vector-icons'
+import { useRouter } from 'expo-router'
 import React, { useEffect, useState } from 'react'
-import { View, Text, FlatList, StyleSheet, Pressable } from 'react-native'
-import { Link } from 'expo-router'
+import { FlatList, Pressable, ScrollView, StyleSheet, useColorScheme, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { Badge } from '../../../src/components/ui/Badge'
+import { Card } from '../../../src/components/ui/Card'
+import { EmptyState } from '../../../src/components/ui/EmptyState'
+import { LoadingState } from '../../../src/components/ui/LoadingState'
+import { Typography } from '../../../src/components/ui/Typography'
 import { usePurchasesStore } from '../../../src/stores/purchasesStore'
 import { Purchase } from '../../../src/types/domain'
-import { Card } from '../../../src/components/ui/Card'
-import { Badge } from '../../../src/components/ui/Badge'
-import { EmptyState } from '../../../src/components/ui/EmptyState'
-import { useTranslation } from '../../../src/lib/i18n'
-import { format } from '../../../src/lib/format'
 
 type FilterType = 'all' | 'success' | 'pending' | 'failed'
 
 export default function HistoryScreen() {
   const { purchases, refreshPurchases, loading } = usePurchasesStore()
   const [filter, setFilter] = useState<FilterType>('all')
-  const { t } = useTranslation()
+  const router = useRouter()
+  const colorScheme = useColorScheme()
+  const colors = Colors[colorScheme ?? 'light']
 
   useEffect(() => {
     refreshPurchases()
-  }, [refreshPurchases])
+  }, [])
 
   const filteredPurchases = purchases.filter(p => {
     if (filter === 'all') return true
     return p.payment_status === filter
   })
 
-  const getStatusColor = (status: Purchase['payment_status']) => {
+  const getStatusVariant = (status: Purchase['payment_status']) => {
     switch (status) {
-      case 'success': return 'green'
-      case 'pending': return 'orange'
-      case 'failed': return 'red'
-      default: return 'gray'
+      case 'success': return 'success'
+      case 'pending': return 'warning'
+      case 'failed': return 'error'
+      default: return 'neutral'
     }
   }
 
   const getStatusText = (status: Purchase['payment_status']) => {
     switch (status) {
-      case 'success': return t('success')
-      case 'pending': return t('payment_pending')
-      case 'failed': return t('failed')
+      case 'success': return 'Réussi'
+      case 'pending': return 'En attente'
+      case 'failed': return 'Échoué'
+      case 'expired': return 'Expiré'
       default: return status
     }
   }
 
+  const getPaymentIcon = (provider: Purchase['payment_provider']) => {
+    switch (provider) {
+      case 'wave': return 'phone-portrait-outline'
+      case 'orange': return 'phone-portrait-outline'
+      case 'moov': return 'phone-portrait-outline'
+      case 'wallet': return 'wallet-outline'
+      default: return 'card-outline'
+    }
+  }
+
+  if (loading && purchases.length === 0) {
+    return <LoadingState message="Chargement de l'historique..." />
+  }
+
   return (
-    <View style={styles.container} accessibilityLabel="Transaction history screen">
-      <Text style={styles.title}>{t('history')}</Text>
-      
-      {/* Filter Tabs */}
-      <View style={styles.filterRow} accessibilityRole="tablist">
-        {(['all', 'success', 'pending', 'failed'] as FilterType[]).map(type => (
-          <Pressable
-            key={type}
-            style={[styles.filterTab, filter === type && styles.filterTabActive]}
-            onPress={() => setFilter(type)}
-            accessibilityRole="tab"
-            accessibilityLabel={`Filter by ${type} transactions`}
-            accessibilityState={{ selected: filter === type }}
-          >
-            <Text style={[styles.filterText, filter === type && styles.filterTextActive]}>
-              {type === 'all' ? 'Tout' : 
-               type === 'success' ? 'Succès' :
-               type === 'pending' ? 'En attente' :
-               'Échoué'}
-            </Text>
-          </Pressable>
-        ))}
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      {/* Header */}
+      <View style={styles.header}>
+        <Typography variant="h1">Historique</Typography>
+        <Typography variant="body" color={colors.textSecondary}>
+          {purchases.length} transaction{purchases.length > 1 ? 's' : ''}
+        </Typography>
       </View>
 
+      {/* Filter Chips */}
+      <ScrollView 
+        horizontal 
+        showsHorizontalScrollIndicator={false} 
+        style={styles.filtersScroll}
+        contentContainerStyle={styles.filtersContainer}
+      >
+        {[
+          { key: 'all' as const, label: 'Tout', count: purchases.length },
+          { key: 'success' as const, label: 'Réussi', count: purchases.filter(p => p.payment_status === 'success').length },
+          { key: 'pending' as const, label: 'En attente', count: purchases.filter(p => p.payment_status === 'pending').length },
+          { key: 'failed' as const, label: 'Échoué', count: purchases.filter(p => p.payment_status === 'failed').length },
+        ].map(({ key, label, count }) => (
+          <Pressable
+            key={key}
+            onPress={() => setFilter(key)}
+            style={[
+              styles.filterChip,
+              { 
+                backgroundColor: filter === key ? colors.tint : colors.card,
+                borderColor: filter === key ? colors.tint : colors.border,
+              }
+            ]}
+          >
+            <Typography 
+              variant="body" 
+              color={filter === key ? '#fff' : colors.text}
+              style={{ fontWeight: filter === key ? '600' : '400' }}
+            >
+              {label}
+            </Typography>
+            {count > 0 && (
+              <View style={[
+                styles.countBadge,
+                { backgroundColor: filter === key ? 'rgba(255,255,255,0.2)' : colors.backgroundSecondary }
+              ]}>
+                <Typography 
+                  variant="caption" 
+                  color={filter === key ? '#fff' : colors.textSecondary}
+                  style={{ fontWeight: '600' }}
+                >
+                  {count}
+                </Typography>
+              </View>
+            )}
+          </Pressable>
+        ))}
+      </ScrollView>
+
+      {/* Transactions List */}
       <FlatList
         data={filteredPurchases}
-        keyExtractor={(p) => p.id}
+        keyExtractor={(item) => item.id}
         refreshing={loading}
         onRefresh={refreshPurchases}
+        contentContainerStyle={styles.listContent}
         ListEmptyComponent={
           <EmptyState 
-            title="Aucune transaction"
-            message="Vos achats apparaîtront ici"
+            title="Aucune transaction" 
+            message={filter === 'all' 
+              ? "Vous n'avez pas encore effectué d'achats"
+              : `Aucune transaction ${getStatusText(filter).toLowerCase()}`}
+            icon="receipt-outline"
+            action={filter !== 'all' ? {
+              label: "Voir toutes les transactions",
+              onPress: () => setFilter('all')
+            } : undefined}
           />
         }
         renderItem={({ item }) => (
-          <Link
-            href={{
+          <Pressable
+            onPress={() => router.push({
               pathname: '/(app)/(shared)/transaction-detail/[id]',
               params: { id: item.id }
-            }}
-            asChild
+            })}
           >
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={`Transaction ${format.currency(item.amount)} XOF, ${getStatusText(item.payment_status)}`}
-              accessibilityHint="Tap to view transaction details"
-            >
-              <Card style={styles.transactionCard}>
-                <View style={styles.transactionHeader}>
-                  <View style={styles.transactionInfo}>
-                    <Text style={styles.amount}>
-                      {format.currency(item.amount)} XOF
-                    </Text>
-                    <Text style={styles.provider}>
-                      {item.payment_provider.toUpperCase()}
-                    </Text>
-                    <Text style={styles.date}>
-                      {format.date(item.created_at)}
-                    </Text>
-                  </View>
-                  <Badge 
-                    text={getStatusText(item.payment_status)} 
-                    color={getStatusColor(item.payment_status)} 
+            <Card variant="elevated" style={styles.transactionCard}>
+              <View style={styles.transactionHeader}>
+                <View style={[styles.iconContainer, { backgroundColor: colors.backgroundSecondary }]}>
+                  <Ionicons 
+                    name={getPaymentIcon(item.payment_provider)} 
+                    size={24} 
+                    color={colors.tint} 
                   />
                 </View>
-                {item.payment_reference && (
-                  <Text style={styles.reference}>
-                    Réf: {item.payment_reference}
-                  </Text>
-                )}
-              </Card>
-            </Pressable>
-          </Link>
+                <View style={styles.transactionInfo}>
+                  <Typography variant="h3">
+                    Plan {item.plan_id}
+                  </Typography>
+                  <Typography variant="caption" color={colors.textSecondary}>
+                    {formatDate(item.created_at)}
+                  </Typography>
+                </View>
+                <View style={styles.transactionRight}>
+                  <Typography variant="h3" color={colors.text}>
+                    {item.amount.toLocaleString()} XOF
+                  </Typography>
+                  <Badge 
+                    variant={getStatusVariant(item.payment_status)} 
+                    label={getStatusText(item.payment_status)} 
+                    size="sm"
+                  />
+                </View>
+              </View>
+              
+              <View style={styles.transactionDetails}>
+                <View style={styles.detailItem}>
+                  <Ionicons name="location-outline" size={14} color={colors.textSecondary} />
+                  <Typography variant="caption" color={colors.textSecondary}>
+                    Hotspot {item.hotspot_id.slice(0, 8)}...
+                  </Typography>
+                </View>
+                <View style={styles.detailItem}>
+                  <Ionicons name={getPaymentIcon(item.payment_provider)} size={14} color={colors.textSecondary} />
+                  <Typography variant="caption" color={colors.textSecondary}>
+                    {item.payment_provider.charAt(0).toUpperCase() + item.payment_provider.slice(1)}
+                  </Typography>
+                </View>
+              </View>
+
+              <Pressable style={styles.viewDetailButton}>
+                <Typography variant="caption" color={colors.tint} style={{ fontWeight: '600' }}>
+                  Voir les détails
+                </Typography>
+                <Ionicons name="chevron-forward" size={16} color={colors.tint} />
+              </Pressable>
+            </Card>
+          </Pressable>
         )}
       />
-    </View>
+    </SafeAreaView>
   )
 }
 
-const styles = StyleSheet.create({ 
-  container: { flex: 1, padding: 16 },
-  title: { fontSize: 24, fontWeight: '700', marginBottom: 16 },
-  filterRow: { 
-    flexDirection: 'row', 
-    gap: 8, 
-    marginBottom: 16,
-    backgroundColor: '#f3f4f6',
-    padding: 4,
-    borderRadius: 8,
+function formatDate(dateString: string): string {
+  const date = new Date(dateString)
+  const now = new Date()
+  const diffMs = now.getTime() - date.getTime()
+  const diffMins = Math.floor(diffMs / (1000 * 60))
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+
+  if (diffMins < 1) return 'À l\'instant'
+  if (diffMins < 60) return `Il y a ${diffMins} min`
+  if (diffHours < 24) return `Il y a ${diffHours}h`
+  if (diffDays < 7) return `Il y a ${diffDays}j`
+  
+  return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+  header: {
+    padding: 16,
+    paddingTop: 48,
   },
-  filterTab: {
-    flex: 1,
+  filtersScroll: {
+    maxHeight: 60,
+  },
+  filtersContainer: {
+    paddingHorizontal: 16,
+    paddingBottom: 8,
+    gap: 8,
+  },
+  filterChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
     paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 6,
+    borderRadius: 20,
+    borderWidth: 1,
+    gap: 6,
+  },
+  countBadge: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 10,
+    minWidth: 20,
     alignItems: 'center',
   },
-  filterTabActive: {
-    backgroundColor: '#fff',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+  listContent: {
+    padding: 16,
+    gap: 12,
   },
-  filterText: {
-    fontSize: 14,
-    color: '#6b7280',
-    fontWeight: '500',
+  transactionCard: {
+    marginBottom: 12,
   },
-  filterTextActive: {
-    color: '#2563eb',
-    fontWeight: '600',
+  transactionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
   },
-  transactionCard: { marginBottom: 12 },
-  transactionHeader: { 
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
-    alignItems: 'flex-start' 
+  iconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
   },
-  transactionInfo: { flex: 1 },
-  amount: { fontSize: 20, fontWeight: '700', color: '#111827', marginBottom: 4 },
-  provider: { fontSize: 14, color: '#6b7280', marginBottom: 2 },
-  date: { fontSize: 12, color: '#9ca3af' },
-  reference: { fontSize: 12, color: '#9ca3af', marginTop: 8, fontFamily: 'monospace' },
+  transactionInfo: {
+    flex: 1,
+  },
+  transactionRight: {
+    alignItems: 'flex-end',
+    gap: 4,
+  },
+  transactionDetails: {
+    flexDirection: 'row',
+    gap: 16,
+    marginTop: 8,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#e5e7eb',
+  },
+  detailItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  viewDetailButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
+    marginTop: 8,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#e5e7eb',
+  },
 })

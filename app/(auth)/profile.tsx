@@ -1,31 +1,86 @@
 import React, { useState } from 'react'
 import { View, StyleSheet, Alert } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
-import { TextField } from '../../src/components/ui/TextField'
 import { Button } from '../../src/components/ui/Button'
+import { Typography } from '../../src/components/ui/Typography'
+import { Input } from '../../components/ui/Input'
 import { useAuthStore } from '../../src/stores/authStore'
-import { AppHeader } from '../../src/components/AppHeader'
-import { t } from '../../src/lib/i18n'
+import { Colors } from '../../constants/theme'
+import { useColorScheme } from 'react-native'
 
 export default function ProfileScreen() {
   const updateProfile = useAuthStore((s) => s.updateProfile)
   const profile = useAuthStore((s) => s.profile)
   const [name, setName] = useState(profile?.full_name ?? '')
   const router = useRouter()
+  const colorScheme = useColorScheme()
+  const colors = Colors[colorScheme ?? 'light']
 
   const onSave = async () => {
+    if (!name.trim()) {
+      Alert.alert('Erreur', 'Veuillez entrer votre nom')
+      return
+    }
+    
     await updateProfile({ full_name: name })
-    Alert.alert('Profil enregistré')
+    Alert.alert('Succès', 'Profil enregistré')
     router.replace('/(app)/(user)/map')
   }
 
   return (
-    <View style={styles.container}>
-      <AppHeader title={t('profile_title')} showBack />
-      <TextField label="Nom" value={name} onChangeText={setName} />
-      <Button label={t('continue')} onPress={onSave} />
-    </View>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={styles.content}>
+        <Typography variant="h1" style={styles.title}>Votre profil</Typography>
+        <Typography variant="body" color="textSecondary" style={styles.subtitle}>
+          Complétez votre profil pour continuer
+        </Typography>
+
+        <View style={styles.form}>
+          <Typography variant="label" style={styles.label}>Nom</Typography>
+          <Input
+            value={name}
+            onChangeText={setName}
+            placeholder="Entrez votre nom complet"
+            autoCapitalize="words"
+            autoFocus
+          />
+        </View>
+
+        <Button 
+          variant="primary"
+          size="large"
+          onPress={onSave}
+          fullWidth
+          disabled={!name.trim()}
+        >
+          Continuer
+        </Button>
+      </View>
+    </SafeAreaView>
   )
 }
 
-const styles = StyleSheet.create({ container: { flex: 1, padding: 24, gap: 16 } })
+const styles = StyleSheet.create({ 
+  container: { 
+    flex: 1,
+  },
+  content: {
+    flex: 1,
+    padding: 24,
+    gap: 16,
+  },
+  title: {
+    marginTop: 20,
+  },
+  subtitle: {
+    marginBottom: 16,
+  },
+  form: {
+    gap: 8,
+    flex: 1,
+  },
+  label: {
+    marginBottom: 8,
+  },
+})

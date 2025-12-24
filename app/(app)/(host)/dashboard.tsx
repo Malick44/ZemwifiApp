@@ -1,11 +1,15 @@
+import { Ionicons } from '@expo/vector-icons'
+import { Link, useRouter } from 'expo-router'
 import React, { useEffect, useState } from 'react'
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native'
-import { Link } from 'expo-router'
-import { supabase } from '../../../src/lib/supabase'
+import { ActivityIndicator, Pressable, RefreshControl, ScrollView, StyleSheet, View, useColorScheme } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { Colors } from '../../../constants/theme'
 import { Card } from '../../../src/components/ui/Card'
-import { Button } from '../../../src/components/ui/Button'
-import { useTranslation } from '../../../src/lib/i18n'
+import { Typography } from '../../../src/components/ui/Typography'
 import { format } from '../../../src/lib/format'
+import { useTranslation } from '../../../src/lib/i18n'
+import { supabase } from '../../../src/lib/supabase'
+import { useAuthStore } from '../../../src/stores/authStore'
 
 type DashboardStats = {
   totalEarnings: number
@@ -16,43 +20,55 @@ type DashboardStats = {
   pendingPayouts: number
 }
 
+// Mock transaction type for the list
+type Transaction = {
+  id: string
+  amount: number
+  status: 'success' | 'pending' | 'failed'
+  created_at: string
+  hotspot: { name: string } | null
+}
+
 export default function HostDashboard() {
+  const router = useRouter()
   const [stats, setStats] = useState<DashboardStats | null>(null)
+  const [transactions, setTransactions] = useState<Transaction[]>([])
   const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
+  const [isOnline, setIsOnline] = useState(true) // Global online status
   const { t } = useTranslation()
+  const profile = useAuthStore((s) => s.profile)
+  const colorScheme = useColorScheme()
+  const colors = Colors[colorScheme ?? 'light']
 
   useEffect(() => {
-    loadDashboardStats()
+    loadDashboardData()
   }, [])
 
-  const loadDashboardStats = async () => {
-    setLoading(true)
+  const loadDashboardData = async () => {
     try {
-      // Get user's hotspots
-      const { data: hotspots } = await supabase
-        .from('hotspots')
-        .select('id, is_online')
-      
+      if (!refreshing) setLoading(true)
+
+      // 1. Fetch Stats (Same logic as before, consolidated)
+      const { data: hotspots } = await supabase.from('hotspots').select('id, is_online')
       const hotspotIds = hotspots?.map(h => h.id) || []
       const activeHotspots = hotspots?.filter(h => h.is_online).length || 0
 
-      // Get earnings (from purchases for host's hotspots)
       const { data: purchases } = await supabase
         .from('purchases')
-        .select('amount, created_at')
+        .select('amount, created_at, status:payment_status, id, hotspot:hotspots(name)')
         .in('hotspot_id', hotspotIds)
-        .eq('payment_status', 'success')
+        .order('created_at', { ascending: false })
+        .limit(5)
 
-      const totalEarnings = purchases?.reduce((sum, p) => sum + p.amount, 0) || 0
-      
-      // Today's earnings
+      const completedPurchases = purchases?.filter(p => p.status === 'success') || []
+      const totalEarnings = completedPurchases.reduce((sum, p) => sum + p.amount, 0)
+
       const today = new Date()
       today.setHours(0, 0, 0, 0)
-      const todayEarnings = purchases?.filter(p => 
-        new Date(p.created_at) >= today
-      ).reduce((sum, p) => sum + p.amount, 0) || 0
+      const todayEarnings = completedPurchases.filter(p => new Date(p.created_at) >= today)
+        .reduce((sum, p) => sum + p.amount, 0)
 
-      // Active sessions (vouchers being used)
       const { count: activeSessions } = await supabase
         .from('vouchers')
         .select('*', { count: 'exact', head: true })
@@ -60,15 +76,11 @@ export default function HostDashboard() {
         .not('used_at', 'is', null)
         .gt('expires_at', new Date().toISOString())
 
-      // Total sales count
-      const totalSales = purchases?.length || 0
-
-      // Pending payouts
       const { data: payouts } = await supabase
         .from('payout_requests')
         .select('amount')
         .eq('status', 'pending')
-      
+
       const pendingPayouts = payouts?.reduce((sum, p) => sum + p.amount, 0) || 0
 
       setStats({
@@ -76,100 +88,351 @@ export default function HostDashboard() {
         todayEarnings,
         activeHotspots,
         activeSessions: activeSessions || 0,
-        totalSales,
+        totalSales: completedPurchases.length,
         pendingPayouts,
       })
+
+      // Set recent transactions
+      setTransactions(purchases?.map(p => ({
+        id: p.id,
+        amount: p.amount,
+        status: p.status as any,
+        created_at: p.created_at,
+        hotspot: p.hotspot as any
+      })) || [])
+
     } catch (error) {
-      console.error('Error loading dashboard stats:', error)
+      console.error('Error loading dashboard:', error)
     } finally {
       setLoading(false)
+      setRefreshing(false)
     }
   }
 
-  if (loading) {
+  const onRefresh = () => {
+    setRefreshing(true)
+    loadDashboardData()
+  }
+
+  const toggleOnlineStatus = () => {
+    // In a real app, this would update all hotspots or a global host status
+    setIsOnline(!isOnline)
+  }
+
+  if (loading && !stats) {
     return (
-      <View style={styles.loading} accessibilityLabel="Loading dashboard">
-        <ActivityIndicator size="large" color="#2563eb" accessibilityLabel="Loading indicator" />
-      </View>
+      <SafeAreaView style={[styles.loading, { backgroundColor: colors.background }]}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </SafeAreaView>
     )
   }
 
   return (
-    <ScrollView style={styles.container} accessibilityLabel="Host dashboard">
-      <Text style={styles.title}>{t('host_dashboard')}</Text>
-      
-      {/* Earnings Overview */}
-      <Card>
-        <Text style={styles.cardTitle}>Gains</Text>
-        <View style={styles.statsRow}>
-          <View style={styles.stat}>
-            <Text style={styles.statLabel}>Total</Text>
-            <Text style={styles.statValue}>{format.currency(stats?.totalEarnings || 0)} XOF</Text>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+      >
+        {/* Header */}
+        <View style={styles.header}>
+          <View>
+            <Typography variant="h2" style={styles.greeting}>Bonjour, {profile?.full_name?.split(' ')[0] || 'Hôte'}</Typography>
+            <View style={styles.statusContainer}>
+              <View style={[styles.statusDot, { backgroundColor: isOnline ? colors.success : colors.textSecondary }]} />
+              <Typography variant="caption" color="textSecondary">
+                {isOnline ? 'Vos services sont en ligne' : 'Vous êtes hors ligne'}
+              </Typography>
+            </View>
           </View>
-          <View style={styles.stat}>
-            <Text style={styles.statLabel}>Aujourd'hui</Text>
-            <Text style={styles.statValue}>{format.currency(stats?.todayEarnings || 0)} XOF</Text>
+          <View style={styles.headerActions}>
+            <Pressable onPress={toggleOnlineStatus} style={[styles.iconButton, { backgroundColor: colors.secondary, marginRight: 8 }]}>
+              <Ionicons name={isOnline ? "power" : "power-outline"} size={20} color={isOnline ? colors.success : colors.textSecondary} />
+            </Pressable>
+            <Link href="/(app)/(user)/settings" asChild>
+              <Pressable style={[styles.iconButton, { backgroundColor: colors.secondary }]}>
+                <Ionicons name="settings-outline" size={20} color={colors.text} />
+              </Pressable>
+            </Link>
           </View>
         </View>
-      </Card>
 
-      {/* Quick Stats */}
-      <View style={styles.gridRow}>
-        <Card style={styles.smallCard}>
-          <Text style={styles.smallCardValue}>{stats?.activeHotspots || 0}</Text>
-          <Text style={styles.smallCardLabel}>Hotspots actifs</Text>
-        </Card>
-        <Card style={styles.smallCard}>
-          <Text style={styles.smallCardValue}>{stats?.activeSessions || 0}</Text>
-          <Text style={styles.smallCardLabel}>Sessions actives</Text>
-        </Card>
-      </View>
+        {/* Main Earnings Card */}
+        <View style={[styles.mainCard, { backgroundColor: colors.primary }]}>
+          <View style={styles.mainCardHeader}>
+            <Typography variant="body" style={{ color: 'rgba(255,255,255,0.8)' }}>Solde disponible</Typography>
+            <Ionicons name="wallet-outline" size={24} color="white" />
+          </View>
+          <Typography variant="h1" style={{ color: 'white', fontSize: 36, marginBottom: 8 }}>
+            {format.currency(stats?.totalEarnings || 0)}
+          </Typography>
+          <View style={styles.mainCardFooter}>
+            <View>
+              <Typography variant="caption" style={{ color: 'rgba(255,255,255,0.6)' }}>Aujourd'hui</Typography>
+              <Typography variant="h4" style={{ color: 'white' }}>+{format.currency(stats?.todayEarnings || 0)}</Typography>
+            </View>
+            <Link href="/(app)/(host)/payouts" asChild>
+              <TouchableOpacity style={styles.withdrawButton}>
+                <Typography variant="button" style={{ color: colors.primary, fontSize: 12 }}>Retirer</Typography>
+              </TouchableOpacity>
+            </Link>
+          </View>
+        </View>
 
-      <View style={styles.gridRow}>
-        <Card style={styles.smallCard}>
-          <Text style={styles.smallCardValue}>{stats?.totalSales || 0}</Text>
-          <Text style={styles.smallCardLabel}>Ventes totales</Text>
-        </Card>
-        <Card style={styles.smallCard}>
-          <Text style={styles.smallCardValue}>{format.currency(stats?.pendingPayouts || 0)}</Text>
-          <Text style={styles.smallCardLabel}>Retraits en attente</Text>
-        </Card>
-      </View>
+        {/* Quick Stats Grid */}
+        <View style={styles.statsGrid}>
+          <Card variant="outlined" style={styles.statCard}>
+            <View style={[styles.statIcon, { backgroundColor: colors.secondary }]}>
+              <Ionicons name="wifi" size={20} color={colors.primary} />
+            </View>
+            <Typography variant="h3">{stats?.activeHotspots || 0}</Typography>
+            <Typography variant="caption" color="textSecondary">Hotspots actifs</Typography>
+          </Card>
 
-      {/* Quick Actions */}
-      <Text style={styles.sectionTitle}>Actions rapides</Text>
-      
-      <Link href="/(app)/(host)/hotspots" asChild>
-        <Button label="Gérer les hotspots" />
-      </Link>
-      
-      <Link href="/(app)/(host)/sessions" asChild>
-        <Button label="Voir les sessions" />
-      </Link>
-      
-      <Link href="/(app)/(host)/cashin" asChild>
-        <Button label="Cash-in clients" />
-      </Link>
-      
-      <Link href="/(app)/(host)/payouts" asChild>
-        <Button label="Demander un retrait" />
-      </Link>
-    </ScrollView>
+          <Card variant="outlined" style={styles.statCard}>
+            <View style={[styles.statIcon, { backgroundColor: 'rgba(16, 185, 129, 0.1)' }]}>
+              <Ionicons name="people" size={20} color={colors.success} />
+            </View>
+            <Typography variant="h3">{stats?.activeSessions || 0}</Typography>
+            <Typography variant="caption" color="textSecondary">Utilisateurs</Typography>
+          </Card>
+
+          <Card variant="outlined" style={styles.statCard}>
+            <View style={[styles.statIcon, { backgroundColor: 'rgba(59, 130, 246, 0.1)' }]}>
+              <Ionicons name="cart" size={20} color="#3b82f6" />
+            </View>
+            <Typography variant="h3">{stats?.totalSales || 0}</Typography>
+            <Typography variant="caption" color="textSecondary">Ventes</Typography>
+          </Card>
+        </View>
+
+        {/* Quick Actions */}
+        <Typography variant="h3" style={styles.sectionTitle}>Actions rapides</Typography>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.actionsScroll} contentContainerStyle={{ paddingHorizontal: 20 }}>
+          <Link href="/(app)/(host)/cashin" asChild>
+            <TouchableOpacity style={[styles.actionBtn, { backgroundColor: colors.secondary }]}>
+              <Ionicons name="qr-code-outline" size={24} color={colors.primary} />
+              <Typography variant="caption" style={styles.actionBtnText}>Cash-in</Typography>
+            </TouchableOpacity>
+          </Link>
+          <Link href="/(app)/(host)/hotspots" asChild>
+            <TouchableOpacity style={[styles.actionBtn, { backgroundColor: colors.secondary }]}>
+              <Ionicons name="hardware-chip-outline" size={24} color={colors.primary} />
+              <Typography variant="caption" style={styles.actionBtnText}>Hotspots</Typography>
+            </TouchableOpacity>
+          </Link>
+          <Link href="/(app)/(host)/claim" asChild>
+            <TouchableOpacity style={[styles.actionBtn, { backgroundColor: colors.secondary }]}>
+              <Ionicons name="add-circle-outline" size={24} color={colors.primary} />
+              <Typography variant="caption" style={styles.actionBtnText}>Ajouter</Typography>
+            </TouchableOpacity>
+          </Link>
+          <Link href="/(app)/(host)/technician-requests" asChild>
+            <TouchableOpacity style={[styles.actionBtn, { backgroundColor: colors.secondary }]}>
+              <Ionicons name="build-outline" size={24} color={colors.primary} />
+              <Typography variant="caption" style={styles.actionBtnText}>Support</Typography>
+            </TouchableOpacity>
+          </Link>
+        </ScrollView>
+
+        {/* Recent Transactions */}
+        <View style={styles.sectionHeader}>
+          <Typography variant="h3">Transactions récentes</Typography>
+          <Link href="/(app)/(host)/earnings" asChild>
+            <Pressable>
+              <Typography variant="button" color="primary">Voir tout</Typography>
+            </Pressable>
+          </Link>
+        </View>
+
+        <View style={styles.transactionsList}>
+          {transactions.length === 0 ? (
+            <Typography variant="body" color="textSecondary" style={{ textAlign: 'center', padding: 20 }}>
+              Aucune transaction récente
+            </Typography>
+          ) : (
+            transactions.map((tx) => (
+              <Link key={tx.id} href={`/(app)/(shared)/transaction-detail/${tx.id}`} asChild>
+                <Pressable style={[styles.transactionItem, { borderBottomColor: colors.border }]}>
+                  <View style={styles.txIcon}>
+                    <Ionicons
+                      name={tx.status === 'success' ? "arrow-down" : "time"}
+                      size={18}
+                      color={tx.status === 'success' ? colors.success : colors.warning}
+                    />
+                  </View>
+                  <View style={styles.txDetails}>
+                    <Typography variant="body" style={styles.txTitle}>
+                      Vente forfait - {tx.hotspot?.name || 'Inconnu'}
+                    </Typography>
+                    <Typography variant="caption" color="textSecondary">
+                      {format.date(tx.created_at)}
+                    </Typography>
+                  </View>
+                  <Typography variant="body" style={[styles.txAmount, { color: tx.status === 'success' ? colors.success : colors.text }]}>
+                    +{format.currency(tx.amount)}
+                  </Typography>
+                </Pressable>
+              </Link>
+            ))
+          )}
+        </View>
+
+      </ScrollView>
+    </SafeAreaView>
   )
 }
 
-const styles = StyleSheet.create({ 
-  container: { flex: 1, padding: 16 }, 
-  loading: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  title: { fontSize: 24, fontWeight: '700', marginBottom: 16 },
-  cardTitle: { fontSize: 16, fontWeight: '600', marginBottom: 12, color: '#6b7280' },
-  statsRow: { flexDirection: 'row', gap: 16 },
-  stat: { flex: 1 },
-  statLabel: { fontSize: 14, color: '#6b7280', marginBottom: 4 },
-  statValue: { fontSize: 24, fontWeight: '700', color: '#2563eb' },
-  gridRow: { flexDirection: 'row', gap: 12, marginBottom: 12 },
-  smallCard: { flex: 1, alignItems: 'center', padding: 16 },
-  smallCardValue: { fontSize: 28, fontWeight: '700', color: '#2563eb', marginBottom: 4 },
-  smallCardLabel: { fontSize: 12, color: '#6b7280', textAlign: 'center' },
-  sectionTitle: { fontSize: 18, fontWeight: '700', marginTop: 24, marginBottom: 12 },
+// Helper component for TouchableOpacity to avoid TS errors with asChild
+const TouchableOpacity = React.forwardRef((props: any, ref: any) => (
+  <Pressable ref={ref} {...props} />
+))
+
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  loading: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  scrollContent: {
+    paddingBottom: 100,
+  },
+  header: {
+    padding: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  greeting: {
+    marginBottom: 4,
+  },
+  statusContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  statusDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  headerActions: {
+    flexDirection: 'row',
+  },
+  iconButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  mainCard: {
+    margin: 20,
+    marginTop: 0,
+    borderRadius: 24,
+    padding: 24,
+    // Add shadow
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  mainCardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  mainCardFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.2)',
+  },
+  withdrawButton: {
+    backgroundColor: 'white',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  statsGrid: {
+    flexDirection: 'row',
+    paddingHorizontal: 20,
+    gap: 12,
+    marginBottom: 24,
+  },
+  statCard: {
+    flex: 1,
+    padding: 12,
+    alignItems: 'center',
+    borderRadius: 16,
+  },
+  statIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  sectionTitle: {
+    paddingHorizontal: 20,
+    marginBottom: 16,
+  },
+  actionsScroll: {
+    marginBottom: 24,
+  },
+  actionBtn: {
+    width: 80,
+    height: 80,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  actionBtnText: {
+    marginTop: 8,
+    fontWeight: '600',
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    marginBottom: 12,
+  },
+  transactionsList: {
+    paddingHorizontal: 20,
+  },
+  transactionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+  },
+  txIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0,0,0,0.03)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  txDetails: {
+    flex: 1,
+  },
+  txTitle: {
+    fontWeight: '500',
+    marginBottom: 2,
+  },
+  txAmount: {
+    fontWeight: '600',
+  },
 })

@@ -1,0 +1,203 @@
+[96m__tests__/authStore.test.ts[0m:[93m29[0m:[93m30[0m - [91merror[0m[90m TS2339: [0mProperty 'signInWithPhone' does not exist on type 'AuthState'.
+
+[7m29[0m         await result.current.signInWithPhone('+221771234567');
+[7m  [0m [91m                             ~~~~~~~~~~~~~~~[0m
+
+[96m__tests__/authStore.test.ts[0m:[93m48[0m:[93m30[0m - [91merror[0m[90m TS2339: [0mProperty 'signInWithPhone' does not exist on type 'AuthState'.
+
+[7m48[0m         await result.current.signInWithPhone('invalid');
+[7m  [0m [91m                             ~~~~~~~~~~~~~~~[0m
+
+[96m__tests__/authStore.test.ts[0m:[93m64[0m:[93m24[0m - [91merror[0m[90m TS2339: [0mProperty 'signInWithPhone' does not exist on type 'AuthState'.
+
+[7m64[0m         result.current.signInWithPhone('+221771234567');
+[7m  [0m [91m                       ~~~~~~~~~~~~~~~[0m
+
+[96m__tests__/authStore.test.ts[0m:[93m183[0m:[93m38[0m - [91merror[0m[90m TS2339: [0mProperty 'language' does not exist on type 'Profile'.
+
+[7m183[0m       expect(result.current.profile?.language).toBe('en');
+[7m   [0m [91m                                     ~~~~~~~~[0m
+
+[96m__tests__/authStore.test.ts[0m:[93m261[0m:[93m24[0m - [91merror[0m[90m TS2339: [0mProperty 'clearError' does not exist on type 'AuthState'.
+
+[7m261[0m         result.current.clearError();
+[7m   [0m [91m                       ~~~~~~~~~~[0m
+
+[96m__tests__/discoveryStore.test.ts[0m:[93m13[0m:[93m5[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'description' does not exist in type 'Hotspot'.
+
+[7m13[0m     description: 'Fast internet at the café',
+[7m  [0m [91m    ~~~~~~~~~~~[0m
+
+[96m__tests__/discoveryStore.test.ts[0m:[93m26[0m:[93m5[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'description' does not exist in type 'Hotspot'.
+
+[7m26[0m     description: 'WiFi for customers',
+[7m  [0m [91m    ~~~~~~~~~~~[0m
+
+[96m__tests__/discoveryStore.test.ts[0m:[93m39[0m:[93m5[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'description' does not exist in type 'Hotspot'.
+
+[7m39[0m     description: 'Study with fast internet',
+[7m  [0m [91m    ~~~~~~~~~~~[0m
+
+[96m__tests__/discoveryStore.test.ts[0m:[93m58[0m:[93m7[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'selectedFilters' does not exist in type 'DiscoveryState | Partial<DiscoveryState> | ((state: DiscoveryState) => DiscoveryState | Partial<DiscoveryState>)'.
+
+[7m58[0m       selectedFilters: {
+[7m  [0m [91m      ~~~~~~~~~~~~~~~[0m
+
+[96m__tests__/discoveryStore.test.ts[0m:[93m83[0m:[93m30[0m - [91merror[0m[90m TS2551: [0mProperty 'loadHotspots' does not exist on type 'DiscoveryState'. Did you mean 'hotspots'?
+
+[7m83[0m         await result.current.loadHotspots();
+[7m  [0m [91m                             ~~~~~~~~~~~~[0m
+
+  [96msrc/stores/discoveryStore.ts[0m:[93m6[0m:[93m3[0m
+    [7m6[0m   hotspots: Hotspot[]
+    [7m [0m [96m  ~~~~~~~~[0m
+    'hotspots' is declared here.
+
+[96m__tests__/discoveryStore.test.ts[0m:[93m105[0m:[93m30[0m - [91merror[0m[90m TS2551: [0mProperty 'loadHotspots' does not exist on type 'DiscoveryState'. Did you mean 'hotspots'?
+
+[7m105[0m         await result.current.loadHotspots();
+[7m   [0m [91m                             ~~~~~~~~~~~~[0m
+
+  [96msrc/stores/discoveryStore.ts[0m:[93m6[0m:[93m3[0m
+    [7m6[0m   hotspots: Hotspot[]
+    [7m [0m [96m  ~~~~~~~~[0m
+    'hotspots' is declared here.
+
+[96m__tests__/discoveryStore.test.ts[0m:[93m126[0m:[93m24[0m - [91merror[0m[90m TS2551: [0mProperty 'loadHotspots' does not exist on type 'DiscoveryState'. Did you mean 'hotspots'?
+
+[7m126[0m         result.current.loadHotspots();
+[7m   [0m [91m                       ~~~~~~~~~~~~[0m
+
+  [96msrc/stores/discoveryStore.ts[0m:[93m6[0m:[93m3[0m
+    [7m6[0m   hotspots: Hotspot[]
+    [7m [0m [96m  ~~~~~~~~[0m
+    'hotspots' is declared here.
+
+[96m__tests__/discoveryStore.test.ts[0m:[93m145[0m:[93m39[0m - [91merror[0m[90m TS2339: [0mProperty 'calculateDistance' does not exist on type 'DiscoveryState'.
+
+[7m145[0m       const distance = result.current.calculateDistance(
+[7m   [0m [91m                                      ~~~~~~~~~~~~~~~~~[0m
+
+[96m__tests__/discoveryStore.test.ts[0m:[93m160[0m:[93m39[0m - [91merror[0m[90m TS2339: [0mProperty 'calculateDistance' does not exist on type 'DiscoveryState'.
+
+[7m160[0m       const distance = result.current.calculateDistance(
+[7m   [0m [91m                                      ~~~~~~~~~~~~~~~~~[0m
+
+[96m__tests__/discoveryStore.test.ts[0m:[93m176[0m:[93m49[0m - [91merror[0m[90m TS2554: [0mExpected 1 arguments, but got 2.
+
+[7m176[0m         result.current.setUserLocation(14.7167, -17.4677);
+[7m   [0m [91m                                                ~~~~~~~~[0m
+
+[96m__tests__/discoveryStore.test.ts[0m:[93m191[0m:[93m27[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'latitude' does not exist in type '{ lat: number; lng: number; }'.
+
+[7m191[0m           userLocation: { latitude: 14.7167, longitude: -17.4677 },
+[7m   [0m [91m                          ~~~~~~~~[0m
+
+[96m__tests__/discoveryStore.test.ts[0m:[93m217[0m:[93m26[0m - [91merror[0m[90m TS2339: [0mProperty 'distance' does not exist on type 'Hotspot'.
+
+[7m217[0m         expect(nearby[i].distance).toBeLessThanOrEqual(nearby[i + 1].distance!);
+[7m   [0m [91m                         ~~~~~~~~[0m
+
+[96m__tests__/discoveryStore.test.ts[0m:[93m217[0m:[93m70[0m - [91merror[0m[90m TS2339: [0mProperty 'distance' does not exist on type 'Hotspot'.
+
+[7m217[0m         expect(nearby[i].distance).toBeLessThanOrEqual(nearby[i + 1].distance!);
+[7m   [0m [91m                                                                     ~~~~~~~~[0m
+
+[96m__tests__/discoveryStore.test.ts[0m:[93m286[0m:[93m11[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'selectedFilters' does not exist in type 'DiscoveryState | Partial<DiscoveryState> | ((state: DiscoveryState) => DiscoveryState | Partial<DiscoveryState>)'.
+
+[7m286[0m           selectedFilters: {
+[7m   [0m [91m          ~~~~~~~~~~~~~~~[0m
+
+[96m__tests__/discoveryStore.test.ts[0m:[93m296[0m:[93m36[0m - [91merror[0m[90m TS2339: [0mProperty 'signal_strength' does not exist on type 'Hotspot'.
+
+[7m296[0m       expect(filtered.every(h => h.signal_strength === 'excellent')).toBe(true);
+[7m   [0m [91m                                   ~~~~~~~~~~~~~~~[0m
+
+[96m__tests__/discoveryStore.test.ts[0m:[93m305[0m:[93m11[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'selectedFilters' does not exist in type 'DiscoveryState | Partial<DiscoveryState> | ((state: DiscoveryState) => DiscoveryState | Partial<DiscoveryState>)'.
+
+[7m305[0m           selectedFilters: {
+[7m   [0m [91m          ~~~~~~~~~~~~~~~[0m
+
+[96m__tests__/discoveryStore.test.ts[0m:[93m333[0m:[93m24[0m - [91merror[0m[90m TS2339: [0mProperty 'setFilters' does not exist on type 'DiscoveryState'.
+
+[7m333[0m         result.current.setFilters({
+[7m   [0m [91m                       ~~~~~~~~~~[0m
+
+[96m__tests__/discoveryStore.test.ts[0m:[93m339[0m:[93m29[0m - [91merror[0m[90m TS2339: [0mProperty 'selectedFilters' does not exist on type 'DiscoveryState'.
+
+[7m339[0m       expect(result.current.selectedFilters.signalStrength).toEqual(['excellent', 'good']);
+[7m   [0m [91m                            ~~~~~~~~~~~~~~~[0m
+
+[96m__tests__/discoveryStore.test.ts[0m:[93m346[0m:[93m24[0m - [91merror[0m[90m TS2339: [0mProperty 'setFilters' does not exist on type 'DiscoveryState'.
+
+[7m346[0m         result.current.setFilters({
+[7m   [0m [91m                       ~~~~~~~~~~[0m
+
+[96m__tests__/discoveryStore.test.ts[0m:[93m352[0m:[93m29[0m - [91merror[0m[90m TS2339: [0mProperty 'selectedFilters' does not exist on type 'DiscoveryState'.
+
+[7m352[0m       expect(result.current.selectedFilters.priceRange).toEqual({ min: 0, max: 1000 });
+[7m   [0m [91m                            ~~~~~~~~~~~~~~~[0m
+
+[96m__tests__/discoveryStore.test.ts[0m:[93m363[0m:[93m24[0m - [91merror[0m[90m TS2339: [0mProperty 'setFilters' does not exist on type 'DiscoveryState'.
+
+[7m363[0m         result.current.setFilters({
+[7m   [0m [91m                       ~~~~~~~~~~[0m
+
+[96m__tests__/discoveryStore.test.ts[0m:[93m371[0m:[93m24[0m - [91merror[0m[90m TS2339: [0mProperty 'clearFilters' does not exist on type 'DiscoveryState'.
+
+[7m371[0m         result.current.clearFilters();
+[7m   [0m [91m                       ~~~~~~~~~~~~[0m
+
+[96m__tests__/discoveryStore.test.ts[0m:[93m375[0m:[93m29[0m - [91merror[0m[90m TS2339: [0mProperty 'selectedFilters' does not exist on type 'DiscoveryState'.
+
+[7m375[0m       expect(result.current.selectedFilters).toEqual({
+[7m   [0m [91m                            ~~~~~~~~~~~~~~~[0m
+
+[96m__tests__/discoveryStore.test.ts[0m:[93m393[0m:[93m24[0m - [91merror[0m[90m TS2339: [0mProperty 'clearError' does not exist on type 'DiscoveryState'.
+
+[7m393[0m         result.current.clearError();
+[7m   [0m [91m                       ~~~~~~~~~~[0m
+
+[96mapp/(app)/(host)/cashin.tsx[0m:[93m101[0m:[93m11[0m - [91merror[0m[90m TS2322: [0mType '{ label: string; value: string; onChangeText: Dispatch<SetStateAction<string>>; placeholder: string; keyboardType: string; }' is not assignable to type 'IntrinsicAttributes & Props'.
+  Property 'keyboardType' does not exist on type 'IntrinsicAttributes & Props'.
+
+[7m101[0m           keyboardType="phone-pad"
+[7m   [0m [91m          ~~~~~~~~~~~~[0m
+
+[96mapp/(app)/(host)/cashin.tsx[0m:[93m108[0m:[93m11[0m - [91merror[0m[90m TS2322: [0mType '{ label: string; value: string; onChangeText: Dispatch<SetStateAction<string>>; placeholder: string; keyboardType: string; }' is not assignable to type 'IntrinsicAttributes & Props'.
+  Property 'keyboardType' does not exist on type 'IntrinsicAttributes & Props'.
+
+[7m108[0m           keyboardType="numeric"
+[7m   [0m [91m          ~~~~~~~~~~~~[0m
+
+[96mapp/(app)/(host)/cashin.tsx[0m:[93m142[0m:[93m24[0m - [91merror[0m[90m TS2322: [0mType '{ text: "pending" | "expired" | "confirmed" | "rejected"; color: string; }' is not assignable to type 'IntrinsicAttributes & BadgeProps'.
+  Property 'text' does not exist on type 'IntrinsicAttributes & BadgeProps'.
+
+[7m142[0m                 <Badge text={item.status} color="orange" />
+[7m   [0m [91m                       ~~~~[0m
+
+[96mapp/(app)/(host)/cashin.tsx[0m:[93m168[0m:[93m24[0m - [91merror[0m[90m TS2322: [0mType '{ text: string; color: string; }' is not assignable to type 'IntrinsicAttributes & BadgeProps'.
+  Property 'text' does not exist on type 'IntrinsicAttributes & BadgeProps'.
+
+[7m168[0m                 <Badge text="Confirmé" color="green" />
+[7m   [0m [91m                       ~~~~[0m
+
+[96mcomponents/ui/Button.tsx[0m:[93m104[0m:[93m45[0m - [91merror[0m[90m TS2345: [0mArgument of type '{ pressed: boolean; }' is not assignable to parameter of type 'PressableStateCallbackType'.
+  Property 'hovered' is missing in type '{ pressed: boolean; }' but required in type 'PressableStateCallbackType'.
+
+[7m104[0m         typeof style === 'function' ? style({ pressed }) : style,
+[7m   [0m [91m                                            ~~~~~~~~~~~[0m
+
+  [96mnode_modules/expo/types/react-native-web.d.ts[0m:[93m245[0m:[93m14[0m
+    [7m245[0m     readonly hovered: boolean;
+    [7m   [0m [96m             ~~~~~~~[0m
+    'hovered' is declared here.
+
+
+Found 34 errors in 4 files.
+
+Errors  Files
+     5  __tests__/authStore.test.ts[90m:29[0m
+    24  __tests__/discoveryStore.test.ts[90m:13[0m
+     4  app/(app)/(host)/cashin.tsx[90m:101[0m
+     1  components/ui/Button.tsx[90m:104[0m

@@ -56,6 +56,17 @@ export const format = {
     if (km < 1) return `${Math.round(km * 1000)} m`
     return `${km.toFixed(1)} km`
   },
+  
+  relativeTime: (dateString: string) => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000)
+    
+    if (seconds < 60) return 'À l\'instant'
+    if (seconds < 3600) return `Il y a ${Math.floor(seconds / 60)} min`
+    if (seconds < 86400) return `Il y a ${Math.floor(seconds / 3600)} h`
+    return `Il y a ${Math.floor(seconds / 86400)} j`
+  },
 }
 
 // Export legacy functions for backward compatibility

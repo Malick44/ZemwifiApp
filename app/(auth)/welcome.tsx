@@ -1,32 +1,272 @@
-import React from 'react'
-import { View, Text, StyleSheet } from 'react-native'
-import { Link } from 'expo-router'
-import { Button } from '../../src/components/ui/Button'
-import { useAuthStore } from '../../src/stores/authStore'
-import { t } from '../../src/lib/i18n'
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { Typography } from '@/components/ui/Typography';
+import { BrandColors, Colors, Spacing } from '@/constants/theme';
+import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
+import React, { useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 
 export default function WelcomeScreen() {
-  const setLanguage = useAuthStore((s) => s.setLanguage)
+  const [language, setLanguage] = useState<'fr' | 'en'>('fr');
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme ?? 'light'];
+
+  const features = [
+    {
+      icon: 'wifi' as const,
+      title: language === 'fr' ? 'Trouvez du Wi-Fi près de vous' : 'Find Wi-Fi near you',
+      description: language === 'fr' ? 'Découvrez des hotspots partout' : 'Discover hotspots everywhere',
+    },
+    {
+      icon: 'phone-portrait' as const,
+      title: language === 'fr' ? 'Payez avec mobile money' : 'Pay with mobile money',
+      description: language === 'fr' ? 'Wave, Orange Money, Moov Money' : 'Wave, Orange Money, Moov Money',
+    },
+    {
+      icon: 'flash' as const,
+      title: language === 'fr' ? 'Accès instantané' : 'Instant access',
+      description: language === 'fr' ? 'Connectez-vous en quelques secondes' : 'Connect in seconds',
+    },
+  ];
+
+  const texts = {
+    fr: {
+      welcome: 'Bienvenue sur',
+      appName: 'ZemNet',
+      tagline: 'Internet pour tous, partout au Burkina Faso',
+      getStarted: 'Commencer',
+      continueAsGuest: 'Continuer en invité',
+    },
+    en: {
+      welcome: 'Welcome to',
+      appName: 'ZemNet',
+      tagline: 'Internet for everyone, everywhere in Burkina Faso',
+      getStarted: 'Get Started',
+      continueAsGuest: 'Continue as guest',
+    },
+  };
+
+  const t = texts[language];
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{t('welcome_title')}</Text>
-      <View style={styles.languages}>
-        <Button label="Français" onPress={() => setLanguage('fr')} />
-        <Button label="English" onPress={() => setLanguage('en')} />
+    <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+      <View style={styles.container}>
+        <LinearGradient
+          colors={[BrandColors.primary, BrandColors.primaryDark]}
+          style={styles.gradient}
+        >
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+          >
+            {/* Language Toggle */}
+            <View style={styles.languageContainer}>
+              <Pressable
+                onPress={() => setLanguage('fr')}
+                style={[
+                  styles.languageButton,
+                  language === 'fr' && styles.languageButtonActive,
+                ]}
+              >
+                <Typography
+                  variant="bodySmall"
+                  weight="medium"
+                  style={{
+                    color: language === 'fr' ? BrandColors.primary : colors.textInverse,
+                  }}
+                >
+                  Français
+                </Typography>
+              </Pressable>
+              <Pressable
+                onPress={() => setLanguage('en')}
+                style={[
+                  styles.languageButton,
+                  language === 'en' && styles.languageButtonActive,
+                ]}
+              >
+                <Typography
+                  variant="bodySmall"
+                  weight="medium"
+                  style={{
+                    color: language === 'en' ? BrandColors.primary : colors.textInverse,
+                  }}
+                >
+                  English
+                </Typography>
+              </Pressable>
+            </View>
+
+            {/* Hero Section */}
+            <View style={styles.hero}>
+              <Typography variant="h2" style={styles.welcomeText}>
+                {t.welcome}
+              </Typography>
+              <Typography variant="h1" style={styles.appName}>
+                {t.appName}
+              </Typography>
+              <Typography
+                variant="body"
+                align="center"
+                style={styles.tagline}
+              >
+                {t.tagline}
+              </Typography>
+            </View>
+
+            {/* Features */}
+            <View style={styles.features}>
+              {features.map((feature, index) => (
+                <Card key={index} variant="filled" style={styles.featureCard}>
+                  <View style={styles.featureContent}>
+                    <View style={styles.iconContainer}>
+                      <Ionicons name={feature.icon} size={32} color={BrandColors.primary} />
+                    </View>
+                    <View style={styles.featureText}>
+                      <Typography variant="body" weight="semibold">
+                        {feature.title}
+                      </Typography>
+                      <Typography variant="bodySmall" color="secondary">
+                        {feature.description}
+                      </Typography>
+                    </View>
+                  </View>
+                </Card>
+              ))}
+            </View>
+
+            {/* Actions */}
+            <View style={styles.actions}>
+              <Button
+                variant="primary"
+                size="lg"
+                fullWidth
+                onPress={() => router.push('/(auth)/phone')}
+              >
+                {t.getStarted}
+              </Button>
+              <Button
+                variant="ghost"
+                size="md"
+                fullWidth
+                onPress={() => router.push('/(app)/(user)/map')}
+              >
+                {t.continueAsGuest}
+              </Button>
+
+              {/* Dev Panel - Only in development */}
+              {__DEV__ && (
+                <Pressable
+                  style={styles.devPanelButton}
+                  onPress={() => router.push('/(app)/(shared)/dev-panel')}
+                >
+                  <Ionicons name="construct-outline" size={16} color="rgba(255,255,255,0.6)" />
+                  <Typography variant="caption" style={styles.devPanelText}>
+                    Dev Panel
+                  </Typography>
+                </Pressable>
+              )}
+            </View>
+          </ScrollView>
+        </LinearGradient>
       </View>
-      <Link href="/(auth)/phone" asChild>
-        <Button label={t('continue')} />
-      </Link>
-      <Link href="/(app)/(app)/map" style={styles.guest}>
-        <Text>Continuer en invité</Text>
-      </Link>
-    </View>
-  )
+    </SafeAreaView>
+  );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', gap: 16, padding: 24 },
-  title: { fontSize: 24, fontWeight: '700' },
-  languages: { flexDirection: 'row', gap: 12 },
-  guest: { alignSelf: 'center' },
+  container: {
+    flex: 1,
+  },
+  gradient: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    padding: Spacing.xl,
+    paddingTop: Spacing['3xl'],
+  },
+  languageContainer: {
+    flexDirection: 'row',
+    alignSelf: 'flex-end',
+    gap: Spacing.sm,
+    marginBottom: Spacing.xl,
+  },
+  languageButton: {
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  languageButtonActive: {
+    backgroundColor: '#FFFFFF',
+  },
+  hero: {
+    alignItems: 'center',
+    marginBottom: Spacing['2xl'],
+  },
+  welcomeText: {
+    color: '#FFFFFF',
+    opacity: 0.9,
+    marginBottom: Spacing.xs,
+  },
+  appName: {
+    color: '#FFFFFF',
+    fontSize: 48,
+    marginBottom: Spacing.md,
+  },
+  tagline: {
+    color: '#FFFFFF',
+    opacity: 0.8,
+    maxWidth: 280,
+  },
+  features: {
+    gap: Spacing.md,
+    marginBottom: Spacing['2xl'],
+  },
+  featureCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+  },
+  featureContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+  },
+  iconContainer: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: `${BrandColors.primary}15`,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  featureText: {
+    flex: 1,
+    gap: Spacing.xs,
+  },
+  actions: {
+    gap: Spacing.md,
+    marginTop: 'auto',
+  },
+  devPanelButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.xs,
+    paddingVertical: Spacing.sm,
+    borderRadius: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  devPanelText: {
+    color: 'rgba(255, 255, 255, 0.8)',
+    fontSize: 12,
+  },
 })

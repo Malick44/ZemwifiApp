@@ -1,11 +1,11 @@
-import React, { useState } from 'react'
-import { View, Text, StyleSheet, ScrollView, Pressable, Alert } from 'react-native'
 import { useRouter } from 'expo-router'
-import { useAuthStore } from '../../../src/stores/authStore'
-import { Card } from '../../../src/components/ui/Card'
+import React, { useState } from 'react'
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { Button } from '../../../src/components/ui/Button'
+import { Card } from '../../../src/components/ui/Card'
 import { TextField } from '../../../src/components/ui/TextField'
 import { useTranslation } from '../../../src/lib/i18n'
+import { useAuthStore } from '../../../src/stores/authStore'
 
 export default function Settings() {
   const { profile, language, setLanguage, signOut, updateProfile } = useAuthStore()

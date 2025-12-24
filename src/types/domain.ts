@@ -12,6 +12,7 @@ export type Hotspot = {
   lng: number
   ssid: string
   is_online: boolean
+  status?: 'online' | 'offline'
   sales_paused: boolean
   hours: string | null
 }

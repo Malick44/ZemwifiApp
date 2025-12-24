@@ -1,12 +1,14 @@
-import React from 'react'
-import { Text, View, StyleSheet } from 'react-native'
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 
-type Props = {
-  label: string
-  tone?: 'success' | 'info' | 'danger'
+export interface BadgeProps {
+  label: string;
+  variant?: 'primary' | 'success' | 'error' | 'warning' | 'neutral';
+  tone?: 'success' | 'info' | 'danger';
+  size?: 'sm' | 'md' | 'lg';
 }
 
-export const Badge: React.FC<Props> = ({ label, tone = 'info' }) => (
+export const Badge: React.FC<BadgeProps> = ({ label, variant, tone = 'info', size = 'md' }) => (
   <View style={[styles.badge, styles[tone]]}>
     <Text style={styles.text}>{label}</Text>
   </View>
@@ -23,4 +25,8 @@ const styles = StyleSheet.create({
   info: { backgroundColor: '#2563eb' },
   success: { backgroundColor: '#16a34a' },
   danger: { backgroundColor: '#dc2626' },
+  primary: { backgroundColor: '#2563eb' },
+  error: { backgroundColor: '#dc2626' },
+  warning: { backgroundColor: '#F59E0B' },
+  neutral: { backgroundColor: '#6B7280' },
 })
