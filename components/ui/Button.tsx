@@ -2,11 +2,11 @@ import { BorderRadius, Colors, FontSizes, Sizes, Spacing } from '@/constants/the
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import React from 'react';
 import {
-    ActivityIndicator,
-    Pressable,
-    PressableProps,
-    StyleSheet,
-    View,
+  ActivityIndicator,
+  Pressable,
+  PressableProps,
+  StyleSheet,
+  View,
 } from 'react-native';
 import { Typography } from './Typography';
 
@@ -94,14 +94,14 @@ export function Button({
 
   return (
     <Pressable
-      style={({ pressed }) => [
+      style={({ pressed }: any) => [
         styles.button,
         variantStyles[variant],
         sizeStyles[size],
         fullWidth && styles.fullWidth,
         isDisabled && styles.disabled,
         pressed && !isDisabled && styles.pressed,
-        typeof style === 'function' ? style({ pressed }) : style,
+        typeof style === 'function' ? style({ pressed, hovered: false } as any) : style,
       ]}
       disabled={isDisabled}
       {...props}

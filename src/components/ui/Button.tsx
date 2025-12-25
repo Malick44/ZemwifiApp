@@ -1,3 +1,4 @@
+import { useColors } from '@/hooks/use-colors';
 import React from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, ViewStyle } from 'react-native';
 
@@ -14,11 +15,11 @@ export interface ButtonProps {
   style?: ViewStyle;
 }
 
-export const Button: React.FC<ButtonProps> = ({ 
-  label, 
+export const Button: React.FC<ButtonProps> = ({
+  label,
   children,
-  onPress, 
-  disabled, 
+  onPress,
+  disabled,
   loading,
   variant = 'primary',
   size = 'md',
@@ -26,35 +27,58 @@ export const Button: React.FC<ButtonProps> = ({
   leftIcon,
   style
 }) => {
+  const colors = useColors();
   const content = children || label;
+
+  const getVariantStyle = () => {
+    switch (variant) {
+      case 'secondary':
+        return { backgroundColor: colors.backgroundSecondary };
+      case 'tertiary':
+        return { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.border };
+      case 'ghost':
+        return { backgroundColor: 'transparent' };
+      default:
+        return { backgroundColor: colors.primary };
+    }
+  };
+
+  const getTextColor = () => {
+    if (variant === 'secondary') return colors.text;
+    if (variant === 'tertiary') return colors.text;
+    if (variant === 'ghost') return colors.primary;
+    return colors.textInverse;
+  };
+
   return (
-    <Pressable 
+    <Pressable
       style={[
         styles.button,
+        getVariantStyle(),
         size === 'sm' && styles.sm,
         size === 'lg' && styles.lg,
-        variant === 'secondary' && styles.secondary,
-        variant === 'tertiary' && styles.tertiary,
-        variant === 'ghost' && styles.ghost,
         fullWidth && styles.fullWidth,
         (disabled || loading) && styles.disabled,
         style
-      ]} 
-      onPress={onPress} 
+      ]}
+      onPress={onPress}
       disabled={disabled || loading}
       accessibilityRole="button"
       accessibilityLabel={typeof content === 'string' ? content : label}
       accessibilityState={{ disabled: disabled || loading, busy: loading }}
     >
       {leftIcon}
-      {loading ? <ActivityIndicator color="#fff" accessibilityLabel="Loading" /> : <Text style={styles.label}>{content}</Text>}
+      {loading ? (
+        <ActivityIndicator color={getTextColor()} accessibilityLabel="Loading" />
+      ) : (
+        <Text style={[styles.label, { color: getTextColor() }]}>{content}</Text>
+      )}
     </Pressable>
   )
 }
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: '#2563eb',
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 12,
@@ -63,12 +87,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
   },
-  label: { color: '#fff', fontWeight: '600' },
+  label: { fontWeight: '600' },
   disabled: { opacity: 0.6 },
   sm: { paddingVertical: 8, paddingHorizontal: 12 },
   lg: { paddingVertical: 16, paddingHorizontal: 24 },
-  secondary: { backgroundColor: '#F3F4F6' },
-  tertiary: { backgroundColor: 'transparent', borderWidth: 1, borderColor: '#E5E7EB' },
-  ghost: { backgroundColor: 'transparent' },
   fullWidth: { width: '100%' },
 })
+

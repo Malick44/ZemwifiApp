@@ -12,6 +12,7 @@ export default function KYCScreen() {
   const router = useRouter()
   const colorScheme = useColorScheme()
   const colors = Colors[colorScheme ?? 'light']
+  const styles = createStyles(colors)
   const [step, setStep] = useState(1)
   const [formData, setFormData] = useState({
     fullName: '',
@@ -53,8 +54,8 @@ export default function KYCScreen() {
   const UploadPlaceholder = ({ label }: { label: string }) => (
     <TouchableOpacity style={[styles.uploadBox, { borderColor: colors.border }]}>
       <Ionicons name="cloud-upload-outline" size={32} color={colors.primary} />
-      <Typography variant="body" style={styles.uploadLabel}>{label}</Typography>
-      <Typography variant="caption" color="textSecondary">Appuyez pour télécharger</Typography>
+      <Typography variant="h4" style={{ marginBottom: 4 }}>Carte d&apos;identité (Recto)</Typography>
+      <Typography variant="caption" color="textSecondary">De la pièce d&apos;identité</Typography>
     </TouchableOpacity>
   )
 
@@ -64,7 +65,7 @@ export default function KYCScreen() {
         <TouchableOpacity onPress={() => step === 1 ? router.back() : setStep(1)} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
-        <Typography variant="h3">Vérification d'identité</Typography>
+        <Typography variant="h3">Vérification d&apos;identité</Typography>
         <View style={{ width: 24 }} />
       </View>
 
@@ -110,16 +111,16 @@ export default function KYCScreen() {
           <View style={styles.formSection}>
             <Typography variant="h2" style={styles.title}>Documents</Typography>
             <Typography variant="body" color="textSecondary" style={styles.subtitle}>
-              Veuillez télécharger une photo claire de votre pièce d'identité et un selfie.
+              Veuillez télécharger une photo claire de votre pièce d&apos;identité et un selfie.
             </Typography>
 
             <View style={styles.uploadGroup}>
-              <Typography variant="label" style={styles.inputLabel}>Photo recto de la pièce d'identité</Typography>
+              <Typography variant="label" style={styles.inputLabel}>Photo recto de la pièce d&apos;identité</Typography>
               <UploadPlaceholder label="Recto CNIB/Passport" />
 
               <View style={styles.spacer} />
 
-              <Typography variant="label" style={styles.inputLabel}>Selfie avec la pièce d'identité</Typography>
+              <Typography variant="label" style={styles.inputLabel}>Selfie avec la pièce d&apos;identité</Typography>
               <UploadPlaceholder label="Prendre un selfie" />
             </View>
           </View>
@@ -128,7 +129,7 @@ export default function KYCScreen() {
 
       <View style={[styles.footer, { borderTopColor: colors.border }]}>
         <Button
-          size="large"
+          size="lg"
           fullWidth
           onPress={handleNext}
           loading={loading}
@@ -141,7 +142,7 @@ export default function KYCScreen() {
   )
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: typeof Colors.light) => StyleSheet.create({
   container: {
     flex: 1,
   },
@@ -203,7 +204,7 @@ const styles = StyleSheet.create({
     padding: 32,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(0,0,0,0.02)',
+    backgroundColor: colors.backgroundSecondary,
   },
   uploadLabel: {
     marginTop: 12,

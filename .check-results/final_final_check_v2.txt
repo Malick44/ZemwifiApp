@@ -1,0 +1,49 @@
+Starting code check...
+-----------------------------------
+[0;32mRunning Lint Check (expo lint)...[0m
+
+> zemwifiapp@1.0.0 lint
+> expo lint
+
+env: load .env
+env: export EXPO_PUBLIC_SUPABASE_URL EXPO_PUBLIC_SUPABASE_KEY SUPABASE_SERVICE_ROLE_KEY
+
+/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(host)/dashboard.tsx
+  168:95  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  284:26  error  Component definition is missing display name                     react/display-name
+
+/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(shared)/settings.tsx
+  30:14  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(technician)/dashboard.tsx
+  20:9  warning  'router' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(user)/history.tsx
+  26:6  warning  React Hook useEffect has a missing dependency: 'refreshPurchases'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(user)/hotspot/[id].tsx
+  27:6  warning  React Hook useEffect has missing dependencies: 'fetchHotspots' and 'fetchPlansForHotspot'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(user)/list.tsx
+  24:14  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(user)/settings.tsx
+  27:14  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(user)/wallet/index.tsx
+  24:6  warning  React Hook useEffect has a missing dependency: 'refresh'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/malickdes/worksapace/ZemwifiApp/src/components/ui/TextField.tsx
+  2:51  warning  '/Users/malickdes/worksapace/ZemwifiApp/node_modules/react-native/index.js' imported multiple times  import/no-duplicates
+  4:32  warning  '/Users/malickdes/worksapace/ZemwifiApp/node_modules/react-native/index.js' imported multiple times  import/no-duplicates
+
+✖ 11 problems (2 errors, 9 warnings)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+
+[0;31mLint check failed![0m
+-----------------------------------
+[0;32mRunning TypeScript Check (tsc)...[0m
+app/(app)/(user)/tech-tab.tsx(4,20): error TS2820: Type '"/(app)/(technician)/technician/dashboard"' is not assignable to type 'RelativePathString | ExternalPathString | "/" | `/?${string}` | `/#${string}` | "/modal" | `/modal?${string}` | `/modal#${string}` | "/_sitemap" | `/_sitemap?${string}` | `/_sitemap#${string}` | ... 323 more ... | { ...; }'. Did you mean '"/(app)/(technician)/dashboard"'?
+[0;31mTypeScript check failed![0m
+-----------------------------------
+[0;31mSome checks failed. Please review the output above.[0m

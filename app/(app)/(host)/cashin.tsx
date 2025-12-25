@@ -14,6 +14,7 @@ export default function CashInScreen() {
   const router = useRouter()
   const colorScheme = useColorScheme()
   const colors = Colors[colorScheme ?? 'light']
+  const styles = createStyles(colors)
   const [userId, setUserId] = useState('')
   const [amount, setAmount] = useState('')
   const [loading, setLoading] = useState(false)
@@ -56,13 +57,13 @@ export default function CashInScreen() {
               <Typography variant="body" style={{ color: 'white', marginTop: 16 }}>
                 Scanner le QR Code du client
               </Typography>
-              <Button style={{ marginTop: 24, backgroundColor: 'white' }} textStyle={{ color: 'black' }} onPress={handleScan}>
+              <Button style={{ marginTop: 24, backgroundColor: 'white' }} onPress={handleScan}>
                 Simuler Scan
               </Button>
             </View>
 
             <View style={styles.manualEntry}>
-              <Typography variant="h4" style={{ marginBottom: 16 }}>Ou entrer l'ID manuellement</Typography>
+              <Typography variant="h4" style={{ marginBottom: 16 }}>Ou entrer l&apos;ID manuellement</Typography>
               <View style={{ flexDirection: 'row', gap: 12 }}>
                 <View style={{ flex: 1 }}>
                   <TextField
@@ -108,7 +109,7 @@ export default function CashInScreen() {
             <View style={styles.spacer} />
 
             <Button
-              size="large"
+              size="lg"
               fullWidth
               onPress={handleConfirm}
               loading={loading}
@@ -123,7 +124,7 @@ export default function CashInScreen() {
   )
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: typeof Colors.light) => StyleSheet.create({
   container: {
     flex: 1,
   },
@@ -162,7 +163,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: 'rgba(0,0,0,0.05)',
+    backgroundColor: colors.backgroundSecondary,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
@@ -175,7 +176,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 16,
     padding: 12,
-    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+    backgroundColor: colors.infoBackground,
     borderRadius: 8,
   },
   spacer: {

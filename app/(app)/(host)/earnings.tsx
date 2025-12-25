@@ -76,7 +76,7 @@ export default function EarningsScreen() {
             </View>
             <View style={styles.txInfo}>
               <Typography variant="body" style={{ fontWeight: '500' }}>Forfait 1h - Cyber Café</Typography>
-              <Typography variant="caption" color="textSecondary">Aujourd'hui, 14:30</Typography>
+              <Typography variant="caption" color="textSecondary">Aujourd&apos;hui</Typography>
             </View>
             <View style={{ alignItems: 'flex-end' }}>
               <Typography variant="body" style={{ fontWeight: '600' }}>+500 F</Typography>

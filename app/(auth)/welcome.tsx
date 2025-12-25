@@ -15,6 +15,7 @@ export default function WelcomeScreen() {
   const [language, setLanguage] = useState<'fr' | 'en'>('fr');
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
+  const styles = createStyles(colors);
 
   const features = [
     {
@@ -165,7 +166,7 @@ export default function WelcomeScreen() {
                   style={styles.devPanelButton}
                   onPress={() => router.push('/(app)/(shared)/dev-panel')}
                 >
-                  <Ionicons name="construct-outline" size={16} color="rgba(255,255,255,0.6)" />
+                  <Ionicons name="construct-outline" size={16} color={colors.overlayWhiteMedium} />
                   <Typography variant="caption" style={styles.devPanelText}>
                     Dev Panel
                   </Typography>
@@ -179,7 +180,7 @@ export default function WelcomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: typeof Colors.light) => StyleSheet.create({
   container: {
     flex: 1,
   },
@@ -202,27 +203,27 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.sm,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
+    borderColor: colors.overlayWhiteMedium,
   },
   languageButtonActive: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.background,
   },
   hero: {
     alignItems: 'center',
     marginBottom: Spacing['2xl'],
   },
   welcomeText: {
-    color: '#FFFFFF',
+    color: colors.textInverse,
     opacity: 0.9,
     marginBottom: Spacing.xs,
   },
   appName: {
-    color: '#FFFFFF',
+    color: colors.textInverse,
     fontSize: 48,
     marginBottom: Spacing.md,
   },
   tagline: {
-    color: '#FFFFFF',
+    color: colors.textInverse,
     opacity: 0.8,
     maxWidth: 280,
   },
@@ -231,7 +232,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing['2xl'],
   },
   featureCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    backgroundColor: colors.overlayWhite,
   },
   featureContent: {
     flexDirection: 'row',
@@ -261,12 +262,13 @@ const styles = StyleSheet.create({
     gap: Spacing.xs,
     paddingVertical: Spacing.sm,
     borderRadius: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: colors.overlayWhite,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
+    borderColor: colors.overlayWhiteMedium,
   },
   devPanelText: {
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: colors.overlayWhiteLight,
     fontSize: 12,
   },
 })
+

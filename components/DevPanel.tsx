@@ -4,14 +4,14 @@ import { useAuthStore } from '@/src/stores/authStore';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
-    Animated,
-    PanResponder,
-    Platform,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View,
+  Animated,
+  PanResponder,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
 
 // Test users configuration
@@ -104,11 +104,11 @@ export function DevPanel() {
 
   const handleQuickLogin = async (user: typeof TEST_USERS[0]) => {
     if (isLoggingIn) return;
-    
+
     setIsLoggingIn(true);
     try {
       // First, try to sign in with email (dev users use email/password)
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+      const { error: authError } = await supabase.auth.signInWithPassword({
         email: user.email,
         password: 'test123456', // Dev password for all test users
       });
@@ -134,6 +134,7 @@ export function DevPanel() {
         const { error: profileError } = await supabase.from('profiles').upsert({
           id: signUpData.user.id,
           phone: user.phone,
+          email: user.email,
           full_name: user.name,
           role: user.role,
           wallet_balance_xof: user.balance || 0,
@@ -143,20 +144,34 @@ export function DevPanel() {
         if (profileError) {
           console.warn('Profile creation warning:', profileError.message);
         }
+      } else {
+        // User exists, update their profile to ensure correct role
+        const { data: { user: authUser } } = await supabase.auth.getUser();
+        if (authUser) {
+          await supabase.from('profiles').upsert({
+            id: authUser.id,
+            phone: user.phone,
+            email: user.email,
+            full_name: user.name,
+            role: user.role,
+            wallet_balance_xof: user.balance || 0,
+            language: 'fr',
+          });
+        }
       }
 
       // Show success message
       console.log(`✅ Connecté en tant que ${user.name}`);
 
-      // Small delay to let auth state update
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Refresh the auth store session to update profile
+      const { refreshSession } = useAuthStore.getState();
+      await refreshSession();
 
-      // Navigate based on role
-      if (user.role === 'technician') {
-        router.replace('/(app)/(technician)/dashboard');
-      } else {
-        router.replace('/(app)/(user)/map');
-      }
+      // Small delay to let state update propagate
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      // All users navigate to map view (tabs will show based on role)
+      router.replace('/(app)/(user)/map');
 
       // Collapse panel after successful login
       setIsExpanded(false);
@@ -230,7 +245,7 @@ export function DevPanel() {
       ]}
     >
       {/* Header - with drag handle */}
-      <View {...panResponder.panHandlers} style={styles.panelHeader}>
+      <View {...panResponder.panHandlers} style={[styles.panelHeader, { cursor: 'move' } as any]}>
         <Text style={styles.headerIcon}>🔧</Text>
         <Text style={styles.headerText}>Dev Panel</Text>
         <Pressable
@@ -287,7 +302,7 @@ export function DevPanel() {
                 </Text>
                 {isCurrent && <Text style={styles.checkmark}>✓</Text>}
               </View>
-              
+
               <Text style={styles.userName}>{user.name}</Text>
               <Text style={styles.userRole}>
                 {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
@@ -371,6 +386,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     gap: 8,
+    // @ts-ignore
     cursor: 'move', // For web
   },
   headerIcon: {

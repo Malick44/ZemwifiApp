@@ -1,13 +1,12 @@
-import React, { useState } from 'react'
-import { View, StyleSheet, Alert } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
+import React, { useState } from 'react'
+import { Alert, StyleSheet, useColorScheme, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { Input } from '../../components/ui/Input'
+import { Colors } from '../../constants/theme'
 import { Button } from '../../src/components/ui/Button'
 import { Typography } from '../../src/components/ui/Typography'
-import { Input } from '../../components/ui/Input'
 import { useAuthStore } from '../../src/stores/authStore'
-import { Colors } from '../../constants/theme'
-import { useColorScheme } from 'react-native'
 
 export default function ProfileScreen() {
   const updateProfile = useAuthStore((s) => s.updateProfile)
@@ -22,9 +21,11 @@ export default function ProfileScreen() {
       Alert.alert('Erreur', 'Veuillez entrer votre nom')
       return
     }
-    
+
     await updateProfile({ full_name: name })
     Alert.alert('Succès', 'Profil enregistré')
+
+    // All users land on map view first, then can navigate to role-specific dashboards via tabs
     router.replace('/(app)/(user)/map')
   }
 
@@ -47,9 +48,9 @@ export default function ProfileScreen() {
           />
         </View>
 
-        <Button 
+        <Button
           variant="primary"
-          size="large"
+          size="lg"
           onPress={onSave}
           fullWidth
           disabled={!name.trim()}
@@ -61,8 +62,8 @@ export default function ProfileScreen() {
   )
 }
 
-const styles = StyleSheet.create({ 
-  container: { 
+const styles = StyleSheet.create({
+  container: {
     flex: 1,
   },
   content: {

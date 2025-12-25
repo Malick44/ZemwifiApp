@@ -8,6 +8,7 @@ import { useTranslation } from '../../../src/lib/i18n'
 import { useAuthStore } from '../../../src/stores/authStore'
 
 export default function Settings() {
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   const { profile, language, setLanguage, signOut, updateProfile } = useAuthStore()
   const [fullName, setFullName] = useState(profile?.full_name || '')
   const [isEditing, setIsEditing] = useState(false)
@@ -17,7 +18,7 @@ export default function Settings() {
 
   const handleSaveProfile = async () => {
     if (!profile?.id) return
-    
+
     setSaving(true)
     try {
       await updateProfile({ id: profile.id, full_name: fullName })
@@ -55,7 +56,7 @@ export default function Settings() {
       {/* Profile Section */}
       <Card>
         <Text style={styles.cardTitle}>Profil</Text>
-        
+
         {isEditing ? (
           <>
             <TextField
@@ -65,13 +66,13 @@ export default function Settings() {
               placeholder="Votre nom"
             />
             <View style={styles.actions}>
-              <Button 
-                label={t('save')} 
+              <Button
+                label={t('save')}
                 onPress={handleSaveProfile}
                 loading={saving}
               />
-              <Button 
-                label={t('cancel')} 
+              <Button
+                label={t('cancel')}
                 onPress={() => {
                   setIsEditing(false)
                   setFullName(profile?.full_name || '')
@@ -93,8 +94,8 @@ export default function Settings() {
               <Text style={styles.label}>Email</Text>
               <Text style={styles.value}>{profile?.email || 'Non défini'}</Text>
             </View>
-            <Button 
-              label="Modifier le profil" 
+            <Button
+              label="Modifier le profil"
               onPress={() => setIsEditing(true)}
             />
           </>
@@ -139,21 +140,21 @@ export default function Settings() {
 
       {/* Links */}
       <Card>
-        <Pressable 
+        <Pressable
           style={styles.linkButton}
           onPress={() => router.push('/(app)/(shared)/support')}
         >
           <Text style={styles.linkText}>Support & Aide</Text>
           <Text style={styles.arrow}>›</Text>
         </Pressable>
-        <Pressable 
+        <Pressable
           style={styles.linkButton}
           onPress={() => router.push('/(app)/(shared)/legal')}
         >
           <Text style={styles.linkText}>Conditions & Confidentialité</Text>
           <Text style={styles.arrow}>›</Text>
         </Pressable>
-        <Pressable 
+        <Pressable
           style={styles.linkButton}
           onPress={() => router.push('/(app)/(shared)/about')}
         >
@@ -163,17 +164,17 @@ export default function Settings() {
       </Card>
 
       {/* Sign Out */}
-      <Button 
-        label={t('sign_out')} 
+      <Button
+        label={t('sign_out')}
         onPress={handleSignOut}
       />
-      
+
       <View style={styles.spacer} />
     </ScrollView>
   )
 }
 
-const styles = StyleSheet.create({ 
+const styles = StyleSheet.create({
   container: { flex: 1, padding: 16 },
   title: { fontSize: 24, fontWeight: '700', marginBottom: 16 },
   cardTitle: { fontSize: 16, fontWeight: '600', marginBottom: 16 },

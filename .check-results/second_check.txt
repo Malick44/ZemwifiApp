@@ -1,0 +1,129 @@
+Starting code check...
+-----------------------------------
+[0;32mRunning Lint Check (expo lint)...[0m
+
+> zemwifiapp@1.0.0 lint
+> expo lint
+
+env: load .env
+env: export EXPO_PUBLIC_SUPABASE_URL EXPO_PUBLIC_SUPABASE_KEY SUPABASE_SERVICE_ROLE_KEY
+
+/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(host)/cashin.tsx
+  65:80  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(host)/dashboard.tsx
+   33:9   warning  'router' is assigned a value but never used                                                                           @typescript-eslint/no-unused-vars
+   39:11  warning  't' is assigned a value but never used                                                                                @typescript-eslint/no-unused-vars
+   46:6   warning  React Hook useEffect has a missing dependency: 'loadDashboardData'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  170:95  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                       react/no-unescaped-entities
+  286:26  error    Component definition is missing display name                                                                          react/display-name
+
+/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(host)/earnings.tsx
+  79:74  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(host)/kyc.tsx
+   67:48  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  113:69  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  117:94  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  122:91  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(host)/setup.tsx
+  55:38  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(host)/start.tsx
+  38:51  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  79:74  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(host)/technician-requests/index.tsx
+  84:23  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  84:50  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(shared)/settings.tsx
+  26:14  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(user)/history.tsx
+  26:6  warning  React Hook useEffect has a missing dependency: 'refreshPurchases'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(user)/hotspot/[id].tsx
+  27:6  warning  React Hook useEffect has missing dependencies: 'fetchHotspots' and 'fetchPlansForHotspot'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(user)/list.tsx
+  24:14  warning  'error' is defined but never used                       @typescript-eslint/no-unused-vars
+  31:9   warning  'renderScannedItem' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(user)/settings.tsx
+  27:14  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(user)/wallet/index.tsx
+  24:6  warning  React Hook useEffect has a missing dependency: 'refresh'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/malickdes/worksapace/ZemwifiApp/app/(auth)/phone.tsx
+  122:58  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/Users/malickdes/worksapace/ZemwifiApp/app/(auth)/profile.tsx
+   2:41  warning  '/Users/malickdes/worksapace/ZemwifiApp/node_modules/react-native/index.js' imported multiple times  import/no-duplicates
+  10:32  warning  '/Users/malickdes/worksapace/ZemwifiApp/node_modules/react-native/index.js' imported multiple times  import/no-duplicates
+
+/Users/malickdes/worksapace/ZemwifiApp/components/DevPanel.tsx
+  111:21  warning  'authData' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/malickdes/worksapace/ZemwifiApp/src/components/ErrorBoundary.tsx
+  42:55  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  44:38  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  48:61  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+✖ 30 problems (17 errors, 13 warnings)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+
+[0;31mLint check failed![0m
+-----------------------------------
+[0;32mRunning TypeScript Check (tsc)...[0m
+app/(app)/(host)/cashin.tsx(59,75): error TS2322: Type '{ children: string; style: { marginTop: number; backgroundColor: string; }; textStyle: { color: string; }; onPress: () => void; }' is not assignable to type 'IntrinsicAttributes & ButtonProps'.
+  Property 'textStyle' does not exist on type 'IntrinsicAttributes & ButtonProps'.
+app/(app)/(host)/cashin.tsx(93,15): error TS2322: Type '{ placeholder: string; keyboardType: string; value: string; onChangeText: Dispatch<SetStateAction<string>>; style: { fontSize: number; fontWeight: string; }; }' is not assignable to type 'IntrinsicAttributes & Props'.
+  Property 'keyboardType' does not exist on type 'IntrinsicAttributes & Props'.
+app/(app)/(host)/cashin.tsx(111,15): error TS2322: Type '"large"' is not assignable to type '"sm" | "md" | "lg" | undefined'.
+app/(app)/(host)/claim.tsx(50,21): error TS2820: Type '"router-outline"' is not assignable to type '"wallet" | "push" | "map" | "filter" | "at" | "search" | "repeat" | "link" | "language" | "options" | "star" | "text" | "card" | "warning" | "save" | "refresh" | "time" | "infinite" | ... 1339 more ... | undefined'. Did you mean '"rose-outline"'?
+app/(app)/(host)/claim.tsx(64,13): error TS2322: Type '{ label: string; placeholder: string; value: string; onChangeText: Dispatch<SetStateAction<string>>; autoCapitalize: string; }' is not assignable to type 'IntrinsicAttributes & Props'.
+  Property 'autoCapitalize' does not exist on type 'IntrinsicAttributes & Props'.
+app/(app)/(host)/claim.tsx(81,11): error TS2322: Type '"large"' is not assignable to type '"sm" | "md" | "lg" | undefined'.
+app/(app)/(host)/hotspots.tsx(39,23): error TS2820: Type '"router-outline"' is not assignable to type '"wallet" | "push" | "map" | "filter" | "at" | "search" | "repeat" | "link" | "language" | "options" | "star" | "text" | "card" | "warning" | "save" | "refresh" | "time" | "infinite" | ... 1339 more ... | undefined'. Did you mean '"rose-outline"'?
+app/(app)/(host)/hotspots.tsx(58,28): error TS2322: Type '"success" | "secondary"' is not assignable to type '"success" | "error" | "primary" | "warning" | "neutral" | undefined'.
+  Type '"secondary"' is not assignable to type '"success" | "error" | "primary" | "warning" | "neutral" | undefined'.
+app/(app)/(host)/kyc.tsx(131,11): error TS2322: Type '"large"' is not assignable to type '"sm" | "md" | "lg" | undefined'.
+app/(app)/(host)/payouts.tsx(67,19): error TS2322: Type '{ placeholder: string; value: string; onChangeText: Dispatch<SetStateAction<string>>; keyboardType: string; style: { color: string; }; }' is not assignable to type 'IntrinsicAttributes & Props'.
+  Property 'keyboardType' does not exist on type 'IntrinsicAttributes & Props'.
+app/(app)/(host)/payouts.tsx(72,25): error TS2322: Type '"small"' is not assignable to type '"sm" | "md" | "lg" | undefined'.
+app/(app)/(host)/payouts.tsx(73,25): error TS2322: Type '"small"' is not assignable to type '"sm" | "md" | "lg" | undefined'.
+app/(app)/(host)/sessions.tsx(70,18): error TS2322: Type '{ children: string; variant: "success"; }' is not assignable to type 'IntrinsicAttributes & BadgeProps'.
+  Property 'children' does not exist on type 'IntrinsicAttributes & BadgeProps'.
+app/(app)/(host)/setup.tsx(72,15): error TS2322: Type '{ label: string; placeholder: string; value: string; onChangeText: (t: string) => void; multiline: true; numberOfLines: number; }' is not assignable to type 'IntrinsicAttributes & Props'.
+  Property 'multiline' does not exist on type 'IntrinsicAttributes & Props'.
+app/(app)/(host)/setup.tsx(106,11): error TS2322: Type '"large"' is not assignable to type '"sm" | "md" | "lg" | undefined'.
+app/(app)/(host)/start.tsx(89,21): error TS2322: Type '"large"' is not assignable to type '"sm" | "md" | "lg" | undefined'.
+app/(app)/(host)/technician-requests/[id].tsx(47,14): error TS2322: Type '{ children: string; variant: "warning"; }' is not assignable to type 'IntrinsicAttributes & BadgeProps'.
+  Property 'children' does not exist on type 'IntrinsicAttributes & BadgeProps'.
+app/(app)/(host)/technician-requests/[id].tsx(89,17): error TS2322: Type '"outline"' is not assignable to type '"primary" | "secondary" | "tertiary" | "ghost" | undefined'.
+app/(app)/(host)/technician-requests/index.tsx(94,22): error TS2322: Type '{ children: string; variant: any; }' is not assignable to type 'IntrinsicAttributes & BadgeProps'.
+  Property 'children' does not exist on type 'IntrinsicAttributes & BadgeProps'.
+app/(app)/(host)/technician-requests/new.tsx(75,13): error TS2322: Type '{ label: string; placeholder: string; value: string; onChangeText: (t: string) => void; multiline: true; numberOfLines: number; style: { height: number; textAlignVertical: string; }; }' is not assignable to type 'IntrinsicAttributes & Props'.
+  Property 'multiline' does not exist on type 'IntrinsicAttributes & Props'.
+app/(app)/(host)/technician-requests/new.tsx(94,11): error TS2322: Type '"large"' is not assignable to type '"sm" | "md" | "lg" | undefined'.
+app/(auth)/profile.tsx(52,11): error TS2322: Type '"large"' is not assignable to type '"sm" | "md" | "lg" | undefined'.
+components/DevPanel.tsx(156,24): error TS2345: Argument of type '"/(app)/(technician)/dashboard"' is not assignable to parameter of type 'RelativePathString | ExternalPathString | "/" | `/?${string}` | `/#${string}` | "/modal" | `/modal?${string}` | `/modal#${string}` | "/_sitemap" | `/_sitemap?${string}` | `/_sitemap#${string}` | ... 326 more ... | { ...; }'.
+components/DevPanel.tsx(233,43): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: ViewProps): View', gave the following error.
+    Type '{ flexDirection: "row"; alignItems: "center"; backgroundColor: string; paddingHorizontal: number; paddingVertical: number; gap: number; cursor: string; }' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type '{ flexDirection: "row"; alignItems: "center"; backgroundColor: string; paddingHorizontal: number; paddingVertical: number; gap: number; cursor: string; }' is not assignable to type 'ViewStyle'.
+        Types of property 'cursor' are incompatible.
+          Type 'string' is not assignable to type 'CursorValue | undefined'.
+  Overload 2 of 2, '(props: ViewProps, context: any): View', gave the following error.
+    Type '{ flexDirection: "row"; alignItems: "center"; backgroundColor: string; paddingHorizontal: number; paddingVertical: number; gap: number; cursor: string; }' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type '{ flexDirection: "row"; alignItems: "center"; backgroundColor: string; paddingHorizontal: number; paddingVertical: number; gap: number; cursor: string; }' is not assignable to type 'ViewStyle'.
+        Types of property 'cursor' are incompatible.
+          Type 'string' is not assignable to type 'CursorValue | undefined'.
+components/ui/Button.tsx(104,45): error TS2345: Argument of type '{ pressed: boolean; }' is not assignable to parameter of type 'PressableStateCallbackType'.
+  Property 'hovered' is missing in type '{ pressed: boolean; }' but required in type 'PressableStateCallbackType'.
+[0;31mTypeScript check failed![0m
+-----------------------------------
+[0;31mSome checks failed. Please review the output above.[0m

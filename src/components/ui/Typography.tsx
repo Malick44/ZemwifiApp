@@ -3,7 +3,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import React from 'react';
 import { StyleSheet, Text, TextProps } from 'react-native';
 
-type TypographyVariant = 'h1' | 'h2' | 'h3' | 'body' | 'bodySmall' | 'caption' | 'label';
+type TypographyVariant = 'h1' | 'h2' | 'h3' | 'h4' | 'body' | 'bodySmall' | 'caption' | 'label' | 'button';
 
 export interface TypographyProps extends TextProps {
   variant?: TypographyVariant;
@@ -27,10 +27,12 @@ export function Typography({
     h1: styles.h1,
     h2: styles.h2,
     h3: styles.h3,
+    h4: styles.h4,
     body: styles.body,
     bodySmall: styles.bodySmall,
     caption: styles.caption,
     label: styles.label,
+    button: styles.button,
   };
 
   const colorStyles = {
@@ -84,6 +86,11 @@ const styles = StyleSheet.create({
     fontWeight: FontWeights.semibold,
     lineHeight: FontSizes.lg * LineHeights.normal,
   },
+  h4: {
+    fontSize: FontSizes.base,
+    fontWeight: FontWeights.semibold,
+    lineHeight: FontSizes.base * LineHeights.normal,
+  },
   body: {
     fontSize: FontSizes.base,
     fontWeight: FontWeights.regular,
@@ -105,5 +112,10 @@ const styles = StyleSheet.create({
     lineHeight: FontSizes.xs * LineHeights.normal,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
+  },
+  button: {
+    fontSize: FontSizes.base,
+    fontWeight: FontWeights.semibold,
+    lineHeight: FontSizes.base * LineHeights.normal,
   },
 });

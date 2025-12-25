@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons'
-import { Link } from 'expo-router'
+import { Link, useRouter } from 'expo-router'
 import React from 'react'
 import { ScrollView, StyleSheet, useColorScheme, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -11,6 +11,8 @@ import { Typography } from '../../../src/components/ui/Typography'
 export default function HostStart() {
   const colorScheme = useColorScheme()
   const colors = Colors[colorScheme ?? 'light']
+  const router = useRouter()
+  const styles = createStyles(colors)
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -35,10 +37,8 @@ export default function HostStart() {
               <Ionicons name="cash-outline" size={24} color={colors.primary} />
             </View>
             <View style={styles.benefitText}>
-              <Typography variant="h4">Gagnez de l'argent</Typography>
-              <Typography variant="caption" color="textSecondary">
-                Vendez des forfaits Wi-Fi et gagnez des commissions sur chaque recharge.
-              </Typography>
+              <Typography variant="h4" style={styles.cardTitle}>Continuer l&apos;inscription</Typography>
+              <Typography variant="body" color="textSecondary">Reprendre là où vous vous êtes arrêté</Typography>
             </View>
           </View>
 
@@ -76,7 +76,7 @@ export default function HostStart() {
           </View>
           <View style={styles.reqItem}>
             <Ionicons name="checkmark-circle" size={20} color={colors.success} />
-            <Typography variant="body" style={styles.reqText}>Une pièce d'identité valide</Typography>
+            <Typography variant="body" style={styles.reqText}>Une pièce d&apos;identité valide</Typography>
           </View>
           <View style={styles.reqItem}>
             <Ionicons name="checkmark-circle" size={20} color={colors.success} />
@@ -86,8 +86,8 @@ export default function HostStart() {
 
         <View style={styles.actions}>
           <Link href="/(app)/(host)/kyc" asChild>
-            <Button size="large" fullWidth>
-              Commencer la vérification
+            <Button size="lg" onPress={() => router.push('/(app)/(host)/setup')}>
+              Continuer
             </Button>
           </Link>
         </View>
@@ -96,7 +96,7 @@ export default function HostStart() {
   )
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: typeof Colors.light) => StyleSheet.create({
   container: {
     flex: 1,
   },
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: 'rgba(0,0,0,0.05)',
+    backgroundColor: colors.backgroundSecondary,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 20,
@@ -165,4 +165,9 @@ const styles = StyleSheet.create({
   actions: {
     marginTop: 'auto',
   },
+  cardTitle: {
+    marginBottom: 4,
+    fontWeight: '600',
+  },
 })
+

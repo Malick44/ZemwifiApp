@@ -14,6 +14,8 @@ import { Purchase } from '../../../src/types/domain'
 
 type FilterType = 'all' | 'success' | 'pending' | 'failed'
 
+import { Header } from '../../../src/components/ui/Header'
+
 export default function HistoryScreen() {
   const { purchases, refreshPurchases, loading } = usePurchasesStore()
   const [filter, setFilter] = useState<FilterType>('all')
@@ -66,17 +68,16 @@ export default function HistoryScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
-      <View style={styles.header}>
-        <Typography variant="h1">Historique</Typography>
-        <Typography variant="body" color={colors.textSecondary}>
-          {purchases.length} transaction{purchases.length > 1 ? 's' : ''}
-        </Typography>
-      </View>
+      <Header
+        variant="large"
+        title="Historique"
+        subtitle={`${purchases.length} transaction${purchases.length > 1 ? 's' : ''}`}
+      />
 
       {/* Filter Chips */}
-      <ScrollView 
-        horizontal 
-        showsHorizontalScrollIndicator={false} 
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
         style={styles.filtersScroll}
         contentContainerStyle={styles.filtersContainer}
       >
@@ -91,14 +92,14 @@ export default function HistoryScreen() {
             onPress={() => setFilter(key)}
             style={[
               styles.filterChip,
-              { 
+              {
                 backgroundColor: filter === key ? colors.tint : colors.card,
                 borderColor: filter === key ? colors.tint : colors.border,
               }
             ]}
           >
-            <Typography 
-              variant="body" 
+            <Typography
+              variant="body"
               color={filter === key ? '#fff' : colors.text}
               style={{ fontWeight: filter === key ? '600' : '400' }}
             >
@@ -109,8 +110,8 @@ export default function HistoryScreen() {
                 styles.countBadge,
                 { backgroundColor: filter === key ? 'rgba(255,255,255,0.2)' : colors.backgroundSecondary }
               ]}>
-                <Typography 
-                  variant="caption" 
+                <Typography
+                  variant="caption"
                   color={filter === key ? '#fff' : colors.textSecondary}
                   style={{ fontWeight: '600' }}
                 >
@@ -130,9 +131,9 @@ export default function HistoryScreen() {
         onRefresh={refreshPurchases}
         contentContainerStyle={styles.listContent}
         ListEmptyComponent={
-          <EmptyState 
-            title="Aucune transaction" 
-            message={filter === 'all' 
+          <EmptyState
+            title="Aucune transaction"
+            message={filter === 'all'
               ? "Vous n'avez pas encore effectué d'achats"
               : `Aucune transaction ${getStatusText(filter).toLowerCase()}`}
             icon="receipt-outline"
@@ -152,10 +153,10 @@ export default function HistoryScreen() {
             <Card variant="elevated" style={styles.transactionCard}>
               <View style={styles.transactionHeader}>
                 <View style={[styles.iconContainer, { backgroundColor: colors.backgroundSecondary }]}>
-                  <Ionicons 
-                    name={getPaymentIcon(item.payment_provider)} 
-                    size={24} 
-                    color={colors.tint} 
+                  <Ionicons
+                    name={getPaymentIcon(item.payment_provider)}
+                    size={24}
+                    color={colors.tint}
                   />
                 </View>
                 <View style={styles.transactionInfo}>
@@ -170,14 +171,14 @@ export default function HistoryScreen() {
                   <Typography variant="h3" color={colors.text}>
                     {item.amount.toLocaleString()} XOF
                   </Typography>
-                  <Badge 
-                    variant={getStatusVariant(item.payment_status)} 
-                    label={getStatusText(item.payment_status)} 
+                  <Badge
+                    variant={getStatusVariant(item.payment_status)}
+                    label={getStatusText(item.payment_status)}
                     size="sm"
                   />
                 </View>
               </View>
-              
+
               <View style={styles.transactionDetails}>
                 <View style={styles.detailItem}>
                   <Ionicons name="location-outline" size={14} color={colors.textSecondary} />
@@ -219,16 +220,12 @@ function formatDate(dateString: string): string {
   if (diffMins < 60) return `Il y a ${diffMins} min`
   if (diffHours < 24) return `Il y a ${diffHours}h`
   if (diffDays < 7) return `Il y a ${diffDays}j`
-  
+
   return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: {
-    padding: 16,
-    paddingTop: 48,
-  },
   filtersScroll: {
     maxHeight: 60,
   },

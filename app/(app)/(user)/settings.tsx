@@ -18,13 +18,13 @@ export default function Settings() {
 
   const handleSaveProfile = async () => {
     if (!profile?.id) return
-    
+
     setSaving(true)
     try {
       await updateProfile({ id: profile.id, full_name: fullName })
       Alert.alert('Succès', 'Profil mis à jour')
       setIsEditing(false)
-    } catch (error) {
+    } catch {
       Alert.alert('Erreur', 'Échec de la mise à jour')
     } finally {
       setSaving(false)
@@ -52,131 +52,131 @@ export default function Settings() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView style={styles.container}>
-      <Text style={styles.title}>{t('settings_tab')}</Text>
+        <Text style={styles.title}>{t('settings_tab')}</Text>
 
-      {/* Profile Section */}
-      <Card>
-        <Text style={styles.cardTitle}>Profil</Text>
-        
-        {isEditing ? (
-          <>
-            <TextField
-              label={t('full_name')}
-              value={fullName}
-              onChangeText={setFullName}
-              placeholder="Votre nom"
-            />
-            <View style={styles.actions}>
-              <Button 
-                label={t('save')} 
-                onPress={handleSaveProfile}
-                loading={saving}
-              />
-              <Button 
-                label={t('cancel')} 
-                onPress={() => {
-                  setIsEditing(false)
-                  setFullName(profile?.full_name || '')
-                }}
-              />
-            </View>
-          </>
-        ) : (
-          <>
-            <View style={styles.profileInfo}>
-              <Text style={styles.label}>Nom</Text>
-              <Text style={styles.value}>{profile?.full_name || 'Non défini'}</Text>
-            </View>
-            <View style={styles.profileInfo}>
-              <Text style={styles.label}>Téléphone</Text>
-              <Text style={styles.value}>{profile?.phone || 'Non défini'}</Text>
-            </View>
-            <View style={styles.profileInfo}>
-              <Text style={styles.label}>Email</Text>
-              <Text style={styles.value}>{profile?.email || 'Non défini'}</Text>
-            </View>
-            <Button 
-              label="Modifier le profil" 
-              onPress={() => setIsEditing(true)}
-            />
-          </>
-        )}
-      </Card>
+        {/* Profile Section */}
+        <Card>
+          <Text style={styles.cardTitle}>Profil</Text>
 
-      {/* Language Section */}
-      <Card>
-        <Text style={styles.cardTitle}>Langue / Language</Text>
-        <View style={styles.languageButtons}>
+          {isEditing ? (
+            <>
+              <TextField
+                label={t('full_name')}
+                value={fullName}
+                onChangeText={setFullName}
+                placeholder="Votre nom"
+              />
+              <View style={styles.actions}>
+                <Button
+                  label={t('save')}
+                  onPress={handleSaveProfile}
+                  loading={saving}
+                />
+                <Button
+                  label={t('cancel')}
+                  onPress={() => {
+                    setIsEditing(false)
+                    setFullName(profile?.full_name || '')
+                  }}
+                />
+              </View>
+            </>
+          ) : (
+            <>
+              <View style={styles.profileInfo}>
+                <Text style={styles.label}>Nom</Text>
+                <Text style={styles.value}>{profile?.full_name || 'Non défini'}</Text>
+              </View>
+              <View style={styles.profileInfo}>
+                <Text style={styles.label}>Téléphone</Text>
+                <Text style={styles.value}>{profile?.phone || 'Non défini'}</Text>
+              </View>
+              <View style={styles.profileInfo}>
+                <Text style={styles.label}>Email</Text>
+                <Text style={styles.value}>{profile?.email || 'Non défini'}</Text>
+              </View>
+              <Button
+                label="Modifier le profil"
+                onPress={() => setIsEditing(true)}
+              />
+            </>
+          )}
+        </Card>
+
+        {/* Language Section */}
+        <Card>
+          <Text style={styles.cardTitle}>Langue / Language</Text>
+          <View style={styles.languageButtons}>
+            <Pressable
+              style={[styles.languageButton, language === 'fr' && styles.languageButtonActive]}
+              onPress={() => setLanguage('fr')}
+            >
+              <Text style={[styles.languageText, language === 'fr' && styles.languageTextActive]}>
+                Français
+              </Text>
+            </Pressable>
+            <Pressable
+              style={[styles.languageButton, language === 'en' && styles.languageButtonActive]}
+              onPress={() => setLanguage('en')}
+            >
+              <Text style={[styles.languageText, language === 'en' && styles.languageTextActive]}>
+                English
+              </Text>
+            </Pressable>
+          </View>
+        </Card>
+
+        {/* App Info */}
+        <Card>
+          <Text style={styles.cardTitle}>À propos</Text>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Version</Text>
+            <Text style={styles.infoValue}>1.0.0</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Application</Text>
+            <Text style={styles.infoValue}>ZemNet WiFi</Text>
+          </View>
+        </Card>
+
+        {/* Links */}
+        <Card>
           <Pressable
-            style={[styles.languageButton, language === 'fr' && styles.languageButtonActive]}
-            onPress={() => setLanguage('fr')}
+            style={styles.linkButton}
+            onPress={() => router.push('/(app)/(shared)/support')}
           >
-            <Text style={[styles.languageText, language === 'fr' && styles.languageTextActive]}>
-              Français
-            </Text>
+            <Text style={styles.linkText}>Support & Aide</Text>
+            <Text style={styles.arrow}>›</Text>
           </Pressable>
           <Pressable
-            style={[styles.languageButton, language === 'en' && styles.languageButtonActive]}
-            onPress={() => setLanguage('en')}
+            style={styles.linkButton}
+            onPress={() => router.push('/(app)/(shared)/legal')}
           >
-            <Text style={[styles.languageText, language === 'en' && styles.languageTextActive]}>
-              English
-            </Text>
+            <Text style={styles.linkText}>Conditions & Confidentialité</Text>
+            <Text style={styles.arrow}>›</Text>
           </Pressable>
-        </View>
-      </Card>
+          <Pressable
+            style={styles.linkButton}
+            onPress={() => router.push('/(app)/(shared)/about')}
+          >
+            <Text style={styles.linkText}>À propos de ZemNet</Text>
+            <Text style={styles.arrow}>›</Text>
+          </Pressable>
+        </Card>
 
-      {/* App Info */}
-      <Card>
-        <Text style={styles.cardTitle}>À propos</Text>
-        <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>Version</Text>
-          <Text style={styles.infoValue}>1.0.0</Text>
-        </View>
-        <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>Application</Text>
-          <Text style={styles.infoValue}>ZemNet WiFi</Text>
-        </View>
-      </Card>
+        {/* Sign Out */}
+        <Button
+          label={t('sign_out')}
+          onPress={handleSignOut}
+        />
 
-      {/* Links */}
-      <Card>
-        <Pressable 
-          style={styles.linkButton}
-          onPress={() => router.push('/(app)/(shared)/support')}
-        >
-          <Text style={styles.linkText}>Support & Aide</Text>
-          <Text style={styles.arrow}>›</Text>
-        </Pressable>
-        <Pressable 
-          style={styles.linkButton}
-          onPress={() => router.push('/(app)/(shared)/legal')}
-        >
-          <Text style={styles.linkText}>Conditions & Confidentialité</Text>
-          <Text style={styles.arrow}>›</Text>
-        </Pressable>
-        <Pressable 
-          style={styles.linkButton}
-          onPress={() => router.push('/(app)/(shared)/about')}
-        >
-          <Text style={styles.linkText}>À propos de ZemNet</Text>
-          <Text style={styles.arrow}>›</Text>
-        </Pressable>
-      </Card>
-
-      {/* Sign Out */}
-      <Button 
-        label={t('sign_out')} 
-        onPress={handleSignOut}
-      />
-      
-      <View style={styles.spacer} />
-    </ScrollView>
+        <View style={styles.spacer} />
+      </ScrollView>
     </SafeAreaView>
   )
 }
 
-const styles = StyleSheet.create({ 
+const styles = StyleSheet.create({
   container: { flex: 1, padding: 16 },
   title: { fontSize: 24, fontWeight: '700', marginBottom: 16 },
   cardTitle: { fontSize: 16, fontWeight: '600', marginBottom: 16 },

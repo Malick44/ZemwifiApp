@@ -1,3 +1,4 @@
+import { useColors } from '@/hooks/use-colors';
 import React from 'react';
 import { StyleSheet, Text, View, ViewProps } from 'react-native';
 
@@ -6,18 +7,29 @@ export interface CardProps extends ViewProps {
   children?: React.ReactNode;
 }
 
-export const Card: React.FC<CardProps> = ({ children, style, variant = 'elevated', ...rest }) => (
-  <View style={[styles.card, variant === 'outlined' && styles.outlined, variant === 'filled' && styles.filled, style]} {...rest}>
-    {typeof children === 'string' ? <Text>{children}</Text> : children}
-  </View>
-)
+export const Card: React.FC<CardProps> = ({ children, style, variant = 'elevated', ...rest }) => {
+  const colors = useColors();
+
+  return (
+    <View
+      style={[
+        styles.card,
+        { backgroundColor: colors.card, shadowColor: colors.shadow },
+        variant === 'outlined' && [styles.outlined, { borderColor: colors.border }],
+        variant === 'filled' && styles.filled,
+        style
+      ]}
+      {...rest}
+    >
+      {typeof children === 'string' ? <Text>{children}</Text> : children}
+    </View>
+  );
+}
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#fff',
     borderRadius: 14,
     padding: 16,
-    shadowColor: '#000',
     shadowOpacity: 0.05,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 8,
@@ -26,7 +38,6 @@ const styles = StyleSheet.create({
   },
   outlined: {
     borderWidth: 1,
-    borderColor: '#E5E7EB',
     shadowOpacity: 0,
     elevation: 0,
   },

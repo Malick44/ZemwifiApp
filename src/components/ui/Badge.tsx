@@ -1,18 +1,37 @@
+import { useColors } from '@/hooks/use-colors';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 export interface BadgeProps {
-  label: string;
+  label?: string;
+  children?: React.ReactNode;
   variant?: 'primary' | 'success' | 'error' | 'warning' | 'neutral';
   tone?: 'success' | 'info' | 'danger';
   size?: 'sm' | 'md' | 'lg';
 }
 
-export const Badge: React.FC<BadgeProps> = ({ label, variant, tone = 'info', size = 'md' }) => (
-  <View style={[styles.badge, styles[tone]]}>
-    <Text style={styles.text}>{label}</Text>
-  </View>
-)
+export const Badge: React.FC<BadgeProps> = ({ label, children, variant, tone = 'info', size = 'md' }) => {
+  const colors = useColors();
+
+  const getBackgroundColor = () => {
+    if (variant === 'success') return colors.success;
+    if (variant === 'error') return colors.error;
+    if (variant === 'warning') return colors.warning;
+    if (variant === 'neutral') return colors.gray.gray600;
+    if (variant === 'primary') return colors.primary;
+
+    // Fallback to tone
+    if (tone === 'success') return colors.success;
+    if (tone === 'danger') return colors.error;
+    return colors.info;
+  };
+
+  return (
+    <View style={[styles.badge, { backgroundColor: getBackgroundColor() }]}>
+      <Text style={[styles.text, { color: colors.textInverse }]}>{children || label}</Text>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   badge: {
@@ -21,12 +40,6 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     alignSelf: 'flex-start',
   },
-  text: { color: '#fff', fontSize: 12 },
-  info: { backgroundColor: '#2563eb' },
-  success: { backgroundColor: '#16a34a' },
-  danger: { backgroundColor: '#dc2626' },
-  primary: { backgroundColor: '#2563eb' },
-  error: { backgroundColor: '#dc2626' },
-  warning: { backgroundColor: '#F59E0B' },
-  neutral: { backgroundColor: '#6B7280' },
+  text: { fontSize: 12 },
 })
+

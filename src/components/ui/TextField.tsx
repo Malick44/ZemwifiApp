@@ -1,33 +1,31 @@
+import { useColors } from '@/hooks/use-colors'
 import React from 'react'
-import { TextInput, StyleSheet, View, Text } from 'react-native'
+import { StyleSheet, Text, TextInput, TextInputProps, View } from 'react-native'
 
-type Props = {
+interface Props extends TextInputProps {
   label?: string
-  value: string
-  onChangeText: (text: string) => void
-  placeholder?: string
-  secureTextEntry?: boolean
 }
 
-export const TextField: React.FC<Props> = ({ label, value, onChangeText, placeholder, secureTextEntry }) => (
-  <View style={styles.container}>
-    {label && <Text style={styles.label}>{label}</Text>}
-    <TextInput
-      style={styles.input}
-      value={value}
-      onChangeText={onChangeText}
-      placeholder={placeholder}
-      secureTextEntry={secureTextEntry}
-    />
-  </View>
-)
+export const TextField: React.FC<Props> = ({ label, style, ...props }) => {
+  const colors = useColors();
+
+  return (
+    <View style={styles.container}>
+      {label && <Text style={[styles.label, { color: colors.text }]}>{label}</Text>}
+      <TextInput
+        style={[styles.input, { borderColor: colors.border, color: colors.text }]}
+        placeholderTextColor={colors.textTertiary}
+        {...props}
+      />
+    </View>
+  );
+}
 
 const styles = StyleSheet.create({
   container: { marginBottom: 12 },
-  label: { marginBottom: 4, color: '#111' },
+  label: { marginBottom: 4 },
   input: {
     borderWidth: 1,
-    borderColor: '#e5e7eb',
     borderRadius: 12,
     padding: 12,
   },

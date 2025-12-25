@@ -15,6 +15,7 @@ export type Hotspot = {
   status?: 'online' | 'offline'
   sales_paused: boolean
   hours: string | null
+  distance?: number
 }
 
 export type Plan = {

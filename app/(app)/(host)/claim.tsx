@@ -12,6 +12,7 @@ export default function ClaimRouterScreen() {
   const router = useRouter()
   const colorScheme = useColorScheme()
   const colors = Colors[colorScheme ?? 'light']
+  const styles = createStyles(colors)
   const [serialNumber, setSerialNumber] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -47,7 +48,7 @@ export default function ClaimRouterScreen() {
 
       <View style={styles.content}>
         <View style={styles.iconContainer}>
-          <Ionicons name="router-outline" size={64} color={colors.primary} />
+          <Ionicons name="rose-outline" size={48} color={colors.textInverse} />
         </View>
 
         <Typography variant="h2" style={styles.title}>Numéro de série</Typography>
@@ -78,7 +79,7 @@ export default function ClaimRouterScreen() {
         <View style={styles.spacer} />
 
         <Button
-          size="large"
+          size="lg"
           fullWidth
           onPress={handleClaim}
           loading={loading}
@@ -91,7 +92,7 @@ export default function ClaimRouterScreen() {
   )
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: typeof Colors.light) => StyleSheet.create({
   container: {
     flex: 1,
   },
@@ -116,7 +117,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: 'rgba(0,0,0,0.03)',
+    backgroundColor: colors.backgroundSecondary,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -142,7 +143,7 @@ const styles = StyleSheet.create({
   helpContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.02)',
+    backgroundColor: colors.backgroundSecondary,
     padding: 12,
     borderRadius: 8,
   },

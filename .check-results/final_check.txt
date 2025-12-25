@@ -1,0 +1,68 @@
+Starting code check...
+-----------------------------------
+[0;32mRunning Lint Check (expo lint)...[0m
+
+> zemwifiapp@1.0.0 lint
+> expo lint
+
+env: load .env
+env: export EXPO_PUBLIC_SUPABASE_URL EXPO_PUBLIC_SUPABASE_KEY SUPABASE_SERVICE_ROLE_KEY
+
+/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(host)/dashboard.tsx
+   32:9   warning  'router' is assigned a value but never used                      @typescript-eslint/no-unused-vars
+  169:95  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  285:26  error    Component definition is missing display name                     react/display-name
+
+/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(host)/kyc.tsx
+   67:48  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  113:69  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  117:94  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  122:91  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(host)/setup.tsx
+  55:38  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(host)/start.tsx
+  78:74  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(shared)/settings.tsx
+  26:14  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(user)/history.tsx
+  26:6  warning  React Hook useEffect has a missing dependency: 'refreshPurchases'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(user)/hotspot/[id].tsx
+  27:6  warning  React Hook useEffect has missing dependencies: 'fetchHotspots' and 'fetchPlansForHotspot'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(user)/list.tsx
+  24:14  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(user)/settings.tsx
+  27:14  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(user)/wallet/index.tsx
+  24:6  warning  React Hook useEffect has a missing dependency: 'refresh'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/malickdes/worksapace/ZemwifiApp/app/(auth)/profile.tsx
+   2:41  warning  '/Users/malickdes/worksapace/ZemwifiApp/node_modules/react-native/index.js' imported multiple times  import/no-duplicates
+  10:32  warning  '/Users/malickdes/worksapace/ZemwifiApp/node_modules/react-native/index.js' imported multiple times  import/no-duplicates
+
+/Users/malickdes/worksapace/ZemwifiApp/src/components/ui/TextField.tsx
+  2:51  warning  '/Users/malickdes/worksapace/ZemwifiApp/node_modules/react-native/index.js' imported multiple times  import/no-duplicates
+  4:32  warning  '/Users/malickdes/worksapace/ZemwifiApp/node_modules/react-native/index.js' imported multiple times  import/no-duplicates
+
+✖ 19 problems (8 errors, 11 warnings)
+  0 errors and 2 warnings potentially fixable with the `--fix` option.
+
+[0;31mLint check failed![0m
+-----------------------------------
+[0;32mRunning TypeScript Check (tsc)...[0m
+app/(app)/(host)/cashin.tsx(59,75): error TS2322: Type '{ children: string; style: { marginTop: number; backgroundColor: string; }; textStyle: { color: string; }; onPress: () => void; }' is not assignable to type 'IntrinsicAttributes & ButtonProps'.
+  Property 'textStyle' does not exist on type 'IntrinsicAttributes & ButtonProps'.
+app/(app)/(host)/technician-requests/[id].tsx(89,17): error TS2322: Type '"outline"' is not assignable to type '"primary" | "secondary" | "tertiary" | "ghost" | undefined'.
+app/(app)/(host)/technician-requests/new.tsx(94,11): error TS2322: Type '"large"' is not assignable to type '"sm" | "md" | "lg" | undefined'.
+app/(auth)/profile.tsx(52,11): error TS2322: Type '"large"' is not assignable to type '"sm" | "md" | "lg" | undefined'.
+components/DevPanel.tsx(156,24): error TS2345: Argument of type '"/(app)/(technician)/dashboard"' is not assignable to parameter of type 'RelativePathString | ExternalPathString | "/" | `/?${string}` | `/#${string}` | "/modal" | `/modal?${string}` | `/modal#${string}` | "/_sitemap" | `/_sitemap?${string}` | `/_sitemap#${string}` | ... 326 more ... | { ...; }'.
+[0;31mTypeScript check failed![0m
+-----------------------------------
+[0;31mSome checks failed. Please review the output above.[0m

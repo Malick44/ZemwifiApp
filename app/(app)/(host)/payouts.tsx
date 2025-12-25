@@ -69,8 +69,10 @@ export default function PayoutsScreen() {
                 />
               </View>
               <View style={styles.formActions}>
-                <Button size="small" variant="ghost" onPress={() => setShowRequestForm(false)} textStyle={{ color: 'white' }}>Annuler</Button>
-                <Button size="small" variant="secondary" onPress={handleRequest} loading={loading}>Confirmer</Button>
+                <Button size="sm" variant="secondary" onPress={() => setRequestAmount('1000')}>1000</Button>
+                <Button size="sm" variant="secondary" onPress={() => setRequestAmount('2000')}>2000</Button>
+                <Button size="sm" variant="ghost" onPress={() => setShowRequestForm(false)}>Annuler</Button>
+                <Button size="sm" variant="primary" onPress={handleRequest} loading={loading}>Confirmer</Button>
               </View>
             </View>
           ) : (

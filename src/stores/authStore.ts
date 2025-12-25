@@ -25,6 +25,7 @@ type AuthState = {
   verifyOtp: (phone: string, token: string) => Promise<void>
   refreshSession: () => Promise<void>
   updateProfile: (input: Partial<Profile>) => Promise<void>
+  clearError: () => void
 }
 
 const storage = createJSONStorage(() => AsyncStorage)
@@ -37,6 +38,7 @@ export const useAuthStore = create<AuthState>()(
       profile: null,
       loading: false,
       error: null,
+      clearError: () => set({ error: null }),
       setLanguage: (language) => set({ language }),
       setGuest: () => set({ session: null, profile: null }),
       signOut: async () => {
@@ -57,7 +59,7 @@ export const useAuthStore = create<AuthState>()(
           return
         }
         set({ session: data.session })
-        
+
         // Manually create profile if trigger failed (RLS workaround)
         if (data.user) {
           try {
@@ -67,12 +69,17 @@ export const useAuthStore = create<AuthState>()(
               .select('*')
               .eq('id', data.user.id)
               .single()
-            
+
             if (!existingProfile) {
+              // Get phone and email from auth user
+              const userPhone = data.user.phone || data.user.user_metadata?.phone || phone
+              const userEmail = data.user.email || null
+
               // Create profile manually using service role or authenticated context
               await supabase.from('profiles').insert({
                 id: data.user.id,
-                phone: phone,
+                phone: userPhone,
+                email: userEmail,
                 full_name: '',
                 role: 'user'
               })
@@ -82,7 +89,7 @@ export const useAuthStore = create<AuthState>()(
             console.warn('Profile creation warning:', profileError)
           }
         }
-        
+
         set({ loading: false })
         await get().refreshSession()
       },
@@ -90,30 +97,35 @@ export const useAuthStore = create<AuthState>()(
         const { data } = await supabase.auth.getSession()
         if (data.session) {
           set({ session: data.session })
-          
+
           // Try to get profile, create if doesn't exist
           const { data: profileData, error: profileError } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', data.session.user.id)
             .single()
-          
+
           if (profileData) {
             set({ profile: profileData })
           } else if (profileError?.code === 'PGRST116') {
             // Profile doesn't exist, create it
             try {
+              // Get phone from user metadata or phone field
+              const phone = data.session.user.phone || data.session.user.user_metadata?.phone || null
+              const email = data.session.user.email || null
+
               const { data: newProfile } = await supabase
                 .from('profiles')
                 .insert({
                   id: data.session.user.id,
-                  phone: data.session.user.phone || null,
+                  phone: phone,
+                  email: email,
                   full_name: '',
                   role: 'user'
                 })
                 .select()
                 .single()
-              
+
               if (newProfile) set({ profile: newProfile })
             } catch (err) {
               console.warn('Could not create profile:', err)

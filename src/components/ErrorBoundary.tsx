@@ -39,13 +39,13 @@ export class ErrorBoundary extends Component<Props, State> {
         <View style={styles.container}>
           <View style={styles.errorBox}>
             <Text style={styles.emoji}>⚠️</Text>
-            <Text style={styles.title}>Quelque chose s'est mal passé</Text>
+            <Text style={styles.title}>Quelque chose s&apos;est mal passé</Text>
             <Text style={styles.message}>
-              Une erreur inattendue s'est produite. Veuillez réessayer.
+              Une erreur inattendue s&apos;est produite. Veuillez réessayer.
             </Text>
             {__DEV__ && (
               <View style={styles.debugBox}>
-                <Text style={styles.debugTitle}>Détails de l'erreur :</Text>
+                <Text style={styles.debugTitle}>Détails de l&apos;erreur :</Text>
                 <Text style={styles.debugText}>{this.state.error.message}</Text>
               </View>
             )}

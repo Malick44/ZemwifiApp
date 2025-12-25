@@ -1,6 +1,7 @@
-import React from 'react'
-import { View, Text, StyleSheet, Pressable } from 'react-native'
+import { useColors } from '@/hooks/use-colors'
 import { useRouter } from 'expo-router'
+import React from 'react'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { t } from '../lib/i18n'
 
 type Props = {
@@ -9,15 +10,17 @@ type Props = {
 }
 
 export const AppHeader: React.FC<Props> = ({ title, showBack }) => {
-  const router = useRouter()
+  const router = useRouter();
+  const colors = useColors();
+
   return (
     <View style={styles.container}>
       {showBack && (
         <Pressable onPress={() => router.back()}>
-          <Text style={styles.back}>{t('back')}</Text>
+          <Text style={[styles.back, { color: colors.primary }]}>{t('back')}</Text>
         </Pressable>
       )}
-      <Text style={styles.title}>{title}</Text>
+      <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
     </View>
   )
 }
@@ -29,6 +32,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
   },
-  back: { color: '#2563eb' },
+  back: {},
   title: { fontSize: 18, fontWeight: '700' },
 })

@@ -18,6 +18,7 @@ export default function HotspotsListScreen() {
   const router = useRouter()
   const colorScheme = useColorScheme()
   const colors = Colors[colorScheme ?? 'light']
+  const styles = createStyles(colors)
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -36,7 +37,7 @@ export default function HotspotsListScreen() {
       <ScrollView contentContainerStyle={styles.content}>
         {MOCK_HOTSPOTS.length === 0 ? (
           <View style={styles.emptyState}>
-            <Ionicons name="router-outline" size={64} color={colors.mutedForeground} />
+            <Ionicons name="rose-outline" size={64} color={colors.mutedForeground} />
             <Typography variant="h4" style={{ marginTop: 16 }}>Aucun hotspot</Typography>
             <Typography variant="body" color="textSecondary" style={{ textAlign: 'center', marginTop: 8 }}>
               Ajoutez votre premier routeur pour commencer à vendre.
@@ -55,9 +56,7 @@ export default function HotspotsListScreen() {
                       <Typography variant="h4">{hotspot.name}</Typography>
                       <Typography variant="caption" color="textSecondary">{hotspot.location}</Typography>
                     </View>
-                    <Badge variant={hotspot.status === 'online' ? 'success' : 'secondary'}>
-                      {hotspot.status === 'online' ? 'En ligne' : 'Hors ligne'}
-                    </Badge>
+                    <Badge variant={hotspot.status === 'online' ? 'success' : 'neutral'} label={hotspot.status === 'online' ? 'En ligne' : 'Hors ligne'} />
                   </View>
 
                   <View style={styles.statsRow}>
@@ -86,7 +85,7 @@ export default function HotspotsListScreen() {
   )
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: typeof Colors.light) => StyleSheet.create({
   container: {
     flex: 1,
   },
@@ -127,7 +126,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 8,
-    backgroundColor: 'rgba(0,0,0,0.03)',
+    backgroundColor: colors.backgroundSecondary,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -155,7 +154,7 @@ const styles = StyleSheet.create({
     padding: 12,
     paddingHorizontal: 16,
     borderTopWidth: 1,
-    backgroundColor: 'rgba(0,0,0,0.01)',
+    backgroundColor: colors.backgroundSecondary,
     gap: 4,
   },
 })

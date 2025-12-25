@@ -12,8 +12,8 @@ export default function UserTabs() {
   const role = profile?.role || 'user'
 
   return (
-    <Tabs 
-      screenOptions={{ 
+    <Tabs
+      screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: activeColor,
         tabBarInactiveTintColor: iconColor,
@@ -24,74 +24,74 @@ export default function UserTabs() {
       }}
     >
       {/* Main 4 tabs */}
-      <Tabs.Screen 
-        name="map" 
-        options={{ 
+      <Tabs.Screen
+        name="map"
+        options={{
           title: 'Découvrir',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="compass" size={size} color={color} />
           )
-        }} 
+        }}
       />
-      <Tabs.Screen 
-        name="wallet/index" 
-        options={{ 
+      <Tabs.Screen
+        name="wallet/index"
+        options={{
           title: 'Portefeuille',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="wallet" size={size} color={color} />
           )
-        }} 
+        }}
       />
-      <Tabs.Screen 
-        name="history" 
-        options={{ 
+      <Tabs.Screen
+        name="history"
+        options={{
           title: 'Historique',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="time" size={size} color={color} />
           )
-        }} 
+        }}
       />
 
       {/* Conditional role-based tabs - always render but hide with href: null */}
-      <Tabs.Screen 
-        name="host-tab" 
-        options={{ 
+      <Tabs.Screen
+        name="host-tab"
+        options={{
           title: 'Hôte',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="business" size={size} color={color} />
           ),
           href: role === 'host' ? '/(app)/(user)/host-tab' : null
-        }} 
+        }}
       />
-      <Tabs.Screen 
-        name="admin-tab" 
-        options={{ 
+      <Tabs.Screen
+        name="admin-tab"
+        options={{
           title: 'Admin',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="shield-checkmark" size={size} color={color} />
           ),
           href: role === 'admin' ? '/(app)/(user)/admin-tab' : null
-        }} 
+        }}
       />
-      <Tabs.Screen 
-        name="tech-tab" 
-        options={{ 
+      <Tabs.Screen
+        name="tech-tab"
+        options={{
           title: 'Tech',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="construct" size={size} color={color} />
           ),
           href: role === 'technician' ? '/(app)/(user)/tech-tab' : null
-        }} 
+        }}
       />
 
-      <Tabs.Screen 
-        name="settings" 
-        options={{ 
+      <Tabs.Screen
+        name="settings"
+        options={{
           title: 'Réglages',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="settings" size={size} color={color} />
           )
-        }} 
+        }}
       />
 
       {/* Hide all nested/detail routes from tabs */}
@@ -105,6 +105,8 @@ export default function UserTabs() {
       <Tabs.Screen name="wallet/topup-qr" options={{ href: null }} />
       <Tabs.Screen name="wallet/topup-requests/index" options={{ href: null }} />
       <Tabs.Screen name="wallet/topup-requests/[id]" options={{ href: null }} />
+      <Tabs.Screen name="technician-dashboard" options={{ href: null }} />
+      <Tabs.Screen name="host-dashboard" options={{ href: null }} />
     </Tabs>
   )
 }
