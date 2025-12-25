@@ -10,7 +10,7 @@ import { useAuthStore } from '../../../src/stores/authStore'
 
 export default function Settings() {
   const { profile, language, setLanguage, signOut, updateProfile } = useAuthStore()
-  const [fullName, setFullName] = useState(profile?.full_name || '')
+  const [fullName, setFullName] = useState(profile?.name || '')
   const [isEditing, setIsEditing] = useState(false)
   const [saving, setSaving] = useState(false)
   const router = useRouter()
@@ -21,7 +21,7 @@ export default function Settings() {
 
     setSaving(true)
     try {
-      await updateProfile({ id: profile.id, full_name: fullName })
+      await updateProfile({ id: profile.id, name: fullName })
       Alert.alert('Succès', 'Profil mis à jour')
       setIsEditing(false)
     } catch {
@@ -76,7 +76,7 @@ export default function Settings() {
                   label={t('cancel')}
                   onPress={() => {
                     setIsEditing(false)
-                    setFullName(profile?.full_name || '')
+                    setFullName(profile?.name || '')
                   }}
                 />
               </View>
@@ -85,7 +85,7 @@ export default function Settings() {
             <>
               <View style={styles.profileInfo}>
                 <Text style={styles.label}>Nom</Text>
-                <Text style={styles.value}>{profile?.full_name || 'Non défini'}</Text>
+                <Text style={styles.value}>{profile?.name || 'Non défini'}</Text>
               </View>
               <View style={styles.profileInfo}>
                 <Text style={styles.label}>Téléphone</Text>

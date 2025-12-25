@@ -11,7 +11,7 @@ import { useAuthStore } from '../../src/stores/authStore'
 export default function ProfileScreen() {
   const updateProfile = useAuthStore((s) => s.updateProfile)
   const profile = useAuthStore((s) => s.profile)
-  const [name, setName] = useState(profile?.full_name ?? '')
+  const [name, setName] = useState(profile?.name ?? '')
   const router = useRouter()
   const colorScheme = useColorScheme()
   const colors = Colors[colorScheme ?? 'light']
@@ -22,7 +22,7 @@ export default function ProfileScreen() {
       return
     }
 
-    await updateProfile({ full_name: name })
+    await updateProfile({ name: name })
     Alert.alert('Succès', 'Profil enregistré')
 
     // All users land on map view first, then can navigate to role-specific dashboards via tabs

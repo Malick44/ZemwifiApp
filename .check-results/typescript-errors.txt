@@ -1,203 +1,175 @@
-[96m__tests__/authStore.test.ts[0m:[93m29[0m:[93m30[0m - [91merror[0m[90m TS2339: [0mProperty 'signInWithPhone' does not exist on type 'AuthState'.
+[96m__tests__/authStore.test.ts[0m:[93m213[0m:[93m46[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'full_name' does not exist in type 'Partial<Profile>'.
 
-[7m29[0m         await result.current.signInWithPhone('+221771234567');
-[7m  [0m [91m                             ~~~~~~~~~~~~~~~[0m
+[7m213[0m         await result.current.updateProfile({ full_name: 'John Doe' });
+[7m   [0m [91m                                             ~~~~~~~~~[0m
 
-[96m__tests__/authStore.test.ts[0m:[93m48[0m:[93m30[0m - [91merror[0m[90m TS2339: [0mProperty 'signInWithPhone' does not exist on type 'AuthState'.
+[96m__tests__/authStore.test.ts[0m:[93m217[0m:[93m38[0m - [91merror[0m[90m TS2339: [0mProperty 'full_name' does not exist on type 'Profile'.
 
-[7m48[0m         await result.current.signInWithPhone('invalid');
-[7m  [0m [91m                             ~~~~~~~~~~~~~~~[0m
+[7m217[0m       expect(result.current.profile?.full_name).toBe('John Doe');
+[7m   [0m [91m                                     ~~~~~~~~~[0m
 
-[96m__tests__/authStore.test.ts[0m:[93m64[0m:[93m24[0m - [91merror[0m[90m TS2339: [0mProperty 'signInWithPhone' does not exist on type 'AuthState'.
+[96m__tests__/authStore.test.ts[0m:[93m244[0m:[93m46[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'full_name' does not exist in type 'Partial<Profile>'.
 
-[7m64[0m         result.current.signInWithPhone('+221771234567');
-[7m  [0m [91m                       ~~~~~~~~~~~~~~~[0m
+[7m244[0m         await result.current.updateProfile({ full_name: 'John Doe' });
+[7m   [0m [91m                                             ~~~~~~~~~[0m
 
-[96m__tests__/authStore.test.ts[0m:[93m183[0m:[93m38[0m - [91merror[0m[90m TS2339: [0mProperty 'language' does not exist on type 'Profile'.
+[96m__tests__/discoveryStore.test.ts[0m:[93m10[0m:[93m3[0m - [91merror[0m[90m TS2741: [0mProperty 'range_meters' is missing in type '{ id: string; host_id: string; name: string; landmark: string; address: string; lat: number; lng: number; ssid: string; is_online: true; sales_paused: false; hours: string; }' but required in type 'Hotspot'.
 
-[7m183[0m       expect(result.current.profile?.language).toBe('en');
-[7m   [0m [91m                                     ~~~~~~~~[0m
+[7m 10[0m   {
+[7m   [0m [91m  ~[0m
+[7m 11[0m     id: '1',
+[7m   [0m [91m~~~~~~~~~~~~[0m
+[7m...[0m 
+[7m 21[0m     hours: '08:00 - 22:00'
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m 22[0m   },
+[7m   [0m [91m~~~[0m
 
-[96m__tests__/authStore.test.ts[0m:[93m261[0m:[93m24[0m - [91merror[0m[90m TS2339: [0mProperty 'clearError' does not exist on type 'AuthState'.
+  [96msrc/types/domain.ts[0m:[93m19[0m:[93m3[0m
+    [7m19[0m   range_meters: number
+    [7m  [0m [96m  ~~~~~~~~~~~~[0m
+    'range_meters' is declared here.
 
-[7m261[0m         result.current.clearError();
-[7m   [0m [91m                       ~~~~~~~~~~[0m
+[96m__tests__/discoveryStore.test.ts[0m:[93m23[0m:[93m3[0m - [91merror[0m[90m TS2741: [0mProperty 'range_meters' is missing in type '{ id: string; host_id: string; name: string; landmark: string; address: string; lat: number; lng: number; ssid: string; is_online: true; sales_paused: false; hours: string; }' but required in type 'Hotspot'.
 
-[96m__tests__/discoveryStore.test.ts[0m:[93m13[0m:[93m5[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'description' does not exist in type 'Hotspot'.
+[7m 23[0m   {
+[7m   [0m [91m  ~[0m
+[7m 24[0m     id: '2',
+[7m   [0m [91m~~~~~~~~~~~~[0m
+[7m...[0m 
+[7m 34[0m     hours: '10:00 - 23:00'
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m 35[0m   },
+[7m   [0m [91m~~~[0m
 
-[7m13[0m     description: 'Fast internet at the café',
-[7m  [0m [91m    ~~~~~~~~~~~[0m
+  [96msrc/types/domain.ts[0m:[93m19[0m:[93m3[0m
+    [7m19[0m   range_meters: number
+    [7m  [0m [96m  ~~~~~~~~~~~~[0m
+    'range_meters' is declared here.
 
-[96m__tests__/discoveryStore.test.ts[0m:[93m26[0m:[93m5[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'description' does not exist in type 'Hotspot'.
+[96m__tests__/discoveryStore.test.ts[0m:[93m36[0m:[93m3[0m - [91merror[0m[90m TS2741: [0mProperty 'range_meters' is missing in type '{ id: string; host_id: string; name: string; landmark: string; address: string; lat: number; lng: number; ssid: string; is_online: true; sales_paused: false; hours: string; }' but required in type 'Hotspot'.
 
-[7m26[0m     description: 'WiFi for customers',
-[7m  [0m [91m    ~~~~~~~~~~~[0m
+[7m 36[0m   {
+[7m   [0m [91m  ~[0m
+[7m 37[0m     id: '3',
+[7m   [0m [91m~~~~~~~~~~~~[0m
+[7m...[0m 
+[7m 47[0m     hours: '09:00 - 18:00'
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m 48[0m   },
+[7m   [0m [91m~~~[0m
 
-[96m__tests__/discoveryStore.test.ts[0m:[93m39[0m:[93m5[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'description' does not exist in type 'Hotspot'.
+  [96msrc/types/domain.ts[0m:[93m19[0m:[93m3[0m
+    [7m19[0m   range_meters: number
+    [7m  [0m [96m  ~~~~~~~~~~~~[0m
+    'range_meters' is declared here.
 
-[7m39[0m     description: 'Study with fast internet',
-[7m  [0m [91m    ~~~~~~~~~~~[0m
+[96mapp/(app)/(host)/dashboard.tsx[0m:[93m138[0m:[93m39[0m - [91merror[0m[90m TS2339: [0mProperty 'full_name' does not exist on type 'Profile'.
 
-[96m__tests__/discoveryStore.test.ts[0m:[93m58[0m:[93m7[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'selectedFilters' does not exist in type 'DiscoveryState | Partial<DiscoveryState> | ((state: DiscoveryState) => DiscoveryState | Partial<DiscoveryState>)'.
+[7m138[0m           title={`Bonjour, ${profile?.full_name?.split(' ')[0] || 'Hôte'}`}
+[7m   [0m [91m                                      ~~~~~~~~~[0m
 
-[7m58[0m       selectedFilters: {
-[7m  [0m [91m      ~~~~~~~~~~~~~~~[0m
+[96mapp/(app)/(shared)/settings.tsx[0m:[93m13[0m:[93m53[0m - [91merror[0m[90m TS2339: [0mProperty 'full_name' does not exist on type 'Profile'.
 
-[96m__tests__/discoveryStore.test.ts[0m:[93m83[0m:[93m30[0m - [91merror[0m[90m TS2551: [0mProperty 'loadHotspots' does not exist on type 'DiscoveryState'. Did you mean 'hotspots'?
+[7m13[0m   const [fullName, setFullName] = useState(profile?.full_name || '')
+[7m  [0m [91m                                                    ~~~~~~~~~[0m
 
-[7m83[0m         await result.current.loadHotspots();
-[7m  [0m [91m                             ~~~~~~~~~~~~[0m
+[96mapp/(app)/(shared)/settings.tsx[0m:[93m24[0m:[93m45[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'full_name' does not exist in type 'Partial<Profile>'.
 
-  [96msrc/stores/discoveryStore.ts[0m:[93m6[0m:[93m3[0m
-    [7m6[0m   hotspots: Hotspot[]
-    [7m [0m [96m  ~~~~~~~~[0m
-    'hotspots' is declared here.
+[7m24[0m       await updateProfile({ id: profile.id, full_name: fullName })
+[7m  [0m [91m                                            ~~~~~~~~~[0m
 
-[96m__tests__/discoveryStore.test.ts[0m:[93m105[0m:[93m30[0m - [91merror[0m[90m TS2551: [0mProperty 'loadHotspots' does not exist on type 'DiscoveryState'. Did you mean 'hotspots'?
+[96mapp/(app)/(shared)/settings.tsx[0m:[93m78[0m:[93m40[0m - [91merror[0m[90m TS2339: [0mProperty 'full_name' does not exist on type 'Profile'.
 
-[7m105[0m         await result.current.loadHotspots();
-[7m   [0m [91m                             ~~~~~~~~~~~~[0m
+[7m78[0m                   setFullName(profile?.full_name || '')
+[7m  [0m [91m                                       ~~~~~~~~~[0m
 
-  [96msrc/stores/discoveryStore.ts[0m:[93m6[0m:[93m3[0m
-    [7m6[0m   hotspots: Hotspot[]
-    [7m [0m [96m  ~~~~~~~~[0m
-    'hotspots' is declared here.
+[96mapp/(app)/(shared)/settings.tsx[0m:[93m87[0m:[93m52[0m - [91merror[0m[90m TS2339: [0mProperty 'full_name' does not exist on type 'Profile'.
 
-[96m__tests__/discoveryStore.test.ts[0m:[93m126[0m:[93m24[0m - [91merror[0m[90m TS2551: [0mProperty 'loadHotspots' does not exist on type 'DiscoveryState'. Did you mean 'hotspots'?
+[7m87[0m               <Text style={styles.value}>{profile?.full_name || 'Non défini'}</Text>
+[7m  [0m [91m                                                   ~~~~~~~~~[0m
 
-[7m126[0m         result.current.loadHotspots();
-[7m   [0m [91m                       ~~~~~~~~~~~~[0m
+[96mapp/(app)/(user)/host-dashboard.tsx[0m:[93m138[0m:[93m39[0m - [91merror[0m[90m TS2339: [0mProperty 'full_name' does not exist on type 'Profile'.
 
-  [96msrc/stores/discoveryStore.ts[0m:[93m6[0m:[93m3[0m
-    [7m6[0m   hotspots: Hotspot[]
-    [7m [0m [96m  ~~~~~~~~[0m
-    'hotspots' is declared here.
+[7m138[0m           title={`Bonjour, ${profile?.full_name?.split(' ')[0] || 'Hôte'}`}
+[7m   [0m [91m                                      ~~~~~~~~~[0m
 
-[96m__tests__/discoveryStore.test.ts[0m:[93m145[0m:[93m39[0m - [91merror[0m[90m TS2339: [0mProperty 'calculateDistance' does not exist on type 'DiscoveryState'.
+[96mapp/(app)/(user)/settings.tsx[0m:[93m13[0m:[93m53[0m - [91merror[0m[90m TS2339: [0mProperty 'full_name' does not exist on type 'Profile'.
 
-[7m145[0m       const distance = result.current.calculateDistance(
-[7m   [0m [91m                                      ~~~~~~~~~~~~~~~~~[0m
+[7m13[0m   const [fullName, setFullName] = useState(profile?.full_name || '')
+[7m  [0m [91m                                                    ~~~~~~~~~[0m
 
-[96m__tests__/discoveryStore.test.ts[0m:[93m160[0m:[93m39[0m - [91merror[0m[90m TS2339: [0mProperty 'calculateDistance' does not exist on type 'DiscoveryState'.
+[96mapp/(app)/(user)/settings.tsx[0m:[93m24[0m:[93m45[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'full_name' does not exist in type 'Partial<Profile>'.
 
-[7m160[0m       const distance = result.current.calculateDistance(
-[7m   [0m [91m                                      ~~~~~~~~~~~~~~~~~[0m
+[7m24[0m       await updateProfile({ id: profile.id, full_name: fullName })
+[7m  [0m [91m                                            ~~~~~~~~~[0m
 
-[96m__tests__/discoveryStore.test.ts[0m:[93m176[0m:[93m49[0m - [91merror[0m[90m TS2554: [0mExpected 1 arguments, but got 2.
+[96mapp/(app)/(user)/settings.tsx[0m:[93m79[0m:[93m42[0m - [91merror[0m[90m TS2339: [0mProperty 'full_name' does not exist on type 'Profile'.
 
-[7m176[0m         result.current.setUserLocation(14.7167, -17.4677);
-[7m   [0m [91m                                                ~~~~~~~~[0m
+[7m79[0m                     setFullName(profile?.full_name || '')
+[7m  [0m [91m                                         ~~~~~~~~~[0m
 
-[96m__tests__/discoveryStore.test.ts[0m:[93m191[0m:[93m27[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'latitude' does not exist in type '{ lat: number; lng: number; }'.
+[96mapp/(app)/(user)/settings.tsx[0m:[93m88[0m:[93m54[0m - [91merror[0m[90m TS2339: [0mProperty 'full_name' does not exist on type 'Profile'.
 
-[7m191[0m           userLocation: { latitude: 14.7167, longitude: -17.4677 },
-[7m   [0m [91m                          ~~~~~~~~[0m
+[7m88[0m                 <Text style={styles.value}>{profile?.full_name || 'Non défini'}</Text>
+[7m  [0m [91m                                                     ~~~~~~~~~[0m
 
-[96m__tests__/discoveryStore.test.ts[0m:[93m217[0m:[93m26[0m - [91merror[0m[90m TS2339: [0mProperty 'distance' does not exist on type 'Hotspot'.
+[96mapp/(auth)/profile.tsx[0m:[93m14[0m:[93m45[0m - [91merror[0m[90m TS2339: [0mProperty 'full_name' does not exist on type 'Profile'.
 
-[7m217[0m         expect(nearby[i].distance).toBeLessThanOrEqual(nearby[i + 1].distance!);
-[7m   [0m [91m                         ~~~~~~~~[0m
+[7m14[0m   const [name, setName] = useState(profile?.full_name ?? '')
+[7m  [0m [91m                                            ~~~~~~~~~[0m
 
-[96m__tests__/discoveryStore.test.ts[0m:[93m217[0m:[93m70[0m - [91merror[0m[90m TS2339: [0mProperty 'distance' does not exist on type 'Hotspot'.
+[96mapp/(auth)/profile.tsx[0m:[93m25[0m:[93m27[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'full_name' does not exist in type 'Partial<Profile>'.
 
-[7m217[0m         expect(nearby[i].distance).toBeLessThanOrEqual(nearby[i + 1].distance!);
-[7m   [0m [91m                                                                     ~~~~~~~~[0m
+[7m25[0m     await updateProfile({ full_name: name })
+[7m  [0m [91m                          ~~~~~~~~~[0m
 
-[96m__tests__/discoveryStore.test.ts[0m:[93m286[0m:[93m11[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'selectedFilters' does not exist in type 'DiscoveryState | Partial<DiscoveryState> | ((state: DiscoveryState) => DiscoveryState | Partial<DiscoveryState>)'.
+[96mcomponents/DevPanel.tsx[0m:[93m265[0m:[93m59[0m - [91merror[0m[90m TS2339: [0mProperty 'full_name' does not exist on type 'Profile'.
 
-[7m286[0m           selectedFilters: {
-[7m   [0m [91m          ~~~~~~~~~~~~~~~[0m
+[7m265[0m             <Text style={styles.currentUserName}>{profile.full_name || 'Unknown'}</Text>
+[7m   [0m [91m                                                          ~~~~~~~~~[0m
 
-[96m__tests__/discoveryStore.test.ts[0m:[93m296[0m:[93m36[0m - [91merror[0m[90m TS2339: [0mProperty 'signal_strength' does not exist on type 'Hotspot'.
+[96msrc/stores/messageStore.ts[0m:[93m130[0m:[93m19[0m - [91merror[0m[90m TS2552: [0mCannot find name 'error'. Did you mean '_error'?
 
-[7m296[0m       expect(filtered.every(h => h.signal_strength === 'excellent')).toBe(true);
-[7m   [0m [91m                                   ~~~~~~~~~~~~~~~[0m
+[7m130[0m             throw error
+[7m   [0m [91m                  ~~~~~[0m
 
-[96m__tests__/discoveryStore.test.ts[0m:[93m305[0m:[93m11[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'selectedFilters' does not exist in type 'DiscoveryState | Partial<DiscoveryState> | ((state: DiscoveryState) => DiscoveryState | Partial<DiscoveryState>)'.
+  [96msrc/stores/messageStore.ts[0m:[93m128[0m:[93m18[0m
+    [7m128[0m         } catch (_error) {
+    [7m   [0m [96m                 ~~~~~~[0m
+    '_error' is declared here.
 
-[7m305[0m           selectedFilters: {
-[7m   [0m [91m          ~~~~~~~~~~~~~~~[0m
+[96msrc/stores/technicianRequestStore.ts[0m:[93m205[0m:[93m19[0m - [91merror[0m[90m TS2552: [0mCannot find name 'error'. Did you mean '_error'?
 
-[96m__tests__/discoveryStore.test.ts[0m:[93m333[0m:[93m24[0m - [91merror[0m[90m TS2339: [0mProperty 'setFilters' does not exist on type 'DiscoveryState'.
+[7m205[0m             throw error
+[7m   [0m [91m                  ~~~~~[0m
 
-[7m333[0m         result.current.setFilters({
-[7m   [0m [91m                       ~~~~~~~~~~[0m
+  [96msrc/stores/technicianRequestStore.ts[0m:[93m203[0m:[93m18[0m
+    [7m203[0m         } catch (_error) {
+    [7m   [0m [96m                 ~~~~~~[0m
+    '_error' is declared here.
 
-[96m__tests__/discoveryStore.test.ts[0m:[93m339[0m:[93m29[0m - [91merror[0m[90m TS2339: [0mProperty 'selectedFilters' does not exist on type 'DiscoveryState'.
+[96msrc/stores/technicianRequestStore.ts[0m:[93m235[0m:[93m19[0m - [91merror[0m[90m TS2552: [0mCannot find name 'error'. Did you mean '_error'?
 
-[7m339[0m       expect(result.current.selectedFilters.signalStrength).toEqual(['excellent', 'good']);
-[7m   [0m [91m                            ~~~~~~~~~~~~~~~[0m
+[7m235[0m             throw error
+[7m   [0m [91m                  ~~~~~[0m
 
-[96m__tests__/discoveryStore.test.ts[0m:[93m346[0m:[93m24[0m - [91merror[0m[90m TS2339: [0mProperty 'setFilters' does not exist on type 'DiscoveryState'.
+  [96msrc/stores/technicianRequestStore.ts[0m:[93m233[0m:[93m18[0m
+    [7m233[0m         } catch (_error) {
+    [7m   [0m [96m                 ~~~~~~[0m
+    '_error' is declared here.
 
-[7m346[0m         result.current.setFilters({
-[7m   [0m [91m                       ~~~~~~~~~~[0m
 
-[96m__tests__/discoveryStore.test.ts[0m:[93m352[0m:[93m29[0m - [91merror[0m[90m TS2339: [0mProperty 'selectedFilters' does not exist on type 'DiscoveryState'.
-
-[7m352[0m       expect(result.current.selectedFilters.priceRange).toEqual({ min: 0, max: 1000 });
-[7m   [0m [91m                            ~~~~~~~~~~~~~~~[0m
-
-[96m__tests__/discoveryStore.test.ts[0m:[93m363[0m:[93m24[0m - [91merror[0m[90m TS2339: [0mProperty 'setFilters' does not exist on type 'DiscoveryState'.
-
-[7m363[0m         result.current.setFilters({
-[7m   [0m [91m                       ~~~~~~~~~~[0m
-
-[96m__tests__/discoveryStore.test.ts[0m:[93m371[0m:[93m24[0m - [91merror[0m[90m TS2339: [0mProperty 'clearFilters' does not exist on type 'DiscoveryState'.
-
-[7m371[0m         result.current.clearFilters();
-[7m   [0m [91m                       ~~~~~~~~~~~~[0m
-
-[96m__tests__/discoveryStore.test.ts[0m:[93m375[0m:[93m29[0m - [91merror[0m[90m TS2339: [0mProperty 'selectedFilters' does not exist on type 'DiscoveryState'.
-
-[7m375[0m       expect(result.current.selectedFilters).toEqual({
-[7m   [0m [91m                            ~~~~~~~~~~~~~~~[0m
-
-[96m__tests__/discoveryStore.test.ts[0m:[93m393[0m:[93m24[0m - [91merror[0m[90m TS2339: [0mProperty 'clearError' does not exist on type 'DiscoveryState'.
-
-[7m393[0m         result.current.clearError();
-[7m   [0m [91m                       ~~~~~~~~~~[0m
-
-[96mapp/(app)/(host)/cashin.tsx[0m:[93m101[0m:[93m11[0m - [91merror[0m[90m TS2322: [0mType '{ label: string; value: string; onChangeText: Dispatch<SetStateAction<string>>; placeholder: string; keyboardType: string; }' is not assignable to type 'IntrinsicAttributes & Props'.
-  Property 'keyboardType' does not exist on type 'IntrinsicAttributes & Props'.
-
-[7m101[0m           keyboardType="phone-pad"
-[7m   [0m [91m          ~~~~~~~~~~~~[0m
-
-[96mapp/(app)/(host)/cashin.tsx[0m:[93m108[0m:[93m11[0m - [91merror[0m[90m TS2322: [0mType '{ label: string; value: string; onChangeText: Dispatch<SetStateAction<string>>; placeholder: string; keyboardType: string; }' is not assignable to type 'IntrinsicAttributes & Props'.
-  Property 'keyboardType' does not exist on type 'IntrinsicAttributes & Props'.
-
-[7m108[0m           keyboardType="numeric"
-[7m   [0m [91m          ~~~~~~~~~~~~[0m
-
-[96mapp/(app)/(host)/cashin.tsx[0m:[93m142[0m:[93m24[0m - [91merror[0m[90m TS2322: [0mType '{ text: "pending" | "expired" | "confirmed" | "rejected"; color: string; }' is not assignable to type 'IntrinsicAttributes & BadgeProps'.
-  Property 'text' does not exist on type 'IntrinsicAttributes & BadgeProps'.
-
-[7m142[0m                 <Badge text={item.status} color="orange" />
-[7m   [0m [91m                       ~~~~[0m
-
-[96mapp/(app)/(host)/cashin.tsx[0m:[93m168[0m:[93m24[0m - [91merror[0m[90m TS2322: [0mType '{ text: string; color: string; }' is not assignable to type 'IntrinsicAttributes & BadgeProps'.
-  Property 'text' does not exist on type 'IntrinsicAttributes & BadgeProps'.
-
-[7m168[0m                 <Badge text="Confirmé" color="green" />
-[7m   [0m [91m                       ~~~~[0m
-
-[96mcomponents/ui/Button.tsx[0m:[93m104[0m:[93m45[0m - [91merror[0m[90m TS2345: [0mArgument of type '{ pressed: boolean; }' is not assignable to parameter of type 'PressableStateCallbackType'.
-  Property 'hovered' is missing in type '{ pressed: boolean; }' but required in type 'PressableStateCallbackType'.
-
-[7m104[0m         typeof style === 'function' ? style({ pressed }) : style,
-[7m   [0m [91m                                            ~~~~~~~~~~~[0m
-
-  [96mnode_modules/expo/types/react-native-web.d.ts[0m:[93m245[0m:[93m14[0m
-    [7m245[0m     readonly hovered: boolean;
-    [7m   [0m [96m             ~~~~~~~[0m
-    'hovered' is declared here.
-
-
-Found 34 errors in 4 files.
+Found 22 errors in 10 files.
 
 Errors  Files
-     5  __tests__/authStore.test.ts[90m:29[0m
-    24  __tests__/discoveryStore.test.ts[90m:13[0m
-     4  app/(app)/(host)/cashin.tsx[90m:101[0m
-     1  components/ui/Button.tsx[90m:104[0m
+     3  __tests__/authStore.test.ts[90m:213[0m
+     3  __tests__/discoveryStore.test.ts[90m:10[0m
+     1  app/(app)/(host)/dashboard.tsx[90m:138[0m
+     4  app/(app)/(shared)/settings.tsx[90m:13[0m
+     1  app/(app)/(user)/host-dashboard.tsx[90m:138[0m
+     4  app/(app)/(user)/settings.tsx[90m:13[0m
+     2  app/(auth)/profile.tsx[90m:14[0m
+     1  components/DevPanel.tsx[90m:265[0m
+     1  src/stores/messageStore.ts[90m:130[0m
+     2  src/stores/technicianRequestStore.ts[90m:205[0m

@@ -156,7 +156,7 @@ export default function NewTechnicianRequestScreen() {
           : 'Un technicien prendra en charge votre demande sous peu.',
         [{ text: 'OK', onPress: () => router.push(`/(app)/(host)/technician-requests/${request.id}`) }]
       )
-    } catch (error) {
+    } catch (_error) {
       Alert.alert('Erreur', 'Impossible de créer la demande. Veuillez réessayer.')
     }
   }

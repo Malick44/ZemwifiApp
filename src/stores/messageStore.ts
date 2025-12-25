@@ -95,7 +95,7 @@ export const useMessageStore = create<MessageState>((set, get) => ({
             await new Promise(resolve => setTimeout(resolve, 400))
             const mockMessages = generateMockMessages(requestId)
             set({ messages: mockMessages, loading: false })
-        } catch (error) {
+        } catch (_error) {
             set({ error: 'Failed to fetch messages', loading: false })
         }
     },
@@ -125,9 +125,9 @@ export const useMessageStore = create<MessageState>((set, get) => ({
             }))
 
             return newMessage
-        } catch (error) {
+        } catch (_error) {
             set({ error: 'Failed to send message', loading: false })
-            throw error
+            throw _error
         }
     },
 
@@ -143,7 +143,7 @@ export const useMessageStore = create<MessageState>((set, get) => ({
                         : msg
                 )
             }))
-        } catch (error) {
+        } catch (_error) {
             set({ error: 'Failed to mark message as read' })
         }
     },
@@ -160,7 +160,7 @@ export const useMessageStore = create<MessageState>((set, get) => ({
                         : msg
                 )
             }))
-        } catch (error) {
+        } catch (_error) {
             set({ error: 'Failed to mark messages as read' })
         }
     },

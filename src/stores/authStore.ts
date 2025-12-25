@@ -74,7 +74,7 @@ export const useAuthStore = create<AuthState>()(
             if (!existingProfile) {
               // Get phone and email from auth user
               const userPhone = data.user.phone || data.user.user_metadata?.phone || phone
-              const userEmail = data.user.email || null
+              const _userEmail = data.user.email || null
 
               // Create profile manually using service role or authenticated context
               await supabase.from('profiles').insert({
@@ -112,7 +112,7 @@ export const useAuthStore = create<AuthState>()(
             try {
               // Get phone from user metadata or phone field
               const phone = data.session.user.phone || data.session.user.user_metadata?.phone || null
-              const email = data.session.user.email || null
+              const _email = data.session.user.email || null
 
               const { data: newProfile } = await supabase
                 .from('profiles')

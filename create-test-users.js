@@ -33,7 +33,7 @@ async function createTestUsers() {
     try {
       console.log(`Creating: ${user.full_name}...`);
       
-      const { data, error } = await supabase.auth.admin.createUser({
+      const { data: _data, error } = await supabase.auth.admin.createUser({
         id: user.id,
         email: user.email,
         password: user.password,

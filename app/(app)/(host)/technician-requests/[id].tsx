@@ -68,7 +68,7 @@ export default function TechnicianRequestDetailScreen() {
       setShowEditSheet(false)
       loadData()
       Alert.alert('Succès', 'La demande a été mise à jour')
-    } catch (error) {
+    } catch (_error) {
       Alert.alert('Erreur', 'Impossible de mettre à jour la demande')
     }
   }
@@ -93,7 +93,7 @@ export default function TechnicianRequestDetailScreen() {
               setShowCancelSheet(false)
               loadData()
               Alert.alert('Succès', 'La demande a été annulée')
-            } catch (error) {
+            } catch (_error) {
               Alert.alert('Erreur', 'Impossible d\'annuler la demande')
             }
           }
@@ -107,7 +107,7 @@ export default function TechnicianRequestDetailScreen() {
     try {
       await sendMessage(id, text)
       // Auto scroll to bottom handled by layout change
-    } catch (error) {
+    } catch (_error) {
       Alert.alert('Erreur', 'Échec de l\'envoi du message')
     }
   }
@@ -257,7 +257,7 @@ export default function TechnicianRequestDetailScreen() {
 
           {request.cancel_reason && (
             <Card variant="outlined" style={[styles.descCard, { borderColor: colors.error }]}>
-              <Typography variant="label" color="error" style={{ marginBottom: 4 }}>Motif d'annulation</Typography>
+              <Typography variant="label" color="error" style={{ marginBottom: 4 }}>Motif d&apos;annulation</Typography>
               <Typography variant="body">{request.cancel_reason}</Typography>
             </Card>
           )}
@@ -284,7 +284,7 @@ export default function TechnicianRequestDetailScreen() {
                 <Ionicons name="person-outline" size={24} color={colors.textSecondary} />
               </View>
               <View style={styles.techInfo}>
-                <Typography variant="body" color="textSecondary">En attente d'assignation...</Typography>
+                <Typography variant="body" color="textSecondary">En attente d&apos;assignation...</Typography>
               </View>
             </Card>
           )}
@@ -431,11 +431,11 @@ export default function TechnicianRequestDetailScreen() {
       >
         <View style={{ padding: 20 }}>
           <Typography variant="body" style={{ marginBottom: 16 }}>
-            Veuillez indiquer la raison de l'annulation. Cette action est irréversible.
+            Veuillez indiquer la raison de l&apos;annulation. Cette action est irréversible.
           </Typography>
 
           <TextField
-            label="Raison de l'annulation"
+            label="Raison de l&apos;annulation"
             placeholder="Ex: Problème résolu, Technicien absent..."
             value={cancelReason}
             onChangeText={setCancelReason}
@@ -450,7 +450,7 @@ export default function TechnicianRequestDetailScreen() {
             onPress={handleCancel}
             loading={reqLoading}
           >
-            Confirmer l'annulation
+            Confirmer l&apos;annulation
           </Button>
         </View>
       </BottomSheet>

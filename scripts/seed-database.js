@@ -110,7 +110,7 @@ async function seedHotspots(userIds) {
     },
   ];
 
-  const { data, error } = await supabase.from('hotspots').upsert(hotspots, { onConflict: 'id' });
+  const { data: _data, error } = await supabase.from('hotspots').upsert(hotspots, { onConflict: 'id' });
   
   if (error) {
     console.error('  ❌ Error seeding hotspots:', error.message);

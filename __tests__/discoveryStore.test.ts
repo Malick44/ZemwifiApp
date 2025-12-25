@@ -18,7 +18,8 @@ const mockHotspots: Hotspot[] = [
     ssid: 'Cafe_Free',
     is_online: true,
     sales_paused: false,
-    hours: '08:00 - 22:00'
+    hours: '08:00 - 22:00',
+    range_meters: 50
   },
   {
     id: '2',
@@ -31,7 +32,8 @@ const mockHotspots: Hotspot[] = [
     ssid: 'Resto_Guest',
     is_online: true,
     sales_paused: false,
-    hours: '10:00 - 23:00'
+    hours: '10:00 - 23:00',
+    range_meters: 75
   },
   {
     id: '3',
@@ -44,7 +46,8 @@ const mockHotspots: Hotspot[] = [
     ssid: 'Lib_Secure',
     is_online: true,
     sales_paused: false,
-    hours: '09:00 - 18:00'
+    hours: '09:00 - 18:00',
+    range_meters: 100
   },
 ];
 

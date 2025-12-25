@@ -262,7 +262,7 @@ export function DevPanel() {
         {profile && (
           <View style={styles.currentUserSection}>
             <Text style={styles.sectionLabel}>Connected as:</Text>
-            <Text style={styles.currentUserName}>{profile.full_name || 'Unknown'}</Text>
+            <Text style={styles.currentUserName}>{profile.name || 'Unknown'}</Text>
             <Text style={styles.currentUserRole}>
               {profile.role ? profile.role.charAt(0).toUpperCase() + profile.role.slice(1) : 'User'}
             </Text>

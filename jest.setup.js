@@ -1,3 +1,4 @@
+/* global jest */
 // Mock Expo modules and globals
 global.__expo = {};
 global.__ExpoImportMetaRegistry = {};

@@ -210,11 +210,11 @@ describe('authStore', () => {
       });
 
       await act(async () => {
-        await result.current.updateProfile({ full_name: 'John Doe' });
+        await result.current.updateProfile({ name: 'John Doe' });
       });
 
-      expect(mockUpdate).toHaveBeenCalledWith({ full_name: 'John Doe' });
-      expect(result.current.profile?.full_name).toBe('John Doe');
+      expect(mockUpdate).toHaveBeenCalledWith({ name: 'John Doe' });
+      expect(result.current.profile?.name).toBe('John Doe');
     });
 
     it('should handle update errors', async () => {

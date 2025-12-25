@@ -91,7 +91,7 @@ export const useTechnicianStore = create<TechnicianState>((set, get) => ({
             const available = mockTechnicians.filter(t => t.is_available)
 
             set({ technicians: available, loading: false })
-        } catch (error) {
+        } catch (_error) {
             set({ error: 'Failed to fetch technicians', loading: false })
         }
     },
@@ -110,7 +110,7 @@ export const useTechnicianStore = create<TechnicianState>((set, get) => ({
 
             set({ loading: false, error: 'Technician not found' })
             return null
-        } catch (error) {
+        } catch (_error) {
             set({ error: 'Failed to fetch technician profile', loading: false })
             return null
         }
@@ -129,7 +129,7 @@ export const useTechnicianStore = create<TechnicianState>((set, get) => ({
                     : null,
                 loading: false
             }))
-        } catch (error) {
+        } catch (_error) {
             set({ error: 'Failed to update availability', loading: false })
         }
     },

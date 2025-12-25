@@ -150,7 +150,7 @@ export default function PlanEditorModal() {
         await createPlan(hotspotId, finalData)
       }
       router.back()
-    } catch (error) {
+    } catch (_error) {
       Alert.alert('Erreur', 'Une erreur est survenue lors de la sauvegarde')
     }
   }

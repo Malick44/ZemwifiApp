@@ -7,14 +7,13 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { Badge } from '../../../src/components/ui/Badge'
 import { Card } from '../../../src/components/ui/Card'
 import { EmptyState } from '../../../src/components/ui/EmptyState'
+import { Header } from '../../../src/components/ui/Header'
 import { LoadingState } from '../../../src/components/ui/LoadingState'
 import { Typography } from '../../../src/components/ui/Typography'
 import { usePurchasesStore } from '../../../src/stores/purchasesStore'
 import { Purchase } from '../../../src/types/domain'
 
 type FilterType = 'all' | 'success' | 'pending' | 'failed'
-
-import { Header } from '../../../src/components/ui/Header'
 
 export default function HistoryScreen() {
   const { purchases, refreshPurchases, loading } = usePurchasesStore()

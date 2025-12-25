@@ -2,89 +2,99 @@
 /Users/malickdes/worksapace/ZemwifiApp/.expo/types/router.d.ts
   1:1  warning  Unused eslint-disable directive (no problems were reported)
 
-/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(host)/cashin.tsx
-  18:61  warning  'loading' is assigned a value but never used  @typescript-eslint/no-unused-vars
-  77:22  warning  'error' is defined but never used             @typescript-eslint/no-unused-vars
+/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(host)/hotspot/[id].tsx
+   90:22  warning  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+  112:20  warning  '_error' is defined but never used  @typescript-eslint/no-unused-vars
 
-/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(host)/dashboard.tsx
-  110:51  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(host)/sessions.tsx
+  23:6  warning  React Hook useEffect has a missing dependency: 'fetchActiveSessions'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
-/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(shared)/settings.tsx
-  26:14  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(host)/technician-requests/[id].tsx
+   41:6   warning  React Hook useEffect has a missing dependency: 'loadData'. Either include it or remove the dependency array                               react-hooks/exhaustive-deps
+   49:6   warning  React Hook useEffect has missing dependencies: 'fetchMessages' and 'refreshMessages'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+   71:14  warning  '_error' is defined but never used                                                                                                        @typescript-eslint/no-unused-vars
+   96:22  warning  '_error' is defined but never used                                                                                                        @typescript-eslint/no-unused-vars
+  110:14  warning  '_error' is defined but never used                                                                                                        @typescript-eslint/no-unused-vars
+
+/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(host)/technician-requests/index.tsx
+  28:6  warning  React Hook useEffect has missing dependencies: 'fetchNotifications' and 'fetchRequests'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(host)/technician-requests/new.tsx
+   43:6   warning  React Hook useEffect has missing dependencies: 'fetchAvailableTechnicians' and 'loadRecentTechnicians'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  159:14  warning  '_error' is defined but never used                                                                                                                          @typescript-eslint/no-unused-vars
+
+/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(shared)/notifications/index.tsx
+  22:8  warning  React Hook useEffect has a missing dependency: 'fetchNotifications'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
 /Users/malickdes/worksapace/ZemwifiApp/app/(app)/(user)/history.tsx
-  26:6  warning  React Hook useEffect has a missing dependency: 'refreshPurchases'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  27:6  warning  React Hook useEffect has a missing dependency: 'refreshPurchases'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
 /Users/malickdes/worksapace/ZemwifiApp/app/(app)/(user)/hotspot/[id].tsx
   27:6  warning  React Hook useEffect has missing dependencies: 'fetchHotspots' and 'fetchPlansForHotspot'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
 
 /Users/malickdes/worksapace/ZemwifiApp/app/(app)/(user)/map.tsx
-   2:55  warning  '/Users/malickdes/worksapace/ZemwifiApp/node_modules/react-native/index.js' imported multiple times  import/no-duplicates
-  12:32  warning  '/Users/malickdes/worksapace/ZemwifiApp/node_modules/react-native/index.js' imported multiple times  import/no-duplicates
-
-/Users/malickdes/worksapace/ZemwifiApp/app/(app)/(user)/settings.tsx
-  27:14  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+  65:6  warning  React Hook useEffect has missing dependencies: 'fetchNearbyHotspots' and 'setUserLocation'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
 
 /Users/malickdes/worksapace/ZemwifiApp/app/(app)/(user)/wallet/index.tsx
-  24:6  warning  React Hook useEffect has a missing dependency: 'refresh'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  25:6  warning  React Hook useEffect has a missing dependency: 'refresh'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
-/Users/malickdes/worksapace/ZemwifiApp/app/(auth)/phone.tsx
-  122:58  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+/Users/malickdes/worksapace/ZemwifiApp/app/(modal)/plan-editor.tsx
+  153:14  warning  '_error' is defined but never used  @typescript-eslint/no-unused-vars
 
 /Users/malickdes/worksapace/ZemwifiApp/create-test-users.js
-  36:15  warning  'data' is assigned a value but never used  no-unused-vars
+  36:21  warning  '_data' is assigned a value but never used  no-unused-vars
 
 /Users/malickdes/worksapace/ZemwifiApp/fix-profile-rls.js
-  28:13  warning  'data' is assigned a value but never used  no-unused-vars
-
-/Users/malickdes/worksapace/ZemwifiApp/jest.setup.js
-   7:1   error  'jest' is not defined  no-undef
-  13:1   error  'jest' is not defined  no-undef
-  14:12  error  'jest' is not defined  no-undef
-  15:12  error  'jest' is not defined  no-undef
-  16:15  error  'jest' is not defined  no-undef
-  17:10  error  'jest' is not defined  no-undef
-  18:15  error  'jest' is not defined  no-undef
-  19:13  error  'jest' is not defined  no-undef
-  20:13  error  'jest' is not defined  no-undef
-  21:16  error  'jest' is not defined  no-undef
-  25:1   error  'jest' is not defined  no-undef
-  28:22  error  'jest' is not defined  no-undef
-  29:18  error  'jest' is not defined  no-undef
-  30:16  error  'jest' is not defined  no-undef
-  31:19  error  'jest' is not defined  no-undef
-  32:26  error  'jest' is not defined  no-undef
-  33:46  error  'jest' is not defined  no-undef
-  36:11  error  'jest' is not defined  no-undef
-  37:15  error  'jest' is not defined  no-undef
-  38:15  error  'jest' is not defined  no-undef
-  39:15  error  'jest' is not defined  no-undef
-  40:15  error  'jest' is not defined  no-undef
-  41:11  error  'jest' is not defined  no-undef
-  42:15  error  'jest' is not defined  no-undef
-  48:1   error  'jest' is not defined  no-undef
-  50:11  error  'jest' is not defined  no-undef
-  51:14  error  'jest' is not defined  no-undef
-  52:11  error  'jest' is not defined  no-undef
-  63:9   error  'jest' is not defined  no-undef
-  64:10  error  'jest' is not defined  no-undef
+  28:19  warning  '_data' is assigned a value but never used  no-unused-vars
 
 /Users/malickdes/worksapace/ZemwifiApp/run-migrations.js
-  30:16  warning  'runMigration' is defined but never used   no-unused-vars
-  31:30  error    '__dirname' is not defined                 no-undef
-  44:13  warning  'data' is assigned a value but never used  no-unused-vars
+  31:16  warning  'runMigration' is defined but never used    no-unused-vars
+  45:19  warning  '_data' is assigned a value but never used  no-unused-vars
 
-/Users/malickdes/worksapace/ZemwifiApp/run-rls-fix.js
-  88:29  error  '__dirname' is not defined  no-undef
+/Users/malickdes/worksapace/ZemwifiApp/scripts/seed-database.js
+  113:17  warning  '_data' is assigned a value but never used  no-unused-vars
 
-/Users/malickdes/worksapace/ZemwifiApp/src/components/ErrorBoundary.tsx
-  42:55  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
-  44:38  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
-  48:61  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+/Users/malickdes/worksapace/ZemwifiApp/src/components/ui/BottomSheet.tsx
+  74:8  warning  React Hook useEffect has missing dependencies: 'backdropOpacity' and 'translateY'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/malickdes/worksapace/ZemwifiApp/src/stores/authStore.ts
+   77:21  warning  '_userEmail' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  115:21  warning  '_email' is assigned a value but never used      @typescript-eslint/no-unused-vars
+
+/Users/malickdes/worksapace/ZemwifiApp/src/stores/messageStore.ts
+   98:18  warning  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+  128:18  warning  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+  146:18  warning  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+  163:18  warning  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/malickdes/worksapace/ZemwifiApp/src/stores/notificationStore.ts
+  129:18  warning  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+  149:18  warning  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+  167:18  warning  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+  183:18  warning  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+  194:18  warning  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/malickdes/worksapace/ZemwifiApp/src/stores/technicianRequestStore.ts
+  142:18  warning  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+  164:18  warning  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+  203:18  warning  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+  233:18  warning  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+  252:18  warning  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+  278:18  warning  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+  301:18  warning  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+  332:18  warning  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+  354:18  warning  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+  378:18  warning  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+  401:18  warning  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/malickdes/worksapace/ZemwifiApp/src/stores/technicianStore.ts
+   94:18  warning  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+  113:18  warning  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+  132:18  warning  '_error' is defined but never used  @typescript-eslint/no-unused-vars
 
 /Users/malickdes/worksapace/ZemwifiApp/verify-database.js
   33:15  warning  'data' is assigned a value but never used  no-unused-vars
 
-✖ 52 problems (37 errors, 15 warnings)
-  0 errors and 2 warnings potentially fixable with the `--fix` option.
+✖ 50 problems (0 errors, 50 warnings)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
 

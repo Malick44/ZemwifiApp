@@ -1,3 +1,4 @@
+/* global __dirname */
 // Automated Migration Runner for Supabase
 require('dotenv').config();
 const { createClient } = require('@supabase/supabase-js');
@@ -41,7 +42,7 @@ async function runMigration(filename) {
 
   try {
     // Note: This won't work with anon key - needs service_role
-    const { data, error } = await supabase.rpc('exec_sql', { sql_string: sql });
+    const { data: _data, error } = await supabase.rpc('exec_sql', { sql_string: sql });
     
     if (error) {
       console.log(`❌ Error: ${error.message}`);

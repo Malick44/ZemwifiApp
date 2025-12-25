@@ -19,15 +19,15 @@ export default function HostHotspotDetail() {
   const colors = Colors[colorScheme ?? 'light']
   const styles = createStyles(colors)
 
-  currentHotspot: hotspot,
+  const {
+    currentHotspot: hotspot,
     currentPlans: plans,
-      currentStats: stats,
-        fetchHotspotDetails,
-        updateHotspotStatus,
-        updateHotspotRange,
-        toggleSalesPause,
-        togglePlanStatus,
-        deletePlan,
+    currentStats: stats,
+    fetchHotspotDetails,
+    updateHotspotStatus,
+    updateHotspotRange,
+    toggleSalesPause,
+    deletePlan,
         deleteHotspot,
         loading
 } = useHostHotspotStore()
@@ -87,7 +87,7 @@ const handleDeleteHotspot = () => {
             try {
               await deleteHotspot(id)
               router.back()
-            } catch (error) {
+            } catch (_error) {
               Alert.alert("Erreur", "Impossible de supprimer le hotspot")
             }
           }
@@ -109,7 +109,7 @@ const handleDeletePlan = (planId: string) => {
         onPress: async () => {
           try {
             await deletePlan(planId)
-          } catch (error) {
+          } catch (_error) {
             Alert.alert("Erreur", "Impossible de supprimer le plan")
           }
         }
@@ -173,7 +173,7 @@ return (
         </Card>
         <Card variant="filled" style={[styles.statCard, { backgroundColor: colors.backgroundSecondary }]}>
           <Typography variant="h3" style={{ textAlign: 'center' }}>{stats?.sales_today || 0}</Typography>
-          <Typography variant="caption" color="textSecondary" style={{ textAlign: 'center' }}>Aujourd'hui</Typography>
+          <Typography variant="caption" color="textSecondary" style={{ textAlign: 'center' }}>Aujourd&apos;hui</Typography>
         </Card>
       </View>
 

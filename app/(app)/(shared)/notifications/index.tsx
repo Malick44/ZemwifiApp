@@ -98,7 +98,7 @@ export default function NotificationsScreen() {
                         <Ionicons name="notifications-off-outline" size={64} color={colors.disabled} />
                         <Typography variant="h4" style={{ marginTop: 16 }}>Aucune notification</Typography>
                         <Typography variant="body" color="textSecondary" style={{ textAlign: 'center', marginTop: 8 }}>
-                            Vous n'avez aucune notification pour le moment.
+                            Vous n&apos;avez aucune notification pour le moment.
                         </Typography>
                     </View>
                 ) : (

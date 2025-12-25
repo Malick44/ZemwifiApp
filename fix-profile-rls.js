@@ -25,7 +25,7 @@ async function fixProfileRLS() {
     const sql = fs.readFileSync('./fix-profile-rls.sql', 'utf8');
     
     // Execute the SQL
-    const { data, error } = await supabase.rpc('exec_sql', { sql_string: sql });
+    const { data: _data, error } = await supabase.rpc('exec_sql', { sql_string: sql });
     
     if (error) {
       // If exec_sql doesn't exist, try running queries individually

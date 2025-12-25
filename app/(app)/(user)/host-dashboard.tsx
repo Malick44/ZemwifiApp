@@ -5,6 +5,7 @@ import { ActivityIndicator, Pressable, RefreshControl, ScrollView, StyleSheet, V
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Colors } from '../../../constants/theme'
 import { Card } from '../../../src/components/ui/Card'
+import { Header } from '../../../src/components/ui/Header'
 import { Typography } from '../../../src/components/ui/Typography'
 import { format } from '../../../src/lib/format'
 import { supabase } from '../../../src/lib/supabase'
@@ -27,8 +28,6 @@ type Transaction = {
   created_at: string
   hotspot: { name: string } | null
 }
-
-import { Header } from '../../../src/components/ui/Header'
 
 export default function HostDashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null)
@@ -136,7 +135,7 @@ export default function HostDashboard() {
         {/* Header */}
         <Header
           variant="large"
-          title={`Bonjour, ${profile?.full_name?.split(' ')[0] || 'Hôte'}`}
+          title={`Bonjour, ${profile?.name?.split(' ')[0] || 'Hôte'}`}
           subtitle={isOnline ? 'Vos services sont en ligne' : 'Vous êtes hors ligne'}
           rightAction={
             <View style={{ flexDirection: 'row', gap: 8 }}>

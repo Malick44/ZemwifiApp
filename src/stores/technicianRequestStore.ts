@@ -139,7 +139,7 @@ export const useTechnicianRequestStore = create<TechnicianRequestState>((set, ge
             await new Promise(resolve => setTimeout(resolve, 500))
             const mockRequests = generateMockRequests()
             set({ requests: mockRequests, loading: false })
-        } catch (error) {
+        } catch (_error) {
             set({ error: 'Failed to fetch requests', loading: false })
         }
     },
@@ -161,7 +161,7 @@ export const useTechnicianRequestStore = create<TechnicianRequestState>((set, ge
             }
             set({ loading: false })
             return null
-        } catch (error) {
+        } catch (_error) {
             set({ loading: false, error: 'Failed to fetch request' })
             return null
         }
@@ -200,9 +200,9 @@ export const useTechnicianRequestStore = create<TechnicianRequestState>((set, ge
             }, 2000)
 
             return newRequest
-        } catch (error) {
+        } catch (_error) {
             set({ error: 'Failed to create request', loading: false })
-            throw error
+            throw _error
         }
     },
 
@@ -230,9 +230,9 @@ export const useTechnicianRequestStore = create<TechnicianRequestState>((set, ge
                 ),
                 loading: false
             }))
-        } catch (error) {
+        } catch (_error) {
             set({ error: 'Failed to update request', loading: false })
-            throw error
+            throw _error
         }
     },
 
@@ -249,7 +249,7 @@ export const useTechnicianRequestStore = create<TechnicianRequestState>((set, ge
                 ),
                 loading: false
             }))
-        } catch (error) {
+        } catch (_error) {
             set({ error: 'Failed to update status', loading: false })
         }
     },
@@ -275,7 +275,7 @@ export const useTechnicianRequestStore = create<TechnicianRequestState>((set, ge
                 ),
                 loading: false
             }))
-        } catch (error) {
+        } catch (_error) {
             set({ error: 'Failed to assign technician', loading: false })
         }
     },
@@ -298,7 +298,7 @@ export const useTechnicianRequestStore = create<TechnicianRequestState>((set, ge
                 ),
                 loading: false
             }))
-        } catch (error) {
+        } catch (_error) {
             set({ error: 'Failed to accept request', loading: false })
         }
     },
@@ -329,7 +329,7 @@ export const useTechnicianRequestStore = create<TechnicianRequestState>((set, ge
             setTimeout(() => {
                 get().assignTechnician(requestId, 'tech-2')
             }, 3000)
-        } catch (error) {
+        } catch (_error) {
             set({ error: 'Failed to reject request', loading: false })
         }
     },
@@ -351,7 +351,7 @@ export const useTechnicianRequestStore = create<TechnicianRequestState>((set, ge
                 ),
                 loading: false
             }))
-        } catch (error) {
+        } catch (_error) {
             set({ error: 'Failed to start request', loading: false })
         }
     },
@@ -375,7 +375,7 @@ export const useTechnicianRequestStore = create<TechnicianRequestState>((set, ge
                 ),
                 loading: false
             }))
-        } catch (error) {
+        } catch (_error) {
             set({ error: 'Failed to complete request', loading: false })
         }
     },
@@ -398,7 +398,7 @@ export const useTechnicianRequestStore = create<TechnicianRequestState>((set, ge
                 ),
                 loading: false
             }))
-        } catch (error) {
+        } catch (_error) {
             set({ error: 'Failed to cancel request', loading: false })
         }
     },

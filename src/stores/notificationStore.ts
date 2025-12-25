@@ -126,7 +126,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
                 unreadCount,
                 loading: false
             })
-        } catch (error) {
+        } catch (_error) {
             set({ error: 'Failed to fetch notifications', loading: false })
         }
     },
@@ -146,7 +146,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
 
                 return { notifications, unreadCount }
             })
-        } catch (error) {
+        } catch (_error) {
             set({ error: 'Failed to mark notification as read' })
         }
     },
@@ -164,7 +164,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
                 ),
                 unreadCount: 0
             }))
-        } catch (error) {
+        } catch (_error) {
             set({ error: 'Failed to mark all notifications as read' })
         }
     },
@@ -180,7 +180,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
 
                 return { notifications, unreadCount }
             })
-        } catch (error) {
+        } catch (_error) {
             set({ error: 'Failed to delete notification' })
         }
     },
@@ -191,7 +191,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
             await new Promise(resolve => setTimeout(resolve, 300))
 
             set({ notifications: [], unreadCount: 0 })
-        } catch (error) {
+        } catch (_error) {
             set({ error: 'Failed to clear notifications' })
         }
     },

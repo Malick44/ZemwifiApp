@@ -22,7 +22,7 @@ export type DiscoveryState = {
 }
 
 // Calculate distance between two points using Haversine formula (in km)
-const calculateDistance = (
+export const calculateDistance = (
   lat1: number,
   lng1: number,
   lat2: number,
