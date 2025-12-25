@@ -1,24 +1,41 @@
 import { Ionicons } from '@expo/vector-icons'
 import { Link, useRouter } from 'expo-router'
-import React from 'react'
-import { Pressable, ScrollView, StyleSheet, TouchableOpacity, useColorScheme, View } from 'react-native'
+import React, { useCallback, useEffect } from 'react'
+import { ActivityIndicator, Pressable, RefreshControl, ScrollView, StyleSheet, TouchableOpacity, useColorScheme, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Colors } from '../../../constants/theme'
 import { Badge } from '../../../src/components/ui/Badge'
 import { Card } from '../../../src/components/ui/Card'
 import { Typography } from '../../../src/components/ui/Typography'
-
-// Mock Data
-const MOCK_HOTSPOTS = [
-  { id: '1', name: 'Cyber Café Central', status: 'online', sessions: 12, sales_today: 15000, location: 'Ouagadougou, Secteur 1' },
-  { id: '2', name: 'Maibangué Wi-Fi', status: 'offline', sessions: 0, sales_today: 0, location: 'Bobo-Dioulasso, Secteur 5' },
-]
+import { format } from '../../../src/lib/format'
+import { useHostHotspotStore } from '../../../src/stores/hostHotspotStore'
 
 export default function HotspotsListScreen() {
   const router = useRouter()
   const colorScheme = useColorScheme()
   const colors = Colors[colorScheme ?? 'light']
   const styles = createStyles(colors)
+
+  const { hotspots, fetchHostHotspots, loading } = useHostHotspotStore()
+  const [refreshing, setRefreshing] = React.useState(false)
+
+  const loadData = useCallback(async () => {
+    await fetchHostHotspots()
+  }, [fetchHostHotspots])
+
+  useEffect(() => {
+    loadData()
+  }, [loadData])
+
+  const onRefresh = async () => {
+    setRefreshing(true)
+    await loadData()
+    setRefreshing(false)
+  }
+
+  // Calculate some derived stats for display if needed
+  // Note: Detailed stats like sales_today would typically come from a joined query
+  // For the list view, we might just show basic info or fetch expanded data
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -34,8 +51,13 @@ export default function HotspotsListScreen() {
         </Link>
       </View>
 
-      <ScrollView contentContainerStyle={styles.content}>
-        {MOCK_HOTSPOTS.length === 0 ? (
+      <ScrollView
+        contentContainerStyle={styles.content}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+      >
+        {loading && !refreshing && hotspots.length === 0 ? (
+          <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 40 }} />
+        ) : hotspots.length === 0 ? (
           <View style={styles.emptyState}>
             <Ionicons name="rose-outline" size={64} color={colors.mutedForeground} />
             <Typography variant="h4" style={{ marginTop: 16 }}>Aucun hotspot</Typography>
@@ -44,30 +66,35 @@ export default function HotspotsListScreen() {
             </Typography>
           </View>
         ) : (
-          MOCK_HOTSPOTS.map((hotspot) => (
+          hotspots.map((hotspot) => (
             <Link key={hotspot.id} href={`/(app)/(host)/hotspot/${hotspot.id}`} asChild>
               <Pressable>
                 <Card variant="elevated" style={styles.card}>
                   <View style={styles.cardHeader}>
                     <View style={styles.iconBox}>
-                      <Ionicons name="wifi" size={24} color={hotspot.status === 'online' ? colors.success : colors.mutedForeground} />
+                      <Ionicons name="wifi" size={24} color={hotspot.is_online ? colors.success : colors.mutedForeground} />
                     </View>
                     <View style={styles.headerText}>
                       <Typography variant="h4">{hotspot.name}</Typography>
-                      <Typography variant="caption" color="textSecondary">{hotspot.location}</Typography>
+                      <Typography variant="caption" color="textSecondary">{hotspot.landmark || 'Sans emplacement'}</Typography>
                     </View>
-                    <Badge variant={hotspot.status === 'online' ? 'success' : 'neutral'} label={hotspot.status === 'online' ? 'En ligne' : 'Hors ligne'} />
+                    <Badge
+                      variant={hotspot.is_online ? 'success' : 'neutral'}
+                      label={hotspot.is_online ? 'En ligne' : 'Hors ligne'}
+                    />
                   </View>
 
                   <View style={styles.statsRow}>
                     <View style={styles.statItem}>
-                      <Typography variant="caption" color="textSecondary">Sessions actives</Typography>
-                      <Typography variant="h4">{hotspot.sessions}</Typography>
+                      <Typography variant="caption" color="textSecondary">Statut Vente</Typography>
+                      <Typography variant="h4" style={{ color: hotspot.sales_paused ? colors.warning : colors.success }}>
+                        {hotspot.sales_paused ? 'Pause' : 'Actif'}
+                      </Typography>
                     </View>
                     <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
                     <View style={styles.statItem}>
-                      <Typography variant="caption" color="textSecondary">Ventes (Auj)</Typography>
-                      <Typography variant="h4">{hotspot.sales_today} F</Typography>
+                      <Typography variant="caption" color="textSecondary">Distance</Typography>
+                      <Typography variant="h4">{hotspot.distance ? format.distance(hotspot.distance) : '--'}</Typography>
                     </View>
                   </View>
 

@@ -16,8 +16,8 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Apply updated_at trigger to all relevant tables
-CREATE TRIGGER update_users_updated_at
-  BEFORE UPDATE ON users
+CREATE TRIGGER update_profiles_updated_at
+  BEFORE UPDATE ON profiles
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
 
@@ -117,8 +117,8 @@ BEGIN
     RAISE EXCEPTION 'Plan not found';
   END IF;
   
-  -- Get user details
-  SELECT * INTO v_user FROM users WHERE id = p_user_id;
+  -- Get user details (from profiles)
+  SELECT * INTO v_user FROM profiles WHERE id = p_user_id;
   IF NOT FOUND THEN
     RAISE EXCEPTION 'User not found';
   END IF;
@@ -131,12 +131,12 @@ BEGIN
     END IF;
     
     -- Deduct from wallet
-    UPDATE users 
+    UPDATE profiles 
     SET wallet_balance = wallet_balance - v_plan.price_xof
     WHERE id = p_user_id;
     
     -- Create transaction record
-    INSERT INTO transactions (
+    INSERT INTO wallet_transactions (
       user_id, 
       type, 
       amount, 
@@ -206,18 +206,18 @@ DECLARE
   v_transaction_id UUID;
 BEGIN
   -- Get user details
-  SELECT * INTO v_user FROM users WHERE id = p_user_id;
+  SELECT * INTO v_user FROM profiles WHERE id = p_user_id;
   IF NOT FOUND THEN
     RAISE EXCEPTION 'User not found';
   END IF;
   
   -- Add to wallet
-  UPDATE users 
+  UPDATE profiles 
   SET wallet_balance = wallet_balance + p_amount
   WHERE id = p_user_id;
   
   -- Create transaction record
-  INSERT INTO transactions (
+  INSERT INTO wallet_transactions (
     user_id,
     type,
     amount,
@@ -268,19 +268,19 @@ BEGIN
   END IF;
   
   -- Get host and user details
-  SELECT * INTO v_host FROM users WHERE id = v_request.host_id;
-  SELECT * INTO v_user FROM users WHERE id = v_request.user_id;
+  SELECT * INTO v_host FROM profiles WHERE id = v_request.host_id;
+  SELECT * INTO v_user FROM profiles WHERE id = v_request.user_id;
   
   -- Calculate commission (2%)
   v_commission := FLOOR(v_request.amount * 0.02);
   
   -- Add amount to customer wallet
-  UPDATE users 
+  UPDATE profiles 
   SET wallet_balance = wallet_balance + v_request.amount
   WHERE id = v_request.user_id;
   
   -- Create transaction for customer
-  INSERT INTO transactions (
+  INSERT INTO wallet_transactions (
     user_id,
     type,
     amount,
@@ -301,12 +301,12 @@ BEGIN
   );
   
   -- Add commission to host wallet
-  UPDATE users 
+  UPDATE profiles 
   SET wallet_balance = wallet_balance + v_commission
   WHERE id = v_request.host_id;
   
   -- Create transaction for host commission
-  INSERT INTO transactions (
+  INSERT INTO wallet_transactions (
     user_id,
     type,
     amount,
@@ -359,7 +359,7 @@ BEGIN
   END IF;
   
   -- Get host details
-  SELECT * INTO v_host FROM users WHERE id = v_payout.host_id;
+  SELECT * INTO v_host FROM profiles WHERE id = v_payout.host_id;
   
   -- Check sufficient balance
   IF v_host.wallet_balance < v_payout.amount THEN
@@ -373,12 +373,12 @@ BEGIN
   END IF;
   
   -- Deduct from host wallet
-  UPDATE users 
+  UPDATE profiles 
   SET wallet_balance = wallet_balance - v_payout.amount
   WHERE id = v_payout.host_id;
   
   -- Create transaction record
-  INSERT INTO transactions (
+  INSERT INTO wallet_transactions (
     user_id,
     type,
     amount,
@@ -620,7 +620,7 @@ BEGIN
       WHERE h.host_id = p_host_id
       AND s.started_at >= CURRENT_DATE
     ),
-    (SELECT wallet_balance::INTEGER FROM users WHERE id = p_host_id),
+    (SELECT wallet_balance::INTEGER FROM profiles WHERE id = p_host_id),
     (SELECT COALESCE(SUM(amount), 0)::INTEGER FROM payouts WHERE host_id = p_host_id AND status = 'pending');
 END;
 $$ LANGUAGE plpgsql;

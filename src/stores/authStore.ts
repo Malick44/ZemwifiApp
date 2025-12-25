@@ -8,8 +8,9 @@ type Profile = {
   id: UUID
   phone: string | null
   email: string | null
-  full_name: string | null
+  name: string | null
   role?: 'guest' | 'user' | 'host' | 'technician' | 'admin'
+  wallet_balance?: number
 }
 
 type AuthState = {
@@ -79,8 +80,7 @@ export const useAuthStore = create<AuthState>()(
               await supabase.from('profiles').insert({
                 id: data.user.id,
                 phone: userPhone,
-                email: userEmail,
-                full_name: '',
+                name: '',
                 role: 'user'
               })
             }
@@ -119,8 +119,7 @@ export const useAuthStore = create<AuthState>()(
                 .insert({
                   id: data.session.user.id,
                   phone: phone,
-                  email: email,
-                  full_name: '',
+                  name: '',
                   role: 'user'
                 })
                 .select()

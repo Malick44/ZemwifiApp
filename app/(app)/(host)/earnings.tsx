@@ -1,17 +1,43 @@
 import { Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
-import React, { useState } from 'react'
-import { ScrollView, StyleSheet, TouchableOpacity, useColorScheme, View } from 'react-native'
+import React, { useCallback, useEffect, useState } from 'react'
+import { RefreshControl, ScrollView, StyleSheet, TouchableOpacity, useColorScheme, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Colors } from '../../../constants/theme'
 import { Card } from '../../../src/components/ui/Card'
 import { Typography } from '../../../src/components/ui/Typography'
+import { format } from '../../../src/lib/format'
+import { useHostHotspotStore } from '../../../src/stores/hostHotspotStore'
 
 export default function EarningsScreen() {
   const router = useRouter()
   const colorScheme = useColorScheme()
   const colors = Colors[colorScheme ?? 'light']
   const [period, setPeriod] = useState<'week' | 'month'>('week')
+  const [refreshing, setRefreshing] = useState(false)
+
+  const { recentSales, fetchHostSales } = useHostHotspotStore()
+
+  const loadData = useCallback(async () => {
+    // Ensure we have sales data
+    await fetchHostSales(period)
+    // We might need general stats too, usually fetched via dashboard or hotspot details
+    // For aggregate stats we might need a separate call or sum up recentSales
+  }, [fetchHostSales, period])
+
+  useEffect(() => {
+    loadData()
+  }, [loadData])
+
+  const onRefresh = async () => {
+    setRefreshing(true)
+    await loadData()
+    setRefreshing(false)
+  }
+
+  // Calculate totals from recentSales for the selected period
+  const totalPeriodSales = recentSales.reduce((sum, sale) => sum + sale.amount, 0)
+  const netEarnings = totalPeriodSales * 0.9 // Assuming 10% platform fee, adjust as needed
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -23,7 +49,10 @@ export default function EarningsScreen() {
         <View style={{ width: 24 }} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+      >
 
         {/* Period Selector */}
         <View style={[styles.periodSelector, { backgroundColor: colors.secondary }]}>
@@ -45,19 +74,23 @@ export default function EarningsScreen() {
         <View style={styles.summaryGrid}>
           <Card variant="outlined" style={styles.summaryItem}>
             <Typography variant="caption" color="textSecondary">Ventes Totales</Typography>
-            <Typography variant="h3" color="primary">45 000 F</Typography>
+            <Typography variant="h3" color="primary">{format.currency(totalPeriodSales)}</Typography>
           </Card>
           <Card variant="outlined" style={styles.summaryItem}>
-            <Typography variant="caption" color="textSecondary">Net perçu</Typography>
-            <Typography variant="h3" color="success">40 500 F</Typography>
+            <Typography variant="caption" color="textSecondary">Net estimé</Typography>
+            <Typography variant="h3" color="success">{format.currency(netEarnings)}</Typography>
           </Card>
         </View>
 
-        {/* Chart Placeholder */}
+        {/* Chart Placeholder - Keeping consistent visualization but dynamic labels if feasible */}
         <Card variant="elevated" style={styles.chartCard}>
           <Typography variant="h4" style={{ marginBottom: 16 }}>Évolution des ventes</Typography>
           <View style={styles.chartPlaceholder}>
-            {/* Simple Bar Chart Visualization using Views */}
+            {/* 
+              This is still a placeholder visualization. 
+              Real charting would require a library or manual SVG drawing based on aggregated daily data.
+              For now we keep the visual rhythm.
+            */}
             {[40, 60, 30, 80, 50, 90, 70].map((h, i) => (
               <View key={i} style={styles.barContainer}>
                 <View style={[styles.bar, { height: `${h}%`, backgroundColor: colors.primary }]} />
@@ -69,21 +102,29 @@ export default function EarningsScreen() {
 
         {/* Recent Transactions List */}
         <Typography variant="h4" style={styles.sectionTitle}>Dernières transactions</Typography>
-        {[1, 2, 3, 4, 5].map((i) => (
-          <View key={i} style={[styles.transactionRow, { borderBottomColor: colors.border }]}>
-            <View style={[styles.txIcon, { backgroundColor: colors.secondary }]}>
-              <Ionicons name="cart-outline" size={20} color={colors.primary} />
+        {recentSales.length === 0 ? (
+          <Typography variant="body" color="textSecondary" style={{ textAlign: 'center', marginTop: 20 }}>
+            Aucune vente sur cette période.
+          </Typography>
+        ) : (
+          recentSales.map((sale) => (
+            <View key={sale.id} style={[styles.transactionRow, { borderBottomColor: colors.border }]}>
+              <View style={[styles.txIcon, { backgroundColor: colors.secondary }]}>
+                <Ionicons name="cart-outline" size={20} color={colors.primary} />
+              </View>
+              <View style={styles.txInfo}>
+                <Typography variant="body" style={{ fontWeight: '500' }}>{sale.plan_name} - {sale.hotspot_name}</Typography>
+                <Typography variant="caption" color="textSecondary">{format.date(sale.created_at)}</Typography>
+              </View>
+              <View style={{ alignItems: 'flex-end' }}>
+                <Typography variant="body" style={{ fontWeight: '600' }}>+{format.currency(sale.amount)}</Typography>
+                <Typography variant="caption" color={sale.status === 'success' ? 'success' : 'warning'}>
+                  {sale.status === 'success' ? 'Succès' : sale.status}
+                </Typography>
+              </View>
             </View>
-            <View style={styles.txInfo}>
-              <Typography variant="body" style={{ fontWeight: '500' }}>Forfait 1h - Cyber Café</Typography>
-              <Typography variant="caption" color="textSecondary">Aujourd&apos;hui</Typography>
-            </View>
-            <View style={{ alignItems: 'flex-end' }}>
-              <Typography variant="body" style={{ fontWeight: '600' }}>+500 F</Typography>
-              <Typography variant="caption" color="success">Succès</Typography>
-            </View>
-          </View>
-        ))}
+          ))
+        )}
 
       </ScrollView>
     </SafeAreaView>

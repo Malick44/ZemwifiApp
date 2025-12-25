@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
-import { CashInRequest, UUID } from '../types/domain'
 import { isoNow } from '../lib/time'
+import { CashInRequest, UUID } from '../types/domain'
 
 export type CashInState = {
   requests: CashInRequest[]
@@ -19,7 +19,7 @@ export const useCashInStore = create<CashInState>((set) => ({
   createRequest: async (hostId, amount, phone) => {
     set({ loading: true, error: null })
     const { data, error } = await supabase
-      .from('cash_in_requests')
+      .from('cashin_requests')
       .insert({ host_id: hostId, amount, user_phone: phone, expires_at: isoNow() })
       .select()
       .single()
@@ -31,7 +31,7 @@ export const useCashInStore = create<CashInState>((set) => ({
     return data
   },
   confirmRequest: async (id) => {
-    const { error } = await supabase.rpc('confirm_cash_in', { request_id: id })
+    const { error } = await supabase.rpc('process_cashin', { p_cashin_request_id: id })
     if (error) throw error
     set((state) => ({
       requests: state.requests.map((r) => (r.id === id ? { ...r, status: 'confirmed' } : r)),
@@ -39,7 +39,7 @@ export const useCashInStore = create<CashInState>((set) => ({
   },
   refresh: async () => {
     const { data, error } = await supabase
-      .from('cash_in_requests')
+      .from('cashin_requests')
       .select('*')
       .order('created_at', { ascending: false })
     if (error) {

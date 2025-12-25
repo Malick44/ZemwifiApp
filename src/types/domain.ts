@@ -16,6 +16,7 @@ export type Hotspot = {
   sales_paused: boolean
   hours: string | null
   distance?: number
+  range_meters: number
 }
 
 export type Plan = {
@@ -69,4 +70,28 @@ export type CashInRequest = {
   confirmed_at: string | null
   rejected_at: string | null
   rejection_reason: string | null
+}
+
+export type PlanFormData = {
+  name: string
+  duration_seconds: number
+  data_bytes: number
+  price_xof: number
+  is_active: boolean
+}
+
+export type PlanTemplate = {
+  id: string
+  name: string
+  description: string
+  duration_seconds: number
+  data_bytes: number
+  suggested_price_xof: number
+}
+
+export type HotspotStats = {
+  active_sessions: number
+  sales_today: number
+  sales_week: number
+  total_revenue: number
 }

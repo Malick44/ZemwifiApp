@@ -1,33 +1,36 @@
 import { Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
-import React, { useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { RefreshControl, ScrollView, StyleSheet, TouchableOpacity, useColorScheme, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Colors } from '../../../constants/theme'
 import { Badge } from '../../../src/components/ui/Badge'
 import { Card } from '../../../src/components/ui/Card'
 import { Typography } from '../../../src/components/ui/Typography'
-
-// Mock Data
-const MOCK_SESSIONS = [
-  { id: '1', device: 'iPhone 13', mac: 'AA:BB:CC:XX:XX:XX', start: '14:00', duration: '25 min', plan: '1 Heure', data: '150 Mo' },
-  { id: '2', device: 'Samsung S21', mac: '11:22:33:XX:XX:XX', start: '13:45', duration: '40 min', plan: '2 Heures', data: '320 Mo' },
-]
+import { format } from '../../../src/lib/format'
+import { useHostHotspotStore } from '../../../src/stores/hostHotspotStore'
 
 export default function SessionsScreen() {
   const router = useRouter()
   const colorScheme = useColorScheme()
   const colors = Colors[colorScheme ?? 'light']
   const [refreshing, setRefreshing] = useState(false)
-  const [sessions, setSessions] = useState(MOCK_SESSIONS)
 
-  const onRefresh = () => {
+  const { activeSessions, fetchActiveSessions } = useHostHotspotStore()
+
+  useEffect(() => {
+    fetchActiveSessions()
+  }, [])
+
+  const onRefresh = useCallback(async () => {
     setRefreshing(true)
-    setTimeout(() => setRefreshing(false), 1000)
-  }
+    await fetchActiveSessions()
+    setRefreshing(false)
+  }, [fetchActiveSessions])
 
   const handleDisconnect = (id: string) => {
-    setSessions(sessions.filter(s => s.id !== id))
+    // TODO: Implement disconnect logic in store
+    console.log('Disconnect session:', id)
   }
 
   return (
@@ -45,17 +48,17 @@ export default function SessionsScreen() {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
         <Typography variant="body" color="textSecondary" style={styles.subtitle}>
-          {sessions.length} appareils actuellement connectés à vos hotspots.
+          {activeSessions.length} appareils actuellement connectés à vos hotspots.
         </Typography>
 
-        {sessions.length === 0 ? (
+        {activeSessions.length === 0 ? (
           <View style={styles.emptyState}>
-            <Ionicons name="wifi-outline" size={64} color={colors.mutedForeground} />
+            <Ionicons name="wifi-outline" size={64} color={colors.textSecondary} />
             <Typography variant="h4" style={{ marginTop: 16 }}>Aucune session</Typography>
             <Typography variant="body" color="textSecondary">Tout est calme pour le moment.</Typography>
           </View>
         ) : (
-          sessions.map((session) => (
+          activeSessions.map((session) => (
             <Card key={session.id} variant="elevated" style={styles.sessionCard}>
               <View style={styles.cardHeader}>
                 <View style={styles.deviceInfo}>
@@ -63,27 +66,29 @@ export default function SessionsScreen() {
                     <Ionicons name="phone-portrait-outline" size={20} color={colors.primary} />
                   </View>
                   <View>
-                    <Typography variant="h4">{session.device}</Typography>
-                    <Typography variant="caption" color="textSecondary">{session.mac}</Typography>
+                    <Typography variant="h4">{session.device_name || 'Appareil'}</Typography>
+                    <Typography variant="caption" color="textSecondary">{session.device_mac}</Typography>
                   </View>
                 </View>
-                <Badge variant="success">Actif</Badge>
+                <Badge variant="success" label="Actif" />
               </View>
 
               <View style={styles.statsRow}>
                 <View style={styles.stat}>
-                  <Typography variant="caption" color="textSecondary">Durée</Typography>
-                  <Typography variant="body" style={{ fontWeight: '500' }}>{session.duration}</Typography>
+                  <Typography variant="caption" color="textSecondary">Début</Typography>
+                  <Typography variant="body" style={{ fontWeight: '500' }}>
+                    {format.date(session.started_at).split(' ')[1]}
+                  </Typography>
                 </View>
                 <View style={[styles.divider, { backgroundColor: colors.border }]} />
                 <View style={styles.stat}>
-                  <Typography variant="caption" color="textSecondary">Données</Typography>
-                  <Typography variant="body" style={{ fontWeight: '500' }}>{session.data}</Typography>
+                  <Typography variant="caption" color="textSecondary">Hotspot</Typography>
+                  <Typography variant="body" style={{ fontWeight: '500' }}>{session.hotspot_name}</Typography>
                 </View>
                 <View style={[styles.divider, { backgroundColor: colors.border }]} />
                 <View style={styles.stat}>
                   <Typography variant="caption" color="textSecondary">Forfait</Typography>
-                  <Typography variant="body" style={{ fontWeight: '500' }}>{session.plan}</Typography>
+                  <Typography variant="body" style={{ fontWeight: '500' }}>{session.plan_name}</Typography>
                 </View>
               </View>
 

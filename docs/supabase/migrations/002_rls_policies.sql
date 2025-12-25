@@ -6,13 +6,13 @@
 -- ENABLE ROW LEVEL SECURITY
 -- ============================================================================
 
-ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE hotspots ENABLE ROW LEVEL SECURITY;
 ALTER TABLE plans ENABLE ROW LEVEL SECURITY;
 ALTER TABLE vouchers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE sessions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE purchases ENABLE ROW LEVEL SECURITY;
-ALTER TABLE transactions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE wallet_transactions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE cashin_requests ENABLE ROW LEVEL SECURITY;
 ALTER TABLE kyc_submissions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payouts ENABLE ROW LEVEL SECURITY;
@@ -20,48 +20,48 @@ ALTER TABLE service_requests ENABLE ROW LEVEL SECURITY;
 ALTER TABLE host_earnings ENABLE ROW LEVEL SECURITY;
 
 -- ============================================================================
--- USERS TABLE POLICIES
+-- PROFILES TABLE POLICIES
 -- ============================================================================
 
--- Users can view their own profile
+-- Profiles can view their own profile
 CREATE POLICY "Users can view own profile"
-  ON users FOR SELECT
+  ON profiles FOR SELECT
   USING (auth.uid() = id);
 
--- Users can update their own profile (limited fields)
+-- Profiles can update their own profile (limited fields)
 CREATE POLICY "Users can update own profile"
-  ON users FOR UPDATE
+  ON profiles FOR UPDATE
   USING (auth.uid() = id)
   WITH CHECK (
     auth.uid() = id AND
     -- Prevent users from changing critical fields
-    role = (SELECT role FROM users WHERE id = auth.uid()) AND
-    wallet_balance = (SELECT wallet_balance FROM users WHERE id = auth.uid())
+    role = (SELECT role FROM profiles WHERE id = auth.uid()) AND
+    wallet_balance = (SELECT wallet_balance FROM profiles WHERE id = auth.uid())
   );
 
--- Admins can view all users
-CREATE POLICY "Admins can view all users"
-  ON users FOR SELECT
+-- Admins can view all profiles
+CREATE POLICY "Admins can view all profiles"
+  ON profiles FOR SELECT
   USING (
     EXISTS (
-      SELECT 1 FROM users 
+      SELECT 1 FROM profiles 
       WHERE id = auth.uid() AND role = 'admin'
     )
   );
 
--- Admins can update any user
-CREATE POLICY "Admins can update users"
-  ON users FOR UPDATE
+-- Admins can update any profile
+CREATE POLICY "Admins can update profiles"
+  ON profiles FOR UPDATE
   USING (
     EXISTS (
-      SELECT 1 FROM users 
+      SELECT 1 FROM profiles 
       WHERE id = auth.uid() AND role = 'admin'
     )
   );
 
 -- Public user registration (insert)
 CREATE POLICY "Public can register"
-  ON users FOR INSERT
+  ON profiles FOR INSERT
   WITH CHECK (true);
 
 -- ============================================================================
@@ -84,7 +84,7 @@ CREATE POLICY "Hosts can create hotspots"
   WITH CHECK (
     host_id = auth.uid() AND
     EXISTS (
-      SELECT 1 FROM users 
+      SELECT 1 FROM profiles 
       WHERE id = auth.uid() AND role IN ('host', 'admin')
     )
   );
@@ -105,7 +105,7 @@ CREATE POLICY "Admins can manage all hotspots"
   ON hotspots FOR ALL
   USING (
     EXISTS (
-      SELECT 1 FROM users 
+      SELECT 1 FROM profiles 
       WHERE id = auth.uid() AND role = 'admin'
     )
   );
@@ -260,25 +260,25 @@ CREATE POLICY "System can update purchases"
   USING (true); -- Protected by application logic and payment webhooks
 
 -- ============================================================================
--- TRANSACTIONS TABLE POLICIES
+-- WALLET TRANSACTIONS TABLE POLICIES
 -- ============================================================================
 
 -- Users can view their own transactions
 CREATE POLICY "Users can view own transactions"
-  ON transactions FOR SELECT
+  ON wallet_transactions FOR SELECT
   USING (user_id = auth.uid());
 
 -- System can create transactions
 CREATE POLICY "System can create transactions"
-  ON transactions FOR INSERT
+  ON wallet_transactions FOR INSERT
   WITH CHECK (true); -- Protected by application logic
 
 -- Admins can view all transactions
 CREATE POLICY "Admins can view all transactions"
-  ON transactions FOR SELECT
+  ON wallet_transactions FOR SELECT
   USING (
     EXISTS (
-      SELECT 1 FROM users 
+      SELECT 1 FROM profiles 
       WHERE id = auth.uid() AND role = 'admin'
     )
   );
@@ -303,7 +303,7 @@ CREATE POLICY "Hosts can create cashin requests"
   WITH CHECK (
     host_id = auth.uid() AND
     EXISTS (
-      SELECT 1 FROM users 
+      SELECT 1 FROM profiles 
       WHERE id = auth.uid() AND role IN ('host', 'admin')
     )
   );
@@ -357,7 +357,7 @@ CREATE POLICY "Admins can view all KYC"
   ON kyc_submissions FOR SELECT
   USING (
     EXISTS (
-      SELECT 1 FROM users 
+      SELECT 1 FROM profiles 
       WHERE id = auth.uid() AND role = 'admin'
     )
   );
@@ -367,7 +367,7 @@ CREATE POLICY "Admins can review KYC"
   ON kyc_submissions FOR UPDATE
   USING (
     EXISTS (
-      SELECT 1 FROM users 
+      SELECT 1 FROM profiles 
       WHERE id = auth.uid() AND role = 'admin'
     )
   );
@@ -387,7 +387,7 @@ CREATE POLICY "Hosts can request payouts"
   WITH CHECK (
     host_id = auth.uid() AND
     EXISTS (
-      SELECT 1 FROM users 
+      SELECT 1 FROM profiles 
       WHERE id = auth.uid() AND role IN ('host', 'admin')
     )
   );
@@ -408,7 +408,7 @@ CREATE POLICY "Admins can manage payouts"
   ON payouts FOR ALL
   USING (
     EXISTS (
-      SELECT 1 FROM users 
+      SELECT 1 FROM profiles 
       WHERE id = auth.uid() AND role = 'admin'
     )
   );
@@ -430,7 +430,7 @@ CREATE POLICY "Technicians can view assigned requests"
     (
       status = 'pending' AND
       EXISTS (
-        SELECT 1 FROM users 
+        SELECT 1 FROM profiles 
         WHERE id = auth.uid() AND role = 'technician'
       )
     )
@@ -442,7 +442,7 @@ CREATE POLICY "Hosts can create requests"
   WITH CHECK (
     host_id = auth.uid() AND
     EXISTS (
-      SELECT 1 FROM users 
+      SELECT 1 FROM profiles 
       WHERE id = auth.uid() AND role IN ('host', 'admin')
     )
   );
@@ -469,7 +469,7 @@ CREATE POLICY "Technicians can claim requests"
   USING (
     status = 'pending' AND
     EXISTS (
-      SELECT 1 FROM users 
+      SELECT 1 FROM profiles 
       WHERE id = auth.uid() AND role = 'technician'
     )
   )
@@ -483,7 +483,7 @@ CREATE POLICY "Admins can manage all requests"
   ON service_requests FOR ALL
   USING (
     EXISTS (
-      SELECT 1 FROM users 
+      SELECT 1 FROM profiles 
       WHERE id = auth.uid() AND role = 'admin'
     )
   );
@@ -507,7 +507,7 @@ CREATE POLICY "Admins can view all earnings"
   ON host_earnings FOR SELECT
   USING (
     EXISTS (
-      SELECT 1 FROM users 
+      SELECT 1 FROM profiles 
       WHERE id = auth.uid() AND role = 'admin'
     )
   );
@@ -521,7 +521,7 @@ CREATE OR REPLACE FUNCTION auth.has_role(required_role user_role)
 RETURNS BOOLEAN AS $$
 BEGIN
   RETURN EXISTS (
-    SELECT 1 FROM users 
+    SELECT 1 FROM profiles 
     WHERE id = auth.uid() AND role = required_role
   );
 END;
@@ -531,8 +531,8 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- COMMENTS
 -- ============================================================================
 
-COMMENT ON POLICY "Users can view own profile" ON users IS 
-  'Users can view their own user record';
+COMMENT ON POLICY "Users can view own profile" ON profiles IS 
+  'Profiles can view their own user record';
 
 COMMENT ON POLICY "Public can view online hotspots" ON hotspots IS 
   'Public discovery of active hotspots for the map/list view';

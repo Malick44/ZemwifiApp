@@ -176,29 +176,41 @@ export default function HostDashboard() {
 
         {/* Quick Stats Grid */}
         <View style={styles.statsGrid}>
-          <Card variant="outlined" style={styles.statCard}>
-            <View style={[styles.statIcon, { backgroundColor: colors.secondary }]}>
-              <Ionicons name="wifi" size={20} color={colors.primary} />
-            </View>
-            <Typography variant="h3">{stats?.activeHotspots || 0}</Typography>
-            <Typography variant="caption" color="textSecondary">Hotspots actifs</Typography>
-          </Card>
+          <Link href="/(app)/(host)/hotspots" asChild>
+            <Pressable style={{ flex: 1 }}>
+              <Card variant="outlined" style={styles.statCard}>
+                <View style={[styles.statIcon, { backgroundColor: colors.secondary }]}>
+                  <Ionicons name="wifi" size={20} color={colors.primary} />
+                </View>
+                <Typography variant="h3">{stats?.activeHotspots || 0}</Typography>
+                <Typography variant="caption" color="textSecondary">Hotspots actifs</Typography>
+              </Card>
+            </Pressable>
+          </Link>
 
-          <Card variant="outlined" style={styles.statCard}>
-            <View style={[styles.statIcon, { backgroundColor: 'rgba(16, 185, 129, 0.1)' }]}>
-              <Ionicons name="people" size={20} color={colors.success} />
-            </View>
-            <Typography variant="h3">{stats?.activeSessions || 0}</Typography>
-            <Typography variant="caption" color="textSecondary">Utilisateurs</Typography>
-          </Card>
+          <Link href="/(app)/(host)/sessions" asChild>
+            <Pressable style={{ flex: 1 }}>
+              <Card variant="outlined" style={styles.statCard}>
+                <View style={[styles.statIcon, { backgroundColor: 'rgba(16, 185, 129, 0.1)' }]}>
+                  <Ionicons name="people" size={20} color={colors.success} />
+                </View>
+                <Typography variant="h3">{stats?.activeSessions || 0}</Typography>
+                <Typography variant="caption" color="textSecondary">Utilisateurs</Typography>
+              </Card>
+            </Pressable>
+          </Link>
 
-          <Card variant="outlined" style={styles.statCard}>
-            <View style={[styles.statIcon, { backgroundColor: 'rgba(59, 130, 246, 0.1)' }]}>
-              <Ionicons name="cart" size={20} color="#3b82f6" />
-            </View>
-            <Typography variant="h3">{stats?.totalSales || 0}</Typography>
-            <Typography variant="caption" color="textSecondary">Ventes</Typography>
-          </Card>
+          <Link href="/(app)/(host)/earnings" asChild>
+            <Pressable style={{ flex: 1 }}>
+              <Card variant="outlined" style={styles.statCard}>
+                <View style={[styles.statIcon, { backgroundColor: 'rgba(59, 130, 246, 0.1)' }]}>
+                  <Ionicons name="cart" size={20} color="#3b82f6" />
+                </View>
+                <Typography variant="h3">{stats?.totalSales || 0}</Typography>
+                <Typography variant="caption" color="textSecondary">Ventes</Typography>
+              </Card>
+            </Pressable>
+          </Link>
         </View>
 
         {/* Quick Actions */}

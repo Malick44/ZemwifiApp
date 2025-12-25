@@ -63,10 +63,10 @@ CREATE TYPE payout_status AS ENUM ('pending', 'processing', 'completed', 'failed
 -- TABLES
 -- ============================================================================
 
--- Users table
-CREATE TABLE users (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  phone VARCHAR(20) UNIQUE NOT NULL,
+-- Profiles table (extends Supabase Auth users)
+CREATE TABLE profiles (
+  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  phone VARCHAR(20) NOT NULL,
   name VARCHAR(255),
   role user_role NOT NULL DEFAULT 'user',
   wallet_balance BIGINT NOT NULL DEFAULT 0, -- Balance in XOF (stored as integer for precision)
@@ -89,7 +89,7 @@ CREATE TABLE users (
 -- Hotspots table
 CREATE TABLE hotspots (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  host_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  host_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   name VARCHAR(255) NOT NULL,
   landmark TEXT NOT NULL,
   address TEXT,
@@ -133,7 +133,7 @@ CREATE TABLE plans (
 CREATE TABLE vouchers (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   code VARCHAR(20) UNIQUE NOT NULL,
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   hotspot_id UUID NOT NULL REFERENCES hotspots(id) ON DELETE CASCADE,
   plan_id UUID NOT NULL REFERENCES plans(id) ON DELETE RESTRICT,
   purchase_id UUID, -- References purchases table (added later)
@@ -164,7 +164,7 @@ CREATE TABLE sessions (
 -- Purchases table (transaction records for plan purchases)
 CREATE TABLE purchases (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   hotspot_id UUID NOT NULL REFERENCES hotspots(id) ON DELETE CASCADE,
   plan_id UUID NOT NULL REFERENCES plans(id) ON DELETE RESTRICT,
   voucher_id UUID REFERENCES vouchers(id) ON DELETE SET NULL,
@@ -186,10 +186,10 @@ ALTER TABLE vouchers
   REFERENCES purchases(id) 
   ON DELETE SET NULL;
 
--- Transactions table (wallet transaction history)
-CREATE TABLE transactions (
+-- Wallet Transactions table (wallet transaction history)
+CREATE TABLE wallet_transactions (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   type transaction_type NOT NULL,
   amount INTEGER NOT NULL, -- Can be negative for debits
   balance_before INTEGER NOT NULL,
@@ -209,8 +209,8 @@ CREATE TABLE transactions (
 -- Cash-in requests table (host wallet top-ups for customers)
 CREATE TABLE cashin_requests (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  host_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  host_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   user_phone VARCHAR(20) NOT NULL,
   amount INTEGER NOT NULL,
   commission INTEGER NOT NULL DEFAULT 0, -- Host commission in XOF
@@ -231,7 +231,7 @@ CREATE TABLE cashin_requests (
 -- KYC submissions table
 CREATE TABLE kyc_submissions (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id UUID UNIQUE NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_id UUID UNIQUE NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   full_name VARCHAR(255) NOT NULL,
   id_type VARCHAR(50) NOT NULL, -- 'national_id', 'passport', 'drivers_license'
   id_number VARCHAR(100) NOT NULL,
@@ -246,7 +246,7 @@ CREATE TABLE kyc_submissions (
   status kyc_status NOT NULL DEFAULT 'pending',
   submitted_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   reviewed_at TIMESTAMPTZ,
-  reviewed_by UUID REFERENCES users(id) ON DELETE SET NULL,
+  reviewed_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
   reviewer_notes TEXT,
   
   -- Constraints
@@ -256,7 +256,7 @@ CREATE TABLE kyc_submissions (
 -- Payouts table (host withdrawal requests)
 CREATE TABLE payouts (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  host_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  host_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   amount INTEGER NOT NULL,
   fee INTEGER NOT NULL DEFAULT 0,
   net_amount INTEGER NOT NULL, -- amount - fee
@@ -281,9 +281,9 @@ CREATE TABLE payouts (
 -- Service requests table (technician support requests)
 CREATE TABLE service_requests (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  host_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  host_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   hotspot_id UUID NOT NULL REFERENCES hotspots(id) ON DELETE CASCADE,
-  technician_id UUID REFERENCES users(id) ON DELETE SET NULL,
+  technician_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
   type service_request_type NOT NULL,
   priority service_request_priority NOT NULL DEFAULT 'medium',
   status service_request_status NOT NULL DEFAULT 'pending',
@@ -312,7 +312,7 @@ CREATE TABLE service_requests (
 -- Host earnings summary table (denormalized for performance)
 CREATE TABLE host_earnings (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  host_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  host_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   period_start DATE NOT NULL,
   period_end DATE NOT NULL,
   total_sales INTEGER NOT NULL DEFAULT 0, -- Total revenue from sales
@@ -336,11 +336,11 @@ CREATE TABLE host_earnings (
 -- INDEXES
 -- ============================================================================
 
--- Users indexes
-CREATE INDEX idx_users_phone ON users(phone);
-CREATE INDEX idx_users_role ON users(role);
-CREATE INDEX idx_users_kyc_status ON users(kyc_status);
-CREATE INDEX idx_users_created_at ON users(created_at DESC);
+-- Profiles indexes
+CREATE INDEX idx_profiles_phone ON profiles(phone);
+CREATE INDEX idx_profiles_role ON profiles(role);
+CREATE INDEX idx_profiles_kyc_status ON profiles(kyc_status);
+CREATE INDEX idx_profiles_created_at ON profiles(created_at DESC);
 
 -- Hotspots indexes
 CREATE INDEX idx_hotspots_host_id ON hotspots(host_id);
@@ -376,11 +376,11 @@ CREATE INDEX idx_purchases_plan_id ON purchases(plan_id);
 CREATE INDEX idx_purchases_payment_status ON purchases(payment_status);
 CREATE INDEX idx_purchases_created_at ON purchases(created_at DESC);
 
--- Transactions indexes
-CREATE INDEX idx_transactions_user_id ON transactions(user_id);
-CREATE INDEX idx_transactions_type ON transactions(type);
-CREATE INDEX idx_transactions_created_at ON transactions(created_at DESC);
-CREATE INDEX idx_transactions_reference ON transactions(reference_id, reference_type);
+-- Wallet Transactions indexes
+CREATE INDEX idx_wallet_transactions_user_id ON wallet_transactions(user_id);
+CREATE INDEX idx_wallet_transactions_type ON wallet_transactions(type);
+CREATE INDEX idx_wallet_transactions_created_at ON wallet_transactions(created_at DESC);
+CREATE INDEX idx_wallet_transactions_reference ON wallet_transactions(reference_id, reference_type);
 
 -- Cash-in requests indexes
 CREATE INDEX idx_cashin_host_id ON cashin_requests(host_id);
@@ -415,20 +415,20 @@ CREATE INDEX idx_host_earnings_period ON host_earnings(period_start, period_end)
 -- COMMENTS
 -- ============================================================================
 
-COMMENT ON TABLE users IS 'Application users (customers, hosts, technicians, admins)';
+COMMENT ON TABLE profiles IS 'Application users (customers, hosts, technicians, admins)';
 COMMENT ON TABLE hotspots IS 'Wi-Fi hotspots managed by hosts';
 COMMENT ON TABLE plans IS 'Pricing plans for hotspot internet access';
 COMMENT ON TABLE vouchers IS 'Purchased voucher codes for internet access';
 COMMENT ON TABLE sessions IS 'Active internet usage sessions';
 COMMENT ON TABLE purchases IS 'Purchase transaction records';
-COMMENT ON TABLE transactions IS 'Wallet transaction history';
+COMMENT ON TABLE wallet_transactions IS 'Wallet transaction history';
 COMMENT ON TABLE cashin_requests IS 'Host-initiated wallet top-ups for customers';
 COMMENT ON TABLE kyc_submissions IS 'KYC verification documents for hosts';
 COMMENT ON TABLE payouts IS 'Host withdrawal requests';
 COMMENT ON TABLE service_requests IS 'Technician service requests from hosts';
 COMMENT ON TABLE host_earnings IS 'Aggregated earnings data for hosts';
 
-COMMENT ON COLUMN users.wallet_balance IS 'Balance in XOF stored as integer (e.g., 1000 = 1000 XOF)';
-COMMENT ON COLUMN transactions.amount IS 'Transaction amount in XOF (negative for debits, positive for credits)';
+COMMENT ON COLUMN profiles.wallet_balance IS 'Balance in XOF stored as integer (e.g., 1000 = 1000 XOF)';
+COMMENT ON COLUMN wallet_transactions.amount IS 'Transaction amount in XOF (negative for debits, positive for credits)';
 COMMENT ON COLUMN cashin_requests.commission IS 'Host commission for performing cash-in service (typically 2%)';
 COMMENT ON COLUMN host_earnings.platform_fee IS 'ZemNet platform fee (e.g., 10% of sales)';
