@@ -19,8 +19,14 @@ export default function MapScreen() {
   const colorScheme = useColorScheme()
   const colors = Colors[colorScheme ?? 'light']
 
-  // Filtered hotspots based on location (real availability)
-  const nearbyHotspots = hotspots
+  // Filtered hotspots based on location (real availability) - ensure uniqueness
+  const nearbyHotspots = React.useMemo(() => {
+    const unique = new Map();
+    hotspots.forEach(h => {
+      if (h.id) unique.set(h.id, h);
+    });
+    return Array.from(unique.values());
+  }, [hotspots]);
 
   const mapRef = React.useRef<MapView>(null)
   const [viewMode, setViewMode] = useState<'map' | 'list'>('map')
@@ -102,7 +108,7 @@ export default function MapScreen() {
       {/* Header */}
       <Header
         title="Points Wi-Fi à proximité"
-        subtitle={`${nearbyHotspots.filter(h => h.status === 'online').length} hotspots en ligne`}
+        subtitle={`${nearbyHotspots.filter(h => h.is_online).length} hotspots en ligne`}
         rightAction={
           <View style={[styles.viewToggle, { backgroundColor: colors.textTertiary + '20' }]}>
             <TouchableOpacity
@@ -156,8 +162,8 @@ export default function MapScreen() {
               <Marker
                 key={hotspot.id}
                 coordinate={{
-                  latitude: hotspot.lat,
-                  longitude: hotspot.lng,
+                  latitude: hotspot.lat || 0,
+                  longitude: hotspot.lng || 0,
                 }}
                 onPress={(e) => {
                   e.stopPropagation()
@@ -168,7 +174,7 @@ export default function MapScreen() {
                 <View style={[
                   styles.customMarker,
                   {
-                    backgroundColor: hotspot.status === 'online' ? colors.success : colors.textTertiary,
+                    backgroundColor: hotspot.is_online ? colors.success : colors.textTertiary,
                     borderColor: selectedHotspot?.id === hotspot.id ? colors.primary : 'white'
                   }
                 ]}>
@@ -200,7 +206,7 @@ export default function MapScreen() {
             <View style={[styles.bottomCard, { backgroundColor: colors.background }]}>
               <View style={styles.cardHeader}>
                 <Typography variant="h3">{selectedHotspot.name}</Typography>
-                {selectedHotspot.status === 'online' && (
+                {selectedHotspot.is_online && (
                   <View style={[styles.badge, { backgroundColor: colors.success + '20' }]}>
                     <View style={[styles.dot, { backgroundColor: colors.success }]} />
                     <Typography variant="caption" color={colors.success}>En ligne</Typography>
@@ -273,7 +279,7 @@ export default function MapScreen() {
               <View style={{ flex: 1 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
                   <Typography variant="h4">{item.name}</Typography>
-                  {item.status === 'online' && (
+                  {item.is_online && (
                     <View style={[styles.badge, { backgroundColor: colors.success + '20', marginLeft: 8 }]}>
                       <View style={[styles.dot, { backgroundColor: colors.success }]} />
                       <Typography variant="caption" color={colors.success}>En ligne</Typography>

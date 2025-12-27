@@ -34,7 +34,7 @@ export default function UserTabs() {
         }}
       />
       <Tabs.Screen
-        name="wallet/index"
+        name="wallet"
         options={{
           title: 'Portefeuille',
           tabBarIcon: ({ color, size }) => (
@@ -97,14 +97,8 @@ export default function UserTabs() {
       {/* Hide all nested/detail routes from tabs */}
       <Tabs.Screen name="list" options={{ href: null }} />
       <Tabs.Screen name="connect-help" options={{ href: null }} />
-      <Tabs.Screen name="hotspot/[id]" options={{ href: null }} />
-      <Tabs.Screen name="payment/method" options={{ href: null }} />
-      <Tabs.Screen name="payment/status" options={{ href: null }} />
-      <Tabs.Screen name="payment/success" options={{ href: null }} />
-      <Tabs.Screen name="wallet/[voucherId]" options={{ href: null }} />
-      <Tabs.Screen name="wallet/topup-qr" options={{ href: null }} />
-      <Tabs.Screen name="wallet/topup-requests/index" options={{ href: null }} />
-      <Tabs.Screen name="wallet/topup-requests/[id]" options={{ href: null }} />
+      <Tabs.Screen name="hotspot" options={{ href: null }} />
+      <Tabs.Screen name="payment" options={{ href: null }} />
       <Tabs.Screen name="technician-dashboard" options={{ href: null }} />
       <Tabs.Screen name="host-dashboard" options={{ href: null }} />
     </Tabs>

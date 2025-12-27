@@ -108,7 +108,14 @@ export default function EarningsScreen() {
           </Typography>
         ) : (
           recentSales.map((sale) => (
-            <View key={sale.id} style={[styles.transactionRow, { borderBottomColor: colors.border }]}>
+            <TouchableOpacity
+              key={sale.id}
+              style={[styles.transactionRow, { borderBottomColor: colors.border }]}
+              onPress={() => router.push({
+                pathname: '/(app)/(shared)/transaction-detail/[id]',
+                params: { id: sale.id }
+              })}
+            >
               <View style={[styles.txIcon, { backgroundColor: colors.secondary }]}>
                 <Ionicons name="cart-outline" size={20} color={colors.primary} />
               </View>
@@ -122,7 +129,7 @@ export default function EarningsScreen() {
                   {sale.status === 'success' ? 'Succès' : sale.status}
                 </Typography>
               </View>
-            </View>
+            </TouchableOpacity>
           ))
         )}
 

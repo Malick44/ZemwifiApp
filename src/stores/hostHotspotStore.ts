@@ -29,6 +29,14 @@ interface HostHotspotState {
     currentPlans: Plan[]
 
     currentStats: HotspotStats | null
+    dashboardStats: {
+        totalEarnings: number
+        todayEarnings: number
+        activeHotspots: number
+        activeSessions: number
+        totalSales: number
+        pendingPayouts: number
+    } | null
     activeSessions: ActiveSession[]
     recentSales: SaleTransaction[]
     loading: boolean
@@ -37,6 +45,7 @@ interface HostHotspotState {
     // Actions
     fetchHostHotspots: () => Promise<void>
     fetchActiveSessions: () => Promise<void>
+    fetchDashboardStats: () => Promise<void>
     fetchHostSales: (period?: 'week' | 'month' | 'all') => Promise<void>
     fetchHotspotDetails: (id: UUID) => Promise<void>
     updateHotspotStatus: (id: UUID, isOnline: boolean) => Promise<void>
@@ -49,6 +58,9 @@ interface HostHotspotState {
     updatePlan: (planId: UUID, planData: Partial<PlanFormData>) => Promise<void>
     togglePlanStatus: (planId: UUID, isActive: boolean) => Promise<void>
     deletePlan: (planId: UUID) => Promise<void>
+
+    // Cash-In Actions
+    createCashInRequest: (phone: string, amount: number) => Promise<{ id: string, expires_at: string }>
 }
 
 export const useHostHotspotStore = create<HostHotspotState>((set, get) => ({
@@ -57,6 +69,7 @@ export const useHostHotspotStore = create<HostHotspotState>((set, get) => ({
     currentPlans: [],
 
     currentStats: null,
+    dashboardStats: null,
     activeSessions: [],
     recentSales: [],
     loading: false,
@@ -75,7 +88,38 @@ export const useHostHotspotStore = create<HostHotspotState>((set, get) => ({
                 .order('created_at', { ascending: false })
 
             if (error) throw error
-            set({ hotspots: data as Hotspot[] })
+
+            const hotspotsData = data as Hotspot[]
+
+            // Fetch active session counts for these hotspots
+            if (hotspotsData.length > 0) {
+                const hotspotIds = hotspotsData.map(h => h.id)
+
+                // Get all active vouchers for these hotspots
+                const { data: vouchers } = await supabase
+                    .from('vouchers')
+                    .select('hotspot_id')
+                    .in('hotspot_id', hotspotIds)
+                    .not('used_at', 'is', null)
+                    .gt('expires_at', new Date().toISOString())
+
+                // Count per hotspot
+                const counts: Record<string, number> = {}
+                vouchers?.forEach((v: any) => {
+                    counts[v.hotspot_id] = (counts[v.hotspot_id] || 0) + 1
+                })
+
+                // Merge counts into hotspots
+                const hotspotsWithCounts = hotspotsData.map(h => ({
+                    ...h,
+                    active_sessions_count: counts[h.id] || 0
+                }))
+
+                set({ hotspots: hotspotsWithCounts })
+            } else {
+                set({ hotspots: hotspotsData })
+            }
+
         } catch (error: any) {
             console.error('Error fetching host hotspots:', error)
             set({ error: error.message })
@@ -139,6 +183,94 @@ export const useHostHotspotStore = create<HostHotspotState>((set, get) => ({
         }
     },
 
+
+
+    fetchDashboardStats: async () => {
+        set({ loading: true, error: null })
+        try {
+            const { data: { user } } = await supabase.auth.getUser()
+            if (!user) throw new Error('Not authenticated')
+
+            // Fetch all stats in parallel for performance
+            const today = new Date()
+            today.setHours(0, 0, 0, 0)
+
+            // 1. Get Host's Hotspots (needed for filtering)
+            const { data: hotspots } = await supabase
+                .from('hotspots')
+                .select('id, is_online')
+                .eq('host_id', user.id)
+
+            const hotspotIds = hotspots?.map(h => h.id) || []
+            const activeHotspotsCount = hotspots?.filter(h => h.is_online).length || 0
+
+            // 2. Active Sessions
+            // We can't easily join and filter deep in one go without inner join, 
+            // but we have hotspotIds so we can filter by that.
+            let activeSessionsCount = 0
+            if (hotspotIds.length > 0) {
+                const { count } = await supabase
+                    .from('vouchers')
+                    .select('*', { count: 'exact', head: true })
+                    .in('hotspot_id', hotspotIds)
+                    .not('used_at', 'is', null)
+                    .gt('expires_at', new Date().toISOString())
+                activeSessionsCount = count || 0
+            }
+
+            // 3. Sales & Earnings
+            let totalEarnings = 0
+            let todayEarnings = 0
+            let totalSales = 0
+
+            if (hotspotIds.length > 0) {
+                // Fetch small payload (just amounts and dates) to aggregate in memory
+                // This is safer than RPC for now
+                const { data: sales } = await supabase
+                    .from('purchases')
+                    .select('amount_xof, created_at, status')
+                    .in('hotspot_id', hotspotIds)
+                    .in('status', ['confirmed', 'success'])
+
+                if (sales) {
+                    totalSales = sales.length
+                    for (const sale of sales) {
+                        const amount = sale.amount_xof || 0
+                        totalEarnings += amount
+                        if (new Date(sale.created_at) >= today) {
+                            todayEarnings += amount
+                        }
+                    }
+                }
+            }
+
+            // 4. Pending Payouts
+            const { data: payouts } = await supabase
+                .from('payouts')
+                .select('amount_xof')
+                .eq('host_id', user.id)
+                .eq('status', 'pending')
+
+            const pendingPayouts = payouts?.reduce((sum, p) => sum + (p.amount_xof || 0), 0) || 0
+
+            set({
+                dashboardStats: {
+                    totalEarnings,
+                    todayEarnings,
+                    activeHotspots: activeHotspotsCount,
+                    activeSessions: activeSessionsCount,
+                    totalSales,
+                    pendingPayouts
+                }
+            })
+        } catch (error: any) {
+            console.error('Error fetching dashboard stats:', error)
+            set({ error: error.message })
+        } finally {
+            set({ loading: false })
+        }
+    },
+
     fetchHostSales: async (period = 'week') => {
         set({ loading: true, error: null })
         try {
@@ -160,9 +292,9 @@ export const useHostHotspotStore = create<HostHotspotState>((set, get) => ({
                 .from('purchases')
                 .select(`
                      id,
-                     amount,
+                     amount_xof,
                      created_at,
-                     payment_status,
+                     status,
                      hotspot:hotspots(name)
                  `)
                 .in('hotspot_id', hotspotIds)
@@ -184,9 +316,9 @@ export const useHostHotspotStore = create<HostHotspotState>((set, get) => ({
 
             const sales: SaleTransaction[] = data.map((item: any) => ({
                 id: item.id,
-                amount: item.amount,
+                amount: item.amount_xof,
                 created_at: item.created_at,
-                status: item.payment_status,
+                status: item.status,
                 plan_name: 'Forfait', // We might join plans if needed
                 hotspot_name: item.hotspot?.name || 'Inconnu'
             }))
@@ -236,22 +368,22 @@ export const useHostHotspotStore = create<HostHotspotState>((set, get) => ({
 
             const { data: salesToday } = await supabase
                 .from('purchases')
-                .select('amount')
+                .select('amount_xof')
                 .eq('hotspot_id', id)
-                .eq('payment_status', 'success')
+                .in('status', ['confirmed', 'success']) // Robust check
                 .gte('created_at', today.toISOString())
 
             const { data: allSales } = await supabase
                 .from('purchases')
-                .select('amount')
+                .select('amount_xof')
                 .eq('hotspot_id', id)
-                .eq('payment_status', 'success')
+                .in('status', ['confirmed', 'success'])
 
             const stats: HotspotStats = {
                 active_sessions: activeSessions || 0,
-                sales_today: salesToday?.reduce((sum, s) => sum + s.amount, 0) || 0,
+                sales_today: salesToday?.reduce((sum, s) => sum + s.amount_xof, 0) || 0,
                 sales_week: 0, // Placeholder, would need date math
-                total_revenue: allSales?.reduce((sum, s) => sum + s.amount, 0) || 0,
+                total_revenue: allSales?.reduce((sum, s) => sum + s.amount_xof, 0) || 0,
             }
 
             set({
@@ -441,6 +573,25 @@ export const useHostHotspotStore = create<HostHotspotState>((set, get) => ({
             }))
         } catch (error: any) {
             console.error('Error deleting plan:', error)
+            set({ error: error.message })
+            throw error
+        } finally {
+            set({ loading: false })
+        }
+    },
+
+    createCashInRequest: async (phone: string, amount: number) => {
+        set({ loading: true, error: null })
+        try {
+            const { data, error } = await supabase.rpc('host_create_cashin', {
+                p_user_phone: phone,
+                p_amount_xof: amount
+            })
+
+            if (error) throw error
+            return data // { id, expires_at }
+        } catch (error: any) {
+            console.error('Error creating cashin:', error)
             set({ error: error.message })
             throw error
         } finally {

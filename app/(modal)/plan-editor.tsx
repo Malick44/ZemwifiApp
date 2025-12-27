@@ -10,10 +10,10 @@ import { PlanFormData, PlanTemplate } from '../../src/types/domain'
 
 // Predefined Templates
 const PLAN_TEMPLATES: PlanTemplate[] = [
-  { id: 'quick', name: 'Accès Rapide', description: 'Idéal pour consulter ses messages', duration_seconds: 1800, data_bytes: 524288000, suggested_price_xof: 100 },
-  { id: 'standard', name: 'Standard', description: '1 Heure de navigation', duration_seconds: 3600, data_bytes: 1073741824, suggested_price_xof: 200 },
-  { id: 'daily', name: 'Journée', description: '24 Heures complètes', duration_seconds: 86400, data_bytes: 5368709120, suggested_price_xof: 1000 },
-  { id: 'work', name: 'Travail', description: 'Gros volume pour travailler', duration_seconds: 14400, data_bytes: 10737418240, suggested_price_xof: 2500 }
+  { id: 'quick', name: 'Accès Rapide', description: 'Idéal pour consulter ses messages', duration_s: 1800, data_cap_bytes: 524288000, suggested_price_xof: 100 },
+  { id: 'standard', name: 'Standard', description: '1 Heure de navigation', duration_s: 3600, data_cap_bytes: 1073741824, suggested_price_xof: 200 },
+  { id: 'daily', name: 'Journée', description: '24 Heures complètes', duration_s: 86400, data_cap_bytes: 5368709120, suggested_price_xof: 1000 },
+  { id: 'work', name: 'Travail', description: 'Gros volume pour travailler', duration_s: 14400, data_cap_bytes: 10737418240, suggested_price_xof: 2500 }
 ]
 
 const UNLIMITED_BYTES = 1024 * 1024 * 1024 * 1024 * 1024 // 1 PB
@@ -30,8 +30,8 @@ export default function PlanEditorModal() {
   // Form State
   const [formData, setFormData] = useState<PlanFormData>({
     name: '',
-    duration_seconds: 3600,
-    data_bytes: 1024 * 1024 * 1024 * 1024 * 1024, // Unlimited by default (1 PB)
+    duration_s: 3600,
+    data_cap_bytes: 1024 * 1024 * 1024 * 1024 * 1024, // Unlimited by default (1 PB)
     price_xof: 0,
     is_active: true
   })
@@ -50,34 +50,34 @@ export default function PlanEditorModal() {
       if (plan) {
         setFormData({
           name: plan.name,
-          duration_seconds: plan.duration_seconds,
-          data_bytes: plan.data_bytes,
+          duration_s: plan.duration_s,
+          data_cap_bytes: plan.data_cap_bytes || 0,
           price_xof: plan.price_xof,
           is_active: plan.is_active
         })
         setIsEditing(true)
 
         // Reverse engineer duration/data for inputs
-        if (plan.duration_seconds >= 86400 && plan.duration_seconds % 86400 === 0) {
+        if (plan.duration_s >= 86400 && plan.duration_s % 86400 === 0) {
           setDurationUnit('days')
-          setCustomDuration((plan.duration_seconds / 86400).toString())
+          setCustomDuration((plan.duration_s / 86400).toString())
         } else {
           setDurationUnit('hours')
-          setCustomDuration((plan.duration_seconds / 3600).toFixed(1).replace(/\.0$/, ''))
+          setCustomDuration((plan.duration_s / 3600).toFixed(1).replace(/\.0$/, ''))
         }
 
-        if (plan.data_bytes >= 1024 * 1024 * 1024 * 1024 * 100) {
+        if ((plan.data_cap_bytes || 0) >= 1024 * 1024 * 1024 * 1024 * 100) {
           setIsUnlimited(true)
           setDataUnit('GB')
           setCustomData('1')
         } else {
           setIsUnlimited(false)
-          if (plan.data_bytes >= 1073741824) {
+          if ((plan.data_cap_bytes || 0) >= 1073741824) {
             setDataUnit('GB')
-            setCustomData((plan.data_bytes / 1073741824).toFixed(1).replace(/\.0$/, ''))
+            setCustomData(((plan.data_cap_bytes || 0) / 1073741824).toFixed(1).replace(/\.0$/, ''))
           } else {
             setDataUnit('MB')
-            setCustomData((plan.data_bytes / 1048576).toFixed(0))
+            setCustomData(((plan.data_cap_bytes || 0) / 1048576).toFixed(0))
           }
         }
       }
@@ -89,32 +89,32 @@ export default function PlanEditorModal() {
     setFormData({
       ...formData,
       name: template.name,
-      duration_seconds: template.duration_seconds,
-      data_bytes: template.data_bytes,
+      duration_s: template.duration_s,
+      data_cap_bytes: template.data_cap_bytes,
       price_xof: template.suggested_price_xof
     })
 
     // Update inputs
-    if (template.duration_seconds >= 86400 && template.duration_seconds % 86400 === 0) {
+    if (template.duration_s >= 86400 && template.duration_s % 86400 === 0) {
       setDurationUnit('days')
-      setCustomDuration((template.duration_seconds / 86400).toString())
+      setCustomDuration((template.duration_s / 86400).toString())
     } else {
       setDurationUnit('hours')
-      setCustomDuration((template.duration_seconds / 3600).toString())
+      setCustomDuration((template.duration_s / 3600).toString())
     }
 
-    if (template.data_bytes >= 1024 * 1024 * 1024 * 1024 * 100) {
+    if (template.data_cap_bytes >= 1024 * 1024 * 1024 * 1024 * 100) {
       setIsUnlimited(true)
       setDataUnit('GB')
       setCustomData('1')
     } else {
       setIsUnlimited(false)
-      if (template.data_bytes >= 1073741824) {
+      if (template.data_cap_bytes >= 1073741824) {
         setDataUnit('GB')
-        setCustomData((template.data_bytes / 1073741824).toString())
+        setCustomData((template.data_cap_bytes / 1073741824).toString())
       } else {
         setDataUnit('MB')
-        setCustomData((template.data_bytes / 1048576).toString())
+        setCustomData((template.data_cap_bytes / 1048576).toString())
       }
     }
   }
@@ -139,8 +139,8 @@ export default function PlanEditorModal() {
 
       const finalData: PlanFormData = {
         ...formData,
-        duration_seconds: parseFloat(customDuration) * durationMult,
-        data_bytes: finalDataBytes
+        duration_s: parseFloat(customDuration) * durationMult,
+        data_cap_bytes: finalDataBytes
       }
 
       if (isEditing && planId) {
@@ -186,8 +186,8 @@ export default function PlanEditorModal() {
                   <TouchableOpacity key={tpl.id} onPress={() => applyTemplate(tpl)}>
                     <Card style={[styles.templateCard, { borderColor: formData.name === tpl.name ? colors.primary : 'transparent', borderWidth: 2 }]}>
                       <Typography variant="h4">{tpl.name}</Typography>
-                      <Typography variant="caption" color="textSecondary">{format.duration(tpl.duration_seconds)}</Typography>
-                      <Typography variant="caption" color="textSecondary">{format.dataSize(tpl.data_bytes)}</Typography>
+                      <Typography variant="caption" color="textSecondary">{format.duration(tpl.duration_s)}</Typography>
+                      <Typography variant="caption" color="textSecondary">{format.dataSize(tpl.data_cap_bytes)}</Typography>
                       <Typography variant="h4" color="primary" style={{ marginTop: 4 }}>{tpl.suggested_price_xof} F</Typography>
                     </Card>
                   </TouchableOpacity>

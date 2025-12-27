@@ -241,7 +241,7 @@ describe('authStore', () => {
       });
 
       await act(async () => {
-        await result.current.updateProfile({ full_name: 'John Doe' });
+        await result.current.updateProfile({ name: 'John Doe' });
       });
 
       expect(result.current.error).toBe('Update failed');

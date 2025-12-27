@@ -8,8 +8,8 @@ import { Card } from '../../../src/components/ui/Card'
 import { Header } from '../../../src/components/ui/Header'
 import { Typography } from '../../../src/components/ui/Typography'
 import { format } from '../../../src/lib/format'
-import { supabase } from '../../../src/lib/supabase'
 import { useAuthStore } from '../../../src/stores/authStore'
+import { useHostHotspotStore } from '../../../src/stores/hostHotspotStore'
 
 type DashboardStats = {
   totalEarnings: number
@@ -30,87 +30,45 @@ type Transaction = {
 }
 
 export default function HostDashboard() {
-  const [stats, setStats] = useState<DashboardStats | null>(null)
-  const [transactions, setTransactions] = useState<Transaction[]>([])
-  const [loading, setLoading] = useState(true)
+  const {
+    dashboardStats,
+    recentSales,
+    fetchDashboardStats,
+    fetchHostSales,
+    loading: storeLoading
+  } = useHostHotspotStore()
+
   const [refreshing, setRefreshing] = useState(false)
   const [isOnline, setIsOnline] = useState(true) // Global online status
-  // const { t } = useTranslation() // Unused
   const profile = useAuthStore((s) => s.profile)
   const colorScheme = useColorScheme()
   const colors = Colors[colorScheme ?? 'light']
 
-  const loadDashboardData = React.useCallback(async () => {
+  const loadData = React.useCallback(async () => {
     try {
-      if (!refreshing) setLoading(true)
+      if (!refreshing && !storeLoading) {
+        // trigger loading if needed, or rely on store
+      }
 
-      // 1. Fetch Stats (Same logic as before, consolidated)
-      const { data: hotspots } = await supabase.from('hotspots').select('id, is_online')
-      const hotspotIds = hotspots?.map(h => h.id) || []
-      const activeHotspots = hotspots?.filter(h => h.is_online).length || 0
-
-      const { data: purchases } = await supabase
-        .from('purchases')
-        .select('amount, created_at, status:payment_status, id, hotspot:hotspots(name)')
-        .in('hotspot_id', hotspotIds)
-        .order('created_at', { ascending: false })
-        .limit(5)
-
-      const completedPurchases = purchases?.filter(p => p.status === 'success') || []
-      const totalEarnings = completedPurchases.reduce((sum, p) => sum + p.amount, 0)
-
-      const today = new Date()
-      today.setHours(0, 0, 0, 0)
-      const todayEarnings = completedPurchases.filter(p => new Date(p.created_at) >= today)
-        .reduce((sum, p) => sum + p.amount, 0)
-
-      const { count: activeSessions } = await supabase
-        .from('vouchers')
-        .select('*', { count: 'exact', head: true })
-        .in('hotspot_id', hotspotIds)
-        .not('used_at', 'is', null)
-        .gt('expires_at', new Date().toISOString())
-
-      const { data: payouts } = await supabase
-        .from('payout_requests')
-        .select('amount')
-        .eq('status', 'pending')
-
-      const pendingPayouts = payouts?.reduce((sum, p) => sum + p.amount, 0) || 0
-
-      setStats({
-        totalEarnings,
-        todayEarnings,
-        activeHotspots,
-        activeSessions: activeSessions || 0,
-        totalSales: completedPurchases.length,
-        pendingPayouts,
-      })
-
-      // Set recent transactions
-      setTransactions(purchases?.map(p => ({
-        id: p.id,
-        amount: p.amount,
-        status: p.status as any,
-        created_at: p.created_at,
-        hotspot: p.hotspot as any
-      })) || [])
+      await Promise.all([
+        fetchDashboardStats(),
+        fetchHostSales('week')
+      ])
 
     } catch (error) {
       console.error('Error loading dashboard:', error)
     } finally {
-      setLoading(false)
       setRefreshing(false)
     }
-  }, [refreshing])
+  }, [refreshing, fetchDashboardStats, fetchHostSales])
 
   useEffect(() => {
-    loadDashboardData()
-  }, [loadDashboardData])
+    loadData()
+  }, [loadData])
 
   const onRefresh = () => {
     setRefreshing(true)
-    loadDashboardData()
+    loadData()
   }
 
   const toggleOnlineStatus = () => {
@@ -118,7 +76,7 @@ export default function HostDashboard() {
     setIsOnline(!isOnline)
   }
 
-  if (loading && !stats) {
+  if (storeLoading && !dashboardStats) {
     return (
       <SafeAreaView style={[styles.loading, { backgroundColor: colors.background }]}>
         <ActivityIndicator size="large" color={colors.primary} />
@@ -158,12 +116,12 @@ export default function HostDashboard() {
             <Ionicons name="wallet-outline" size={24} color="white" />
           </View>
           <Typography variant="h1" style={{ color: 'white', fontSize: 36, marginBottom: 8 }}>
-            {format.currency(stats?.totalEarnings || 0)}
+            {format.currency(dashboardStats?.totalEarnings || 0)}
           </Typography>
           <View style={styles.mainCardFooter}>
             <View>
               <Typography variant="caption" style={{ color: 'rgba(255,255,255,0.6)' }}>Aujourd&apos;hui</Typography>
-              <Typography variant="h4" style={{ color: 'white' }}>+{format.currency(stats?.todayEarnings || 0)}</Typography>
+              <Typography variant="h4" style={{ color: 'white' }}>+{format.currency(dashboardStats?.todayEarnings || 0)}</Typography>
             </View>
             <Link href="/(app)/(host)/payouts" asChild>
               <TouchableOpacity style={styles.withdrawButton}>
@@ -181,7 +139,7 @@ export default function HostDashboard() {
                 <View style={[styles.statIcon, { backgroundColor: colors.secondary }]}>
                   <Ionicons name="wifi" size={20} color={colors.primary} />
                 </View>
-                <Typography variant="h3">{stats?.activeHotspots || 0}</Typography>
+                <Typography variant="h3">{dashboardStats?.activeHotspots || 0}</Typography>
                 <Typography variant="caption" color="textSecondary">Hotspots actifs</Typography>
               </Card>
             </Pressable>
@@ -193,7 +151,7 @@ export default function HostDashboard() {
                 <View style={[styles.statIcon, { backgroundColor: 'rgba(16, 185, 129, 0.1)' }]}>
                   <Ionicons name="people" size={20} color={colors.success} />
                 </View>
-                <Typography variant="h3">{stats?.activeSessions || 0}</Typography>
+                <Typography variant="h3">{dashboardStats?.activeSessions || 0}</Typography>
                 <Typography variant="caption" color="textSecondary">Utilisateurs</Typography>
               </Card>
             </Pressable>
@@ -205,7 +163,7 @@ export default function HostDashboard() {
                 <View style={[styles.statIcon, { backgroundColor: 'rgba(59, 130, 246, 0.1)' }]}>
                   <Ionicons name="cart" size={20} color="#3b82f6" />
                 </View>
-                <Typography variant="h3">{stats?.totalSales || 0}</Typography>
+                <Typography variant="h3">{dashboardStats?.totalSales || 0}</Typography>
                 <Typography variant="caption" color="textSecondary">Ventes</Typography>
               </Card>
             </Pressable>
@@ -252,12 +210,12 @@ export default function HostDashboard() {
         </View>
 
         <View style={styles.transactionsList}>
-          {transactions.length === 0 ? (
+          {recentSales.length === 0 ? (
             <Typography variant="body" color="textSecondary" style={{ textAlign: 'center', padding: 20 }}>
               Aucune transaction récente
             </Typography>
           ) : (
-            transactions.map((tx) => (
+            recentSales.slice(0, 5).map((tx) => (
               <Link key={tx.id} href={`/(app)/(shared)/transaction-detail/${tx.id}`} asChild>
                 <Pressable style={[styles.transactionItem, { borderBottomColor: colors.border }]}>
                   <View style={styles.txIcon}>
@@ -269,7 +227,7 @@ export default function HostDashboard() {
                   </View>
                   <View style={styles.txDetails}>
                     <Typography variant="body" style={styles.txTitle}>
-                      Vente forfait - {tx.hotspot?.name || 'Inconnu'}
+                      Vente forfait - {tx.hotspot_name || 'Inconnu'}
                     </Typography>
                     <Typography variant="caption" color="textSecondary">
                       {format.date(tx.created_at)}

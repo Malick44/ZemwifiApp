@@ -7,31 +7,36 @@ export type Hotspot = {
   host_id: UUID
   name: string
   landmark: string
-  address: string | null
-  lat: number
-  lng: number
-  ssid: string
+  address?: string | null
+  location?: any // GeoJSON or similar
+  lat?: number
+  lng?: number
   is_online: boolean
-  status?: 'online' | 'offline'
   sales_paused: boolean
-  hours: string | null
+  last_seen_at?: string
+  created_at: string
+
+  // Computed or joined
   distance?: number
-  range_meters: number
+  range_meters?: number // Optional/Legacy
+  active_sessions_count?: number
 }
 
 export type Plan = {
   id: UUID
   hotspot_id: UUID
   name: string
-  duration_seconds: number
-  data_bytes: number
+  duration_s: number // standard
+  duration_seconds: number // legacy alias
+  data_cap_bytes: number | null
   price_xof: number
   is_active: boolean
 }
 
 export type Voucher = {
   id: UUID
-  code: string
+  code?: string // optional distinct code if not token
+  jti: string
   user_id: UUID
   hotspot_id: UUID
   plan_id: UUID
@@ -39,7 +44,7 @@ export type Voucher = {
   expires_at: string
   created_at: string
   used_at: string | null
-  device_mac: string | null
+  token: string
 }
 
 export type Purchase = {
@@ -47,35 +52,27 @@ export type Purchase = {
   user_id: UUID
   hotspot_id: UUID
   plan_id: UUID
-  voucher_id: UUID | null
-  amount: number
-  payment_provider: 'wave' | 'orange' | 'moov' | 'wallet'
-  payment_status: 'pending' | 'success' | 'failed' | 'expired'
-  payment_reference: string | null
+  amount_xof: number
+  provider: 'wallet' | 'wave' | 'orange' | 'moov'
+  status: 'pending' | 'confirmed' | 'failed' | 'expired' | 'success'
   created_at: string
-  updated_at: string
 }
 
 export type CashInRequest = {
   id: UUID
   host_id: UUID
-  user_id: UUID
+  user_id: UUID | null
   user_phone: string
-  amount: number
-  commission: number
-  status: 'pending' | 'confirmed' | 'expired' | 'rejected'
-  qr_code: string | null
+  amount_xof: number
+  status: 'pending' | 'confirmed' | 'denied' | 'expired'
   expires_at: string
   created_at: string
-  confirmed_at: string | null
-  rejected_at: string | null
-  rejection_reason: string | null
 }
 
 export type PlanFormData = {
   name: string
-  duration_seconds: number
-  data_bytes: number
+  duration_s: number
+  data_cap_bytes: number
   price_xof: number
   is_active: boolean
 }
@@ -84,8 +81,8 @@ export type PlanTemplate = {
   id: string
   name: string
   description: string
-  duration_seconds: number
-  data_bytes: number
+  duration_s: number
+  data_cap_bytes: number
   suggested_price_xof: number
 }
 

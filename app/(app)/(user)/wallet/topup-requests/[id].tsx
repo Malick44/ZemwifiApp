@@ -1,6 +1,6 @@
-import React from 'react'
-import { View, Text, StyleSheet } from 'react-native'
 import { useLocalSearchParams } from 'expo-router'
+import React from 'react'
+import { StyleSheet, Text, View } from 'react-native'
 import { useCashInStore } from '../../../../../src/stores/cashInStore'
 
 export default function CashInDetail() {
@@ -10,7 +10,7 @@ export default function CashInDetail() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Cash-in</Text>
-      <Text>Montant: {request.amount}</Text>
+      <Text>Montant: {request.amount_xof}</Text>
       <Text>Status: {request.status}</Text>
     </View>
   )

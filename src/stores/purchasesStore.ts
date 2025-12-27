@@ -9,9 +9,9 @@ export type PurchasesState = {
   loading: boolean
   error: string | null
   currentPurchase: Purchase | null
-  startPurchase: (hotspotId: UUID, planId: UUID, provider: Purchase['payment_provider']) => Promise<Purchase | null>
+  startPurchase: (hotspotId: UUID, planId: UUID, provider: Purchase['provider']) => Promise<Purchase | null>
   refreshPurchases: () => Promise<void>
-  updateStatus: (id: UUID, status: Purchase['payment_status']) => Promise<void>
+  updateStatus: (id: UUID, status: Purchase['status']) => Promise<void>
   simulatePayment: (purchaseId: UUID) => Promise<void>
   setCurrentPurchase: (purchase: Purchase | null) => void
 }
@@ -34,7 +34,7 @@ export const usePurchasesStore = create<PurchasesState>()(
           p_user_id: (await supabase.auth.getUser()).data.user?.id, // Get current user
           p_hotspot_id: hotspotId,
           p_plan_id: planId,
-          p_payment_provider: provider
+          p_payment_provider: provider // ensure RPC expects this or check definition
         })
 
         if (rpcError) {
@@ -54,9 +54,17 @@ export const usePurchasesStore = create<PurchasesState>()(
           return null
         }
 
+        const purchaseData = {
+          ...data,
+          ...data,
+          ...data,
+          amount_xof: data.amount_xof ?? data.amount ?? 0, // Handle legacy/transition and ensure number
+          provider: data.provider ?? 'wallet' // Default to wallet if missing
+        }
+
         set((state) => ({
-          purchases: [data, ...state.purchases],
-          currentPurchase: data,
+          purchases: [purchaseData as Purchase, ...state.purchases],
+          currentPurchase: purchaseData as Purchase,
           loading: false
         }))
 
@@ -76,13 +84,19 @@ export const usePurchasesStore = create<PurchasesState>()(
           return
         }
 
-        set({ purchases: data ?? [], loading: false })
+        const mappedPurchases = (data ?? []).map((p: any) => ({
+          ...p,
+          amount_xof: p.amount_xof ?? p.amount ?? 0, // Handle legacy/transition and ensure number
+          provider: p.provider ?? 'wallet' // Default to wallet if missing
+        }))
+
+        set({ purchases: mappedPurchases, loading: false })
       },
 
       updateStatus: async (id, status) => {
         const { error } = await supabase
           .from('purchases')
-          .update({ payment_status: status, updated_at: new Date().toISOString() })
+          .update({ status: status, updated_at: new Date().toISOString() })
           .eq('id', id)
 
         if (error) {
@@ -92,10 +106,10 @@ export const usePurchasesStore = create<PurchasesState>()(
 
         set((state) => ({
           purchases: state.purchases.map((p) =>
-            p.id === id ? { ...p, payment_status: status, updated_at: new Date().toISOString() } : p
+            p.id === id ? { ...p, status: status, updated_at: new Date().toISOString() } : p
           ),
           currentPurchase: state.currentPurchase?.id === id
-            ? { ...state.currentPurchase, payment_status: status }
+            ? { ...state.currentPurchase, status: status }
             : state.currentPurchase
         }))
       },
@@ -109,7 +123,7 @@ export const usePurchasesStore = create<PurchasesState>()(
 
         // 90% success rate for simulation
         const success = Math.random() > 0.1
-        const status: Purchase['payment_status'] = success ? 'success' : 'failed'
+        const status: Purchase['status'] = success ? 'confirmed' : 'failed'
 
         await get().updateStatus(purchaseId, status)
         set({ loading: false })

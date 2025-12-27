@@ -3,6 +3,7 @@ import { useColors } from '@/hooks/use-colors'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import React, { useEffect, useState } from 'react'
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { Button } from '../../../../src/components/ui/Button'
 import { useTranslation } from '../../../../src/lib/i18n'
 import { usePurchasesStore } from '../../../../src/stores/purchasesStore'
@@ -36,9 +37,8 @@ export default function PaymentStatus() {
       // Simulate payment processing
       await simulatePayment(purchase.id)
 
-      // If wallet payment and successful, create voucher
-      if (provider === 'wallet' && purchase.payment_status === 'success') {
-        await wallet.createVoucher(planId, hotspotId)
+      // If wallet payment and successful, just refresh wallet
+      if (provider === 'wallet' && purchase.status === 'confirmed') {
         await wallet.refresh()
       }
 
@@ -50,17 +50,17 @@ export default function PaymentStatus() {
 
   if (processing) {
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
         <ActivityIndicator size="large" color={colors.primary} />
         <Text style={styles.processing}>{t('payment_pending')}</Text>
-      </View>
+      </SafeAreaView>
     )
   }
 
-  const success = currentPurchase?.payment_status === 'success'
+  const success = currentPurchase?.status === 'confirmed'
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={[styles.statusIcon, success ? styles.successIcon : styles.errorIcon]}>
         <Text style={styles.statusEmoji}>{success ? '✓' : '✗'}</Text>
       </View>
@@ -70,7 +70,7 @@ export default function PaymentStatus() {
       </Text>
 
       <Text style={styles.status}>
-        {t('status')}: {currentPurchase?.payment_status || 'unknown'}
+        {t('status')}: {currentPurchase?.status || 'unknown'}
       </Text>
 
       {success && (
@@ -86,7 +86,7 @@ export default function PaymentStatus() {
           onPress={() => router.back()}
         />
       )}
-    </View>
+    </SafeAreaView>
   )
 }
 

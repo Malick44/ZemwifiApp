@@ -10,10 +10,11 @@ import { Card } from '../../../../src/components/ui/Card'
 import { EmptyState } from '../../../../src/components/ui/EmptyState'
 import { LoadingState } from '../../../../src/components/ui/LoadingState'
 import { Typography } from '../../../../src/components/ui/Typography'
+import { format } from '../../../../src/lib/format'
 import { useWalletStore } from '../../../../src/stores/walletStore'
 
 export default function WalletScreen() {
-  const { vouchers, balance, refresh, loading } = useWalletStore()
+  const { vouchers, balance, refresh, loading, pendingCashIns } = useWalletStore()
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<'active' | 'used'>('active')
   const colorScheme = useColorScheme()
@@ -35,6 +36,22 @@ export default function WalletScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
       <ScrollView style={styles.container}>
+        {/* Pending Requests Alert */}
+        {pendingCashIns && pendingCashIns.length > 0 && (
+          <Pressable onPress={() => router.push('/(app)/(user)/wallet/requests')}>
+            <Card variant="filled" style={{ marginBottom: 16, backgroundColor: 'rgba(234, 179, 8, 0.1)', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
+                <Ionicons name="alert-circle" size={24} color={colors.warning} />
+                <View>
+                  <Typography variant="body" style={{ fontWeight: '700', color: colors.warning }}>{pendingCashIns.length} demande(s) en attente</Typography>
+                  <Typography variant="caption" style={{ color: colors.warning }}>Confirmez pour recevoir vos fonds</Typography>
+                </View>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={colors.warning} />
+            </Card>
+          </Pressable>
+        )}
+
         {/* Balance Card */}
         <Card variant="elevated" style={[styles.balanceCard, { backgroundColor: colors.tint }]}>
           <View style={styles.balanceContent}>
@@ -43,7 +60,7 @@ export default function WalletScreen() {
                 Solde disponible
               </Typography>
               <Typography variant="h1" style={{ color: '#fff', marginTop: 4 }}>
-                {balance.toLocaleString()} XOF
+                {format.currency(balance)}
               </Typography>
             </View>
             <Ionicons name="wallet" size={48} color={colors.textInverse} style={{ opacity: 0.3 }} />

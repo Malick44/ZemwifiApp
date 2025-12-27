@@ -13,7 +13,7 @@ import { Typography } from '../../../src/components/ui/Typography'
 import { usePurchasesStore } from '../../../src/stores/purchasesStore'
 import { Purchase } from '../../../src/types/domain'
 
-type FilterType = 'all' | 'success' | 'pending' | 'failed'
+type FilterType = 'all' | 'confirmed' | 'pending' | 'failed'
 
 export default function HistoryScreen() {
   const { purchases, refreshPurchases, loading } = usePurchasesStore()
@@ -28,11 +28,12 @@ export default function HistoryScreen() {
 
   const filteredPurchases = purchases.filter(p => {
     if (filter === 'all') return true
-    return p.payment_status === filter
+    return p.status === filter
   })
 
-  const getStatusVariant = (status: Purchase['payment_status']) => {
+  const getStatusVariant = (status: Purchase['status']) => {
     switch (status) {
+      case 'confirmed': return 'success'
       case 'success': return 'success'
       case 'pending': return 'warning'
       case 'failed': return 'error'
@@ -40,8 +41,9 @@ export default function HistoryScreen() {
     }
   }
 
-  const getStatusText = (status: Purchase['payment_status']) => {
+  const getStatusText = (status: Purchase['status']) => {
     switch (status) {
+      case 'confirmed': return 'Réussi'
       case 'success': return 'Réussi'
       case 'pending': return 'En attente'
       case 'failed': return 'Échoué'
@@ -50,7 +52,7 @@ export default function HistoryScreen() {
     }
   }
 
-  const getPaymentIcon = (provider: Purchase['payment_provider']) => {
+  const getPaymentIcon = (provider?: string) => {
     switch (provider) {
       case 'wave': return 'phone-portrait-outline'
       case 'orange': return 'phone-portrait-outline'
@@ -82,9 +84,9 @@ export default function HistoryScreen() {
       >
         {[
           { key: 'all' as const, label: 'Tout', count: purchases.length },
-          { key: 'success' as const, label: 'Réussi', count: purchases.filter(p => p.payment_status === 'success').length },
-          { key: 'pending' as const, label: 'En attente', count: purchases.filter(p => p.payment_status === 'pending').length },
-          { key: 'failed' as const, label: 'Échoué', count: purchases.filter(p => p.payment_status === 'failed').length },
+          { key: 'confirmed' as const, label: 'Réussi', count: purchases.filter(p => p.status === 'confirmed').length },
+          { key: 'pending' as const, label: 'En attente', count: purchases.filter(p => p.status === 'pending').length },
+          { key: 'failed' as const, label: 'Échoué', count: purchases.filter(p => p.status === 'failed').length },
         ].map(({ key, label, count }) => (
           <Pressable
             key={key}
@@ -153,13 +155,13 @@ export default function HistoryScreen() {
               <View style={styles.transactionHeader}>
                 <View style={[styles.iconContainer, { backgroundColor: colors.backgroundSecondary }]}>
                   <Ionicons
-                    name={getPaymentIcon(item.payment_provider)}
+                    name={getPaymentIcon(item.provider)}
                     size={24}
                     color={colors.tint}
                   />
                 </View>
                 <View style={styles.transactionInfo}>
-                  <Typography variant="h3">
+                  <Typography variant="h3" numberOfLines={1} ellipsizeMode="tail" style={{ flexShrink: 1 }}>
                     Plan {item.plan_id}
                   </Typography>
                   <Typography variant="caption" color={colors.textSecondary}>
@@ -168,11 +170,11 @@ export default function HistoryScreen() {
                 </View>
                 <View style={styles.transactionRight}>
                   <Typography variant="h3" color={colors.text}>
-                    {item.amount.toLocaleString()} XOF
+                    {(item.amount_xof || 0).toLocaleString()} XOF
                   </Typography>
                   <Badge
-                    variant={getStatusVariant(item.payment_status)}
-                    label={getStatusText(item.payment_status)}
+                    variant={getStatusVariant(item.status)}
+                    label={getStatusText(item.status)}
                     size="sm"
                   />
                 </View>
@@ -182,13 +184,13 @@ export default function HistoryScreen() {
                 <View style={styles.detailItem}>
                   <Ionicons name="location-outline" size={14} color={colors.textSecondary} />
                   <Typography variant="caption" color={colors.textSecondary}>
-                    Hotspot {item.hotspot_id.slice(0, 8)}...
+                    Hotspot {(item.hotspot_id || '').slice(0, 8)}...
                   </Typography>
                 </View>
                 <View style={styles.detailItem}>
-                  <Ionicons name={getPaymentIcon(item.payment_provider)} size={14} color={colors.textSecondary} />
+                  <Ionicons name={getPaymentIcon(item.provider)} size={14} color={colors.textSecondary} />
                   <Typography variant="caption" color={colors.textSecondary}>
-                    {item.payment_provider.charAt(0).toUpperCase() + item.payment_provider.slice(1)}
+                    {(item.provider || 'Inconnu').charAt(0).toUpperCase() + (item.provider || 'Inconnu').slice(1)}
                   </Typography>
                 </View>
               </View>
@@ -226,11 +228,12 @@ function formatDate(dateString: string): string {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   filtersScroll: {
-    maxHeight: 60,
+    marginBottom: 8,
+    minHeight: 50,
   },
   filtersContainer: {
     paddingHorizontal: 16,
-    paddingBottom: 8,
+    paddingVertical: 12, // Added top padding
     gap: 8,
   },
   filterChip: {
@@ -271,6 +274,7 @@ const styles = StyleSheet.create({
   },
   transactionInfo: {
     flex: 1,
+    marginRight: 8, // Add spacing between info and amount
   },
   transactionRight: {
     alignItems: 'flex-end',

@@ -15,11 +15,9 @@ const mockHotspots: Hotspot[] = [
     address: '123 Main St',
     lat: 14.7167,
     lng: -17.4677,
-    ssid: 'Cafe_Free',
     is_online: true,
     sales_paused: false,
-    hours: '08:00 - 22:00',
-    range_meters: 50
+    created_at: new Date().toISOString()
   },
   {
     id: '2',
@@ -29,11 +27,9 @@ const mockHotspots: Hotspot[] = [
     address: '456 Center Ave',
     lat: 14.7200,
     lng: -17.4700,
-    ssid: 'Resto_Guest',
     is_online: true,
     sales_paused: false,
-    hours: '10:00 - 23:00',
-    range_meters: 75
+    created_at: new Date().toISOString()
   },
   {
     id: '3',
@@ -43,11 +39,9 @@ const mockHotspots: Hotspot[] = [
     address: '789 Edu Blvd',
     lat: 14.7500,
     lng: -17.5000,
-    ssid: 'Lib_Secure',
     is_online: true,
     sales_paused: false,
-    hours: '09:00 - 18:00',
-    range_meters: 100
+    created_at: new Date().toISOString()
   },
 ];
 

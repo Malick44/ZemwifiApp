@@ -33,8 +33,8 @@ export default function HotspotDetail() {
   if (!hotspot) {
     return (
       <SafeAreaView style={styles.container}>
-        <EmptyState 
-          title="Hotspot introuvable" 
+        <EmptyState
+          title="Hotspot introuvable"
           message="Ce hotspot n'existe pas ou a été supprimé"
           icon="close-circle"
         />
@@ -69,9 +69,9 @@ export default function HotspotDetail() {
                 </Typography>
               </View>
             </View>
-            <Badge 
-              variant={isOnline ? 'success' : 'error'} 
-              label={isOnline ? 'En ligne' : 'Hors ligne'} 
+            <Badge
+              variant={isOnline ? 'success' : 'error'}
+              label={isOnline ? 'En ligne' : 'Hors ligne'}
             />
           </View>
         </Card>
@@ -91,10 +91,10 @@ export default function HotspotDetail() {
         {/* Plans Section */}
         <View style={styles.section}>
           <Typography variant="h2" style={styles.sectionTitle}>Plans disponibles</Typography>
-          
+
           {hotspotPlans.length === 0 ? (
-            <EmptyState 
-              title="Aucun plan disponible" 
+            <EmptyState
+              title="Aucun plan disponible"
               message="Ce hotspot n'a pas de plans actifs pour le moment"
               icon="pricetag-outline"
             />
@@ -104,7 +104,7 @@ export default function HotspotDetail() {
                 key={plan.id}
                 onPress={() => setSelectedPlanId(plan.id)}
               >
-                <Card 
+                <Card
                   variant={selectedPlanId === plan.id ? 'elevated' : 'outlined'}
                   style={[
                     styles.planCard,
@@ -118,14 +118,14 @@ export default function HotspotDetail() {
                         <View style={styles.planDetail}>
                           <Ionicons name="time-outline" size={16} color={colors.textSecondary} />
                           <Typography variant="caption" color={colors.textSecondary}>
-                            {formatDuration(plan.duration_seconds)}
+                            {formatDuration(plan.duration_s || plan.duration_seconds)}
                           </Typography>
                         </View>
-                        {plan.data_bytes > 0 && (
+                        {(plan.data_cap_bytes || 0) > 0 && (
                           <View style={styles.planDetail}>
                             <Ionicons name="cloud-download-outline" size={16} color={colors.textSecondary} />
                             <Typography variant="caption" color={colors.textSecondary}>
-                              {formatData(plan.data_bytes)}
+                              {formatData(plan.data_cap_bytes || 0)}
                             </Typography>
                           </View>
                         )}
@@ -159,7 +159,7 @@ export default function HotspotDetail() {
           <Typography variant="body" color={colors.textSecondary}>
             1. Achetez un plan{'\n'}
             2. Recevez votre code voucher{'\n'}
-            3. Connectez-vous au Wi-Fi: {hotspot.ssid}{'\n'}
+            3. Connectez-vous au Wi-Fi: {hotspot.name}{'\n'}
             4. Entrez votre code voucher
           </Typography>
           <Link href="/(app)/(user)/connect-help" asChild>

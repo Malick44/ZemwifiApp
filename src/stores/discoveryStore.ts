@@ -1,6 +1,5 @@
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
-import { ScannedNetwork, scanNetworks } from '../lib/wifi-scanner'
 import { Hotspot, Plan, UUID } from '../types/domain'
 
 export type DiscoveryState = {
@@ -10,7 +9,6 @@ export type DiscoveryState = {
   error: string | null
   searchQuery: string
   userLocation: { lat: number; lng: number } | null
-  scannedNetworks: ScannedNetwork[]
   fetchHotspots: () => Promise<void>
   fetchNearbyHotspots: (lat: number, lng: number) => Promise<void>
   scanWifi: () => Promise<void>
@@ -48,7 +46,6 @@ export const useDiscoveryStore = create<DiscoveryState>((set, get) => ({
   error: null,
   searchQuery: '',
   userLocation: null,
-  scannedNetworks: [],
 
   fetchHotspots: async () => {
     // Deprecated in favor of fetchNearbyHotspots, keeping empty or redirecting if needed
@@ -60,9 +57,9 @@ export const useDiscoveryStore = create<DiscoveryState>((set, get) => ({
 
     // Call the RPC
     const { data, error } = await supabase.rpc('nearby_hotspots', {
-      lat,
-      lng,
-      radius_m: 10000 // 10km default
+      p_lat: lat,
+      p_lng: lng,
+      p_radius_m: 10000 // 10km default
     })
 
     if (error) {
@@ -91,30 +88,22 @@ export const useDiscoveryStore = create<DiscoveryState>((set, get) => ({
         hours: null // Missing from RPC, acceptable
       }))
 
-      set({ hotspots: mappedHotspots })
+      // Deduplicate by ID just in case
+      const uniqueHotspots = Array.from(new Map(mappedHotspots.map(item => [item.id, item])).values());
+      set({ hotspots: uniqueHotspots })
       // Trigger scan to update status purely based on local detection (optional "double check")
-      get().scanWifi()
+      // Scan trigged removed to prevent infinite loop with fetchNearbyHotspots
     }
     set({ loading: false })
   },
 
   scanWifi: async () => {
-    try {
-      const scanned = await scanNetworks()
-      set({ scannedNetworks: scanned })
-
-      // Update hotspots status based on scan
-      const { hotspots } = get()
-      const updatedHotspots = hotspots.map(h => {
-        const match = scanned.find(n => n.ssid === h.ssid)
-        if (match) {
-          return { ...h, status: 'online', is_online: true } as Hotspot
-        }
-        return h
-      })
-      set({ hotspots: updatedHotspots })
-    } catch (e) {
-      console.warn('Failed to scan wifi:', e)
+    // Native WiFi scanning on iOS/Android is restricted and unreliable.
+    // relying on 'nearby_hotspots' RPC which returns online status based on Heartbeat.
+    // We can just re-fetch the RPC here.
+    const { userLocation } = get()
+    if (userLocation) {
+      await get().fetchNearbyHotspots(userLocation.lat, userLocation.lng)
     }
   },
 

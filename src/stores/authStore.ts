@@ -10,7 +10,7 @@ type Profile = {
   email: string | null
   name: string | null
   role?: 'guest' | 'user' | 'host' | 'technician' | 'admin'
-  wallet_balance?: number
+  wallet_balance_xof?: number
 }
 
 type AuthState = {

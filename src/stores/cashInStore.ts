@@ -1,6 +1,5 @@
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
-import { isoNow } from '../lib/time'
 import { CashInRequest, UUID } from '../types/domain'
 
 export type CashInState = {
@@ -20,7 +19,12 @@ export const useCashInStore = create<CashInState>((set) => ({
     set({ loading: true, error: null })
     const { data, error } = await supabase
       .from('cashin_requests')
-      .insert({ host_id: hostId, amount, user_phone: phone, expires_at: isoNow() })
+      .insert({
+        host_id: hostId,
+        amount,
+        user_phone: phone,
+        expires_at: new Date(Date.now() + 10 * 60000).toISOString()
+      })
       .select()
       .single()
     if (error) {

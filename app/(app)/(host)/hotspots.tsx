@@ -7,7 +7,6 @@ import { Colors } from '../../../constants/theme'
 import { Badge } from '../../../src/components/ui/Badge'
 import { Card } from '../../../src/components/ui/Card'
 import { Typography } from '../../../src/components/ui/Typography'
-import { format } from '../../../src/lib/format'
 import { useHostHotspotStore } from '../../../src/stores/hostHotspotStore'
 
 export default function HotspotsListScreen() {
@@ -93,8 +92,8 @@ export default function HotspotsListScreen() {
                     </View>
                     <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
                     <View style={styles.statItem}>
-                      <Typography variant="caption" color="textSecondary">Distance</Typography>
-                      <Typography variant="h4">{hotspot.distance ? format.distance(hotspot.distance) : '--'}</Typography>
+                      <Typography variant="caption" color="textSecondary">Sessions Actives</Typography>
+                      <Typography variant="h4">{hotspot.active_sessions_count || 0}</Typography>
                     </View>
                   </View>
 
