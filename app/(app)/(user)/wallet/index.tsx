@@ -66,7 +66,7 @@ export default function WalletScreen() {
             <Ionicons name="wallet" size={48} color={colors.textInverse} style={{ opacity: 0.3 }} />
           </View>
           <View style={styles.balanceActions}>
-            <Link href="/(app)/(user)/wallet/topup-qr" asChild style={{ flex: 1 }}>
+            <Link href="/(app)/(user)/wallet/topup" asChild style={{ flex: 1 }}>
               <Button
                 label="Recharger"
                 variant="secondary"
@@ -157,7 +157,7 @@ export default function WalletScreen() {
                   <Card variant="elevated" style={styles.voucherCard}>
                     <View style={styles.voucherHeader}>
                       <View style={styles.voucherIcon}>
-                        <Ionicons name="qr-code" size={24} color={colors.tint} />
+                        <Ionicons name="ticket" size={24} color={colors.tint} />
                       </View>
                       <View style={styles.voucherInfo}>
                         <Typography variant="h3">{voucher.code}</Typography>
@@ -176,7 +176,7 @@ export default function WalletScreen() {
                       </View>
                       <Pressable style={styles.viewQRButton}>
                         <Typography variant="caption" color={colors.tint} style={{ fontWeight: '600' }}>
-                          Voir le QR
+                          Voir le code
                         </Typography>
                         <Ionicons name="chevron-forward" size={16} color={colors.tint} />
                       </Pressable>

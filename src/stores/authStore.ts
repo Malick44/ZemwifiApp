@@ -12,6 +12,7 @@ type Profile = {
   name: string | null
   role?: 'guest' | 'user' | 'host' | 'technician' | 'admin'
   wallet_balance_xof?: number
+  country_code?: string | null
 }
 
 type AuthState = {
@@ -23,8 +24,8 @@ type AuthState = {
   setLanguage: (language: Language) => void
   setGuest: () => void
   signOut: () => Promise<void>
-  sendOtp: (phone: string) => Promise<void>
-  verifyOtp: (phone: string, token: string) => Promise<void>
+  sendOtp: (phone: string, countryCode?: string) => Promise<void>
+  verifyOtp: (phone: string, token: string, countryCode?: string) => Promise<void>
   refreshSession: () => Promise<void>
   updateProfile: (input: Partial<Profile>) => Promise<void>
   clearError: () => void
@@ -47,13 +48,13 @@ export const useAuthStore = create<AuthState>()(
         await supabase.auth.signOut()
         set({ session: null, profile: null })
       },
-      sendOtp: async (phone) => {
+      sendOtp: async (phone, _countryCode) => {
         set({ loading: true, error: null })
         const { error } = await supabase.auth.signInWithOtp({ phone })
         if (error) set({ error: error.message })
         set({ loading: false })
       },
-      verifyOtp: async (phone, token) => {
+      verifyOtp: async (phone, token, countryCode) => {
         set({ loading: true, error: null })
         const { data, error } = await supabase.auth.verifyOtp({ phone, token, type: 'sms' })
         if (error) {
@@ -82,8 +83,14 @@ export const useAuthStore = create<AuthState>()(
                 [COLUMNS.PROFILES.ID]: data.user.id,
                 [COLUMNS.PROFILES.PHONE]: userPhone,
                 [COLUMNS.PROFILES.NAME]: '',
-                [COLUMNS.PROFILES.ROLE]: 'user'
+                [COLUMNS.PROFILES.ROLE]: 'user',
+                [COLUMNS.PROFILES.COUNTRY_CODE]: countryCode || 'BF',
               })
+            } else if (countryCode && !existingProfile.country_code) {
+              // Backfill country_code for existing profiles that don't have it
+              await supabase.from(TABLES.PROFILES).update({
+                [COLUMNS.PROFILES.COUNTRY_CODE]: countryCode,
+              }).eq(COLUMNS.PROFILES.ID, data.user.id)
             }
           } catch (profileError) {
             // Ignore profile creation errors for now - user can update later

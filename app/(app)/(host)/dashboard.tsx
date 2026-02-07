@@ -154,7 +154,7 @@ export default function HostDashboard() {
         <Card variant="filled" style={styles.statsGrid}>
           <Link href="/(app)/(host)/cashin" asChild>
             <TouchableOpacity style={[styles.actionBtn, { backgroundColor: colors.secondary }]}>
-              <Ionicons name="qr-code-outline" size={24} color={colors.primary} />
+              <Ionicons name="cash-outline" size={24} color={colors.primary} />
               <Typography variant="caption" style={styles.actionBtnText}>Cash-in</Typography>
             </TouchableOpacity>
           </Link>

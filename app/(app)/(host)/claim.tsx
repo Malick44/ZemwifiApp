@@ -65,7 +65,7 @@ export default function ClaimRouterScreen() {
             autoCapitalize="characters"
           />
           <TouchableOpacity style={styles.scanButton}>
-            <Ionicons name="qr-code-outline" size={24} color={colors.primary} />
+            <Ionicons name="barcode-outline" size={24} color={colors.primary} />
           </TouchableOpacity>
         </View>
 

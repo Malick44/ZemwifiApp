@@ -17,7 +17,7 @@ export default function ModalLayout() {
       <Stack.Screen
         name="qr"
         options={{
-          title: 'QR Code',
+          title: 'Code Voucher',
         }}
       />
     </Stack>

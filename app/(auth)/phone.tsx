@@ -1,58 +1,74 @@
 import { Button } from '@/components/ui/Button';
+import { CountryPicker } from '@/components/ui/CountryPicker';
 import { Input } from '@/components/ui/Input';
 import { Typography } from '@/components/ui/Typography';
+import {
+  Country,
+  DEFAULT_COUNTRY_CODE,
+  formatPhoneForCountry,
+  getCountryByCode,
+  COUNTRIES,
+} from '@/constants/countries';
 import { Spacing } from '@/constants/theme';
 import { useAuthStore } from '@/src/stores/authStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function PhoneScreen() {
   const [phone, setPhone] = useState('');
+  const [countryCode, setCountryCode] = useState(DEFAULT_COUNTRY_CODE);
   const [error, setError] = useState('');
   const sendOtp = useAuthStore((s) => s.sendOtp);
   const loading = useAuthStore((s) => s.loading);
 
-  const formatPhoneNumber = (value: string) => {
-    // Remove all non-numeric characters
-    const numbers = value.replace(/\D/g, '');
+  const country = useMemo(
+    () => getCountryByCode(countryCode) ?? COUNTRIES[0],
+    [countryCode]
+  );
 
-    // Format as: 70 12 34 56 (max 8 digits)
-    if (numbers.length <= 2) return numbers;
-    if (numbers.length <= 4) return `${numbers.slice(0, 2)} ${numbers.slice(2)}`;
-    if (numbers.length <= 6) return `${numbers.slice(0, 2)} ${numbers.slice(2, 4)} ${numbers.slice(4)}`;
-    return `${numbers.slice(0, 2)} ${numbers.slice(2, 4)} ${numbers.slice(4, 6)} ${numbers.slice(6, 8)}`;
-  };
+  /** Max formatted string length (digits + spaces) */
+  const maxLength = useMemo(
+    () => country.phoneLength + country.formatPattern.length - 1,
+    [country]
+  );
 
-  const validatePhone = (value: string): boolean => {
-    // Burkina Faso phone numbers: 8 digits
-    const numbers = value.replace(/\D/g, '');
-    return numbers.length === 8;
-  };
+  const handleCountrySelect = useCallback((c: Country) => {
+    setCountryCode(c.code);
+    // Reset phone when switching countries to avoid invalid leftovers
+    setPhone('');
+    setError('');
+  }, []);
 
   const handlePhoneChange = (value: string) => {
-    const formatted = formatPhoneNumber(value);
+    const digits = value.replace(/\D/g, '');
+    const formatted = formatPhoneForCountry(digits, country);
     setPhone(formatted);
     setError('');
   };
 
-  const handleSubmit = async () => {
-    const phoneNumbers = phone.replace(/\D/g, '');
+  const validatePhone = (): boolean => {
+    const digits = phone.replace(/\D/g, '');
+    return digits.length === country.phoneLength;
+  };
 
-    if (!validatePhone(phone)) {
-      setError('Veuillez entrer un numéro valide (8 chiffres)');
+  const handleSubmit = async () => {
+    const digits = phone.replace(/\D/g, '');
+
+    if (!validatePhone()) {
+      setError(`Veuillez entrer un numéro valide (${country.phoneLength} chiffres)`);
       return;
     }
 
-    const fullPhone = `+226${phoneNumbers}`;
+    const fullPhone = `${country.dialCode}${digits}`;
 
     try {
       await sendOtp(fullPhone);
       router.push({
         pathname: '/(auth)/otp',
-        params: { phone: fullPhone },
+        params: { phone: fullPhone, countryCode },
       });
     } catch (err: any) {
       setError(err.message || 'Une erreur est survenue');
@@ -83,16 +99,17 @@ export default function PhoneScreen() {
           <View style={styles.form}>
             <Input
               label="Numéro de téléphone"
-              placeholder="70 12 34 56"
+              placeholder={formatPhoneForCountry('0'.repeat(country.phoneLength), country)}
               value={phone}
               onChangeText={handlePhoneChange}
               keyboardType="phone-pad"
-              maxLength={11} // "70 12 34 56" = 11 chars with spaces
+              maxLength={maxLength}
               error={error}
               leftIcon={
-                <Typography variant="body" color="secondary">
-                  +226
-                </Typography>
+                <CountryPicker
+                  selectedCode={countryCode}
+                  onSelect={handleCountrySelect}
+                />
               }
               autoFocus
             />

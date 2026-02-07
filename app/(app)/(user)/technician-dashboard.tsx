@@ -82,8 +82,8 @@ export default function TechnicianDashboard() {
             style={{ flex: 1 }}
           />
           <ActionButton
-            label="Scanner QR"
-            icon="qr-code-outline"
+            label="Mes demandes"
+            icon="list-outline"
             variant="glass"
             size="md"
             onPress={() => { }}

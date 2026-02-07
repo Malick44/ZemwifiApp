@@ -4,7 +4,6 @@ import * as Clipboard from 'expo-clipboard'
 import { Link, useLocalSearchParams, useRouter } from 'expo-router'
 import React, { useCallback, useEffect, useState } from 'react'
 import { ActivityIndicator, Alert, Pressable, RefreshControl, ScrollView, StyleSheet, Switch, TouchableOpacity, View, useColorScheme } from 'react-native'
-import QRCode from 'react-native-qrcode-svg'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Colors } from '../../../../constants/theme'
 import { Badge } from '../../../../src/components/ui/Badge'
@@ -311,16 +310,16 @@ export default function HostHotspotDetail() {
               </View>
 
               <View style={[styles.section, { alignItems: 'center', gap: 16 }]}>
-                <QRCode value={secret || 'hidden'} size={200} />
-                <View>
-                  <Typography variant="body" color="textSecondary" style={{ textAlign: 'center', marginBottom: 4 }}>Clé secrète du hotspot</Typography>
+                <View style={{ backgroundColor: colors.backgroundSecondary, borderRadius: 12, padding: 20, width: '100%', alignItems: 'center' }}>
+                  <Ionicons name="key-outline" size={32} color={colors.primary} style={{ marginBottom: 8 }} />
+                  <Typography variant="body" color="textSecondary" style={{ textAlign: 'center', marginBottom: 8 }}>Clé secrète du hotspot</Typography>
                   <Pressable onPress={async () => {
                     if (secret) {
                       await Clipboard.setStringAsync(secret)
                       Alert.alert('Copié', 'Clé secrète copiée !')
                     }
                   }}>
-                    <Typography variant="body" style={{ fontSize: 16, textAlign: 'center', fontFamily: 'Courier' }}>{secret}</Typography>
+                    <Typography variant="body" style={{ fontSize: 18, textAlign: 'center', fontFamily: 'Courier', letterSpacing: 2 }}>{secret || '••••••••••••'}</Typography>
                   </Pressable>
                 </View>
 

@@ -1,28 +1,46 @@
 import { Colors } from '@/constants/theme'
 import { useColors } from '@/hooks/use-colors'
+import { Ionicons } from '@expo/vector-icons'
+import * as Clipboard from 'expo-clipboard'
 import { useLocalSearchParams } from 'expo-router'
-import React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
-import QRCode from 'react-native-qrcode-svg'
+import React, { useState } from 'react'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { useTranslation } from '../../src/lib/i18n'
 
-export default function QrModal() {
+export default function VoucherCodeModal() {
   const { code, title } = useLocalSearchParams<{ code?: string; title?: string }>()
   const { t } = useTranslation()
   const colors = useColors()
   const styles = createStyles(colors)
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = async () => {
+    if (!code) return
+    await Clipboard.setStringAsync(code)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{title || t('voucher_qr')}</Text>
+      <Text style={styles.title}>{title || t('voucher_code')}</Text>
       {code ? (
-        <View style={styles.qrWrapper}>
-          <QRCode value={code} size={220} />
+        <View style={styles.codeWrapper}>
+          <Text style={[styles.code, { color: colors.primary }]}>{code}</Text>
+          <Pressable onPress={handleCopy} style={styles.copyButton} hitSlop={8}>
+            <Ionicons
+              name={copied ? 'checkmark-circle' : 'copy-outline'}
+              size={22}
+              color={copied ? colors.success : colors.textSecondary}
+            />
+          </Pressable>
         </View>
       ) : (
         <Text style={styles.error}>No code provided</Text>
       )}
-      <Text style={styles.code}>{code}</Text>
+      <Text style={styles.hint}>
+        {copied ? 'Copié !' : 'Appuyez sur l\'icône pour copier le code'}
+      </Text>
     </View>
   )
 }
@@ -30,7 +48,10 @@ export default function QrModal() {
 const createStyles = (colors: typeof Colors.light) => StyleSheet.create({
   container: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16, padding: 24 },
   title: { fontSize: 20, fontWeight: '700', color: colors.text },
-  qrWrapper: {
+  codeWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
     padding: 20,
     backgroundColor: colors.card,
     borderRadius: 12,
@@ -40,6 +61,8 @@ const createStyles = (colors: typeof Colors.light) => StyleSheet.create({
     shadowRadius: 8,
     elevation: 4,
   },
-  code: { fontSize: 16, fontWeight: '600', marginTop: 12, letterSpacing: 2, color: colors.text },
-  error: { fontSize: 14, color: colors.error }
+  code: { fontSize: 22, fontWeight: '700', letterSpacing: 3 },
+  copyButton: { padding: 4 },
+  hint: { fontSize: 14, color: colors.textSecondary, textAlign: 'center', marginTop: 4 },
+  error: { fontSize: 14, color: colors.error },
 })

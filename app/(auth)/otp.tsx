@@ -18,7 +18,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 const OTP_LENGTH = 6;
 
 export default function OtpScreen() {
-  const { phone } = useLocalSearchParams<{ phone: string }>();
+  const { phone, countryCode } = useLocalSearchParams<{ phone: string; countryCode?: string }>();
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [error, setError] = useState('');
   const [timer, setTimer] = useState(60);
@@ -96,7 +96,7 @@ export default function OtpScreen() {
     }
 
     try {
-      await verifyOtp(phone || '', otpCode);
+      await verifyOtp(phone || '', otpCode, countryCode);
       // Check if user needs to complete profile
       router.replace('/(auth)/profile');
     } catch (err: any) {
