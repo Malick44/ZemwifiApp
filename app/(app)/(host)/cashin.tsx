@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons'
 import { Stack, useRouter } from 'expo-router'
 import React, { useEffect, useState } from 'react'
-import { Alert, FlatList, RefreshControl, ScrollView, StyleSheet, TouchableOpacity, View, useColorScheme } from 'react-native'
+import { Alert, RefreshControl, ScrollView, StyleSheet, View, useColorScheme } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Colors } from '../../../constants/theme'
 import { Button } from '../../../src/components/ui/Button'
@@ -9,9 +9,9 @@ import { Card } from '../../../src/components/ui/Card'
 import { Header } from '../../../src/components/ui/Header'
 import { TextField } from '../../../src/components/ui/TextField'
 import { Typography } from '../../../src/components/ui/Typography'
+import { format } from '../../../src/lib/format'
 import { useHostHotspotStore } from '../../../src/stores/hostHotspotStore'
 import { useWalletStore } from '../../../src/stores/walletStore'
-import { format } from '../../../src/lib/format'
 
 export default function HostCashInScreen() {
     const router = useRouter()
