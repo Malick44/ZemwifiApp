@@ -1,3 +1,4 @@
+import { COLUMNS, ENUMS, PAYMENT_STATUS_SUCCESS, TABLES, type PaymentStatus } from '@/constants/db'
 import { Ionicons } from '@expo/vector-icons'
 import { Link } from 'expo-router'
 import React, { useEffect, useState } from 'react'
@@ -10,7 +11,6 @@ import { Typography } from '../../../src/components/ui/Typography'
 import { format } from '../../../src/lib/format'
 import { supabase } from '../../../src/lib/supabase'
 import { useAuthStore } from '../../../src/stores/authStore'
-import { COLUMNS, ENUMS, PAYMENT_STATUS_SUCCESS, TABLES, type PaymentStatus } from '@/constants/db'
 
 type DashboardStats = {
   totalEarnings: number

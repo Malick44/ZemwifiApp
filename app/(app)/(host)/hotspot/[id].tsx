@@ -1,3 +1,4 @@
+import { RPC } from '@/constants/db'
 import { Ionicons } from '@expo/vector-icons'
 import Slider from '@react-native-community/slider'
 import * as Clipboard from 'expo-clipboard'
@@ -13,7 +14,6 @@ import { Typography } from '../../../../src/components/ui/Typography'
 import { format } from '../../../../src/lib/format'
 import { supabase } from '../../../../src/lib/supabase'
 import { useHostHotspotStore } from '../../../../src/stores/hostHotspotStore'
-import { RPC } from '@/constants/db'
 
 export default function HostHotspotDetail() {
   const { id } = useLocalSearchParams<{ id: string }>()

@@ -3,11 +3,11 @@ import { CountryPicker } from '@/components/ui/CountryPicker';
 import { Input } from '@/components/ui/Input';
 import { Typography } from '@/components/ui/Typography';
 import {
+  COUNTRIES,
   Country,
   DEFAULT_COUNTRY_CODE,
   formatPhoneForCountry,
   getCountryByCode,
-  COUNTRIES,
 } from '@/constants/countries';
 import { Spacing } from '@/constants/theme';
 import { useAuthStore } from '@/src/stores/authStore';

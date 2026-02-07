@@ -1,3 +1,4 @@
+import { PAYMENT_STATUS_SUCCESS } from '@/constants/db'
 import { Ionicons } from '@expo/vector-icons'
 import { Link } from 'expo-router'
 import React, { useEffect, useState } from 'react'
@@ -10,7 +11,6 @@ import { Typography } from '../../../src/components/ui/Typography'
 import { format } from '../../../src/lib/format'
 import { useAuthStore } from '../../../src/stores/authStore'
 import { useHostHotspotStore } from '../../../src/stores/hostHotspotStore'
-import { PAYMENT_STATUS_SUCCESS } from '@/constants/db'
 
 export default function HostDashboard() {
   const {

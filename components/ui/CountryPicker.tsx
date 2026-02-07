@@ -1,15 +1,15 @@
-import { BorderRadius, Colors, FontSizes, Shadows, Spacing } from '@/constants/theme'
 import { COUNTRIES, Country, DEFAULT_COUNTRY_CODE, getCountryByCode } from '@/constants/countries'
+import { BorderRadius, Colors, FontSizes, Spacing } from '@/constants/theme'
 import { useColorScheme } from '@/hooks/use-color-scheme'
 import { Ionicons } from '@expo/vector-icons'
 import React, { useCallback, useMemo, useState } from 'react'
 import {
-  FlatList,
-  Modal,
-  Pressable,
-  StyleSheet,
-  TextInput,
-  View,
+    FlatList,
+    Modal,
+    Pressable,
+    StyleSheet,
+    TextInput,
+    View,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Typography } from './Typography'

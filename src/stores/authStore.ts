@@ -1,7 +1,7 @@
+import { COLUMNS, TABLES } from '@/constants/db'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
-import { COLUMNS, TABLES } from '@/constants/db'
 import { supabase } from '../lib/supabase'
 import { Language, UUID } from '../types/domain'
 

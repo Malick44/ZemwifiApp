@@ -1,18 +1,17 @@
-import { Colors, BorderRadius, Spacing, Shadows } from '@/constants/theme'
-import { ENUMS } from '@/constants/db'
+import { BorderRadius, Colors, Spacing } from '@/constants/theme'
 import { Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 import React, { useState } from 'react'
 import {
-  Alert,
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  useColorScheme,
-  View,
+    Alert,
+    Keyboard,
+    KeyboardAvoidingView,
+    Platform,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    useColorScheme,
+    View,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Button } from '../../../../src/components/ui/Button'
