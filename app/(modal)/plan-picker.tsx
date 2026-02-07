@@ -10,6 +10,7 @@ import { Typography } from '../../src/components/ui/Typography'
 import { format } from '../../src/lib/format'
 import { supabase } from '../../src/lib/supabase'
 import { Plan } from '../../src/types/domain'
+import { COLUMNS, TABLES } from '@/constants/db'
 
 export default function PlanPickerModal() {
     const { hotspotId } = useLocalSearchParams<{ hotspotId: string }>()
@@ -27,11 +28,11 @@ export default function PlanPickerModal() {
             if (!hotspotId) return
             try {
                 const { data, error } = await supabase
-                    .from('plans')
+                    .from(TABLES.PLANS)
                     .select('*')
-                    .eq('hotspot_id', hotspotId)
-                    .eq('is_active', true)
-                    .order('price_xof', { ascending: true })
+                    .eq(COLUMNS.PLANS.HOTSPOT_ID, hotspotId)
+                    .eq(COLUMNS.PLANS.IS_ACTIVE, true)
+                    .order(COLUMNS.PLANS.PRICE_XOF, { ascending: true })
 
                 if (error) throw error
                 setPlans(data as any) // Type might need adjustment if duration_s mismatch
@@ -90,7 +91,7 @@ export default function PlanPickerModal() {
                                 <View style={{ flex: 1 }}>
                                     <Typography variant="h3">{item.name}</Typography>
                                     <Typography variant="body" color="textSecondary" style={{ marginTop: 4 }}>
-                                        {format.duration(item.duration_s || item.duration_seconds)} • {format.dataSize(item.data_cap_bytes || 0)}
+                                        {format.duration(item.duration_s)} • {format.dataSize(item.data_cap_bytes || 0)}
                                     </Typography>
                                 </View>
                                 <View style={{ alignItems: 'flex-end' }}>

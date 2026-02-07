@@ -1,0 +1,628 @@
+{
+  "auth": {
+    "audit_log_entries": [
+      {
+        "name": "instance_id",
+        "type": "uuid",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "id",
+        "type": "uuid",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "payload",
+        "type": "json",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "ip_address",
+        "type": "character varying",
+        "nullable": false,
+        "default": "''::character varying"
+      }
+    ],
+    "flow_state": [
+      {
+        "name": "id",
+        "type": "uuid",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "user_id",
+        "type": "uuid",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "auth_code",
+        "type": "text",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "code_challenge_method",
+        "type": "USER-DEFINED",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "code_challenge",
+        "type": "text",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "provider_type",
+        "type": "text",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "provider_access_token",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "provider_refresh_token",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "updated_at",
+        "type": "timestamp with time zone",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "authentication_method",
+        "type": "text",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "auth_code_issued_at",
+        "type": "timestamp with time zone",
+        "nullable": true,
+        "default": null
+      }
+    ],
+    "identities": [
+      {
+        "name": "provider_id",
+        "type": "text",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "user_id",
+        "type": "uuid",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "identity_data",
+        "type": "jsonb",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "provider",
+        "type": "text",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "last_sign_in_at",
+        "type": "timestamp with time zone",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "updated_at",
+        "type": "timestamp with time zone",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "email",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "id",
+        "type": "uuid",
+        "nullable": false,
+        "default": "gen_random_uuid()"
+      }
+    ],
+    "instances": [
+      {
+        "name": "id",
+        "type": "uuid",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "uuid",
+        "type": "uuid",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "raw_base_config",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "updated_at",
+        "type": "timestamp with time zone",
+        "nullable": true,
+        "default": null
+      }
+    ],
+    "mfa_amr_claims": [
+      {
+        "name": "session_id",
+        "type": "uuid",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "updated_at",
+        "type": "timestamp with time zone",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "authentication_method",
+        "type": "text",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "id",
+        "type": "uuid",
+        "nullable": false,
+        "default": null
+      }
+    ],
+    "mfa_challenges": [
+      {
+        "name": "id",
+        "type": "uuid",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "factor_id",
+        "type": "uuid",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "verified_at",
+        "type": "timestamp with time zone",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "ip_address",
+        "type": "inet",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "otp_code",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "web_authn_session_data",
+        "type": "jsonb",
+        "nullable": true,
+        "default": null
+      }
+    ],
+    "mfa_factors": [
+      {
+        "name": "id",
+        "type": "uuid",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "user_id",
+        "type": "uuid",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "friendly_name",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "factor_type",
+        "type": "USER-DEFINED",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "status",
+        "type": "USER-DEFINED",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "updated_at",
+        "type": "timestamp with time zone",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "secret",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "phone",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "last_challenged_at",
+        "type": "timestamp with time zone",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "web_authn_credential",
+        "type": "jsonb",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "web_authn_aaguid",
+        "type": "uuid",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "last_webauthn_challenge_data",
+        "type": "jsonb",
+        "nullable": true,
+        "default": null
+      }
+    ],
+    "oauth_authorizations": [
+      {
+        "name": "id",
+        "type": "uuid",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "authorization_id",
+        "type": "text",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "client_id",
+        "type": "uuid",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "user_id",
+        "type": "uuid",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "redirect_uri",
+        "type": "text",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "scope",
+        "type": "text",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "state",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "resource",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "code_challenge",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "code_challenge_method",
+        "type": "USER-DEFINED",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "response_type",
+        "type": "USER-DEFINED",
+        "nullable": false,
+        "default": "'code'::auth.oauth_response_type"
+      },
+      {
+        "name": "status",
+        "type": "USER-DEFINED",
+        "nullable": false,
+        "default": "'pending'::auth.oauth_authorization_status"
+      },
+      {
+        "name": "authorization_code",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "nullable": false,
+        "default": "now()"
+      },
+      {
+        "name": "expires_at",
+        "type": "timestamp with time zone",
+        "nullable": false,
+        "default": "(now() + '00:03:00'::interval)"
+      },
+      {
+        "name": "approved_at",
+        "type": "timestamp with time zone",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "nonce",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      }
+    ],
+    "oauth_client_states": [
+      {
+        "name": "id",
+        "type": "uuid",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "provider_type",
+        "type": "text",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "code_verifier",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "nullable": false,
+        "default": null
+      }
+    ],
+    "oauth_clients": [
+      {
+        "name": "id",
+        "type": "uuid",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "client_secret_hash",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "registration_type",
+        "type": "USER-DEFINED",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "redirect_uris",
+        "type": "text",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "grant_types",
+        "type": "text",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "client_name",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "client_uri",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "logo_uri",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "nullable": false,
+        "default": "now()"
+      },
+      {
+        "name": "updated_at",
+        "type": "timestamp with time zone",
+        "nullable": false,
+        "default": "now()"
+      },
+      {
+        "name": "deleted_at",
+        "type": "timestamp with time zone",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "client_type",
+        "type": "USER-DEFINED",
+        "nullable": false,
+        "default": "'confidential'::auth.oauth_client_type"
+      }
+    ],
+    "oauth_consents": [
+      {
+        "name": "id",
+        "type": "uuid",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "user_id",
+        "type": "uuid",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "client_id",
+        "type": "uuid",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "scopes",
+        "type": "text",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "granted_at",
+        "type": "timestamp with time zone",
+        "nullable": false,
+        "default": "now()"
+      },
+      {
+        "name": "revoked_at",
+        "type": "timestamp with time zone",
+        "nullable": true,
+        "default": null
+      }
+    ],
+    "one_time_tokens": [
+      {
+        "name": "id",
+        "type": "uuid",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "user_id",
+        "type": "uuid",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "token_type",
+        "type": "USER-DEFINED",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "token_hash",
+        "type": "text",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "relates_to",
+        "type": "text",
+        "nullable": false,
+        "default": null
+      }
+    ]
+  }
+}

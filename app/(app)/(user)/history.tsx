@@ -1,3 +1,4 @@
+import { ENUMS, PAYMENT_STATUS_SUCCESS } from '@/constants/db'
 import { Colors } from '@/constants/theme'
 import { Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
@@ -13,7 +14,7 @@ import { Typography } from '../../../src/components/ui/Typography'
 import { usePurchasesStore } from '../../../src/stores/purchasesStore'
 import { Purchase } from '../../../src/types/domain'
 
-type FilterType = 'all' | 'confirmed' | 'pending' | 'failed'
+type FilterType = 'all' | Purchase['status']
 
 export default function HistoryScreen() {
   const { purchases, refreshPurchases, loading } = usePurchasesStore()
@@ -28,28 +29,25 @@ export default function HistoryScreen() {
 
   const filteredPurchases = purchases.filter(p => {
     if (filter === 'all') return true
+    if (PAYMENT_STATUS_SUCCESS.includes(filter)) {
+      return PAYMENT_STATUS_SUCCESS.includes(p.status)
+    }
     return p.status === filter
   })
 
   const getStatusVariant = (status: Purchase['status']) => {
-    switch (status) {
-      case 'confirmed': return 'success'
-      case 'success': return 'success'
-      case 'pending': return 'warning'
-      case 'failed': return 'error'
-      default: return 'neutral'
-    }
+    if (PAYMENT_STATUS_SUCCESS.includes(status)) return 'success'
+    if (status === ENUMS.PAYMENT_STATUS.PENDING) return 'warning'
+    if (status === ENUMS.PAYMENT_STATUS.FAILED) return 'error'
+    return 'neutral'
   }
 
   const getStatusText = (status: Purchase['status']) => {
-    switch (status) {
-      case 'confirmed': return 'Réussi'
-      case 'success': return 'Réussi'
-      case 'pending': return 'En attente'
-      case 'failed': return 'Échoué'
-      case 'expired': return 'Expiré'
-      default: return status
-    }
+    if (PAYMENT_STATUS_SUCCESS.includes(status)) return 'Réussi'
+    if (status === ENUMS.PAYMENT_STATUS.PENDING) return 'En attente'
+    if (status === ENUMS.PAYMENT_STATUS.FAILED) return 'Échoué'
+    if (status === ENUMS.PAYMENT_STATUS.EXPIRED) return 'Expiré'
+    return status
   }
 
   const getPaymentIcon = (provider?: string) => {
@@ -84,9 +82,9 @@ export default function HistoryScreen() {
       >
         {[
           { key: 'all' as const, label: 'Tout', count: purchases.length },
-          { key: 'confirmed' as const, label: 'Réussi', count: purchases.filter(p => p.status === 'confirmed').length },
-          { key: 'pending' as const, label: 'En attente', count: purchases.filter(p => p.status === 'pending').length },
-          { key: 'failed' as const, label: 'Échoué', count: purchases.filter(p => p.status === 'failed').length },
+          { key: ENUMS.PAYMENT_STATUS.SUCCESS, label: 'Réussi', count: purchases.filter(p => PAYMENT_STATUS_SUCCESS.includes(p.status)).length },
+          { key: ENUMS.PAYMENT_STATUS.PENDING, label: 'En attente', count: purchases.filter(p => p.status === ENUMS.PAYMENT_STATUS.PENDING).length },
+          { key: ENUMS.PAYMENT_STATUS.FAILED, label: 'Échoué', count: purchases.filter(p => p.status === ENUMS.PAYMENT_STATUS.FAILED).length },
         ].map(({ key, label, count }) => (
           <Pressable
             key={key}

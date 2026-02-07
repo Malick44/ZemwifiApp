@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
+import { COLUMNS, ENUMS, RPC, TABLES } from '@/constants/db'
 import { supabase } from '../lib/supabase'
 import { Purchase, UUID } from '../types/domain'
 
@@ -30,7 +31,7 @@ export const usePurchasesStore = create<PurchasesState>()(
         set({ loading: true, error: null })
 
         // Use RPC to process purchase (handles wallet deduction, voucher creation, etc.)
-        const { data: purchaseId, error: rpcError } = await supabase.rpc('process_purchase', {
+        const { data: purchaseId, error: rpcError } = await supabase.rpc(RPC.PROCESS_PURCHASE, {
           p_user_id: (await supabase.auth.getUser()).data.user?.id, // Get current user
           p_hotspot_id: hotspotId,
           p_plan_id: planId,
@@ -44,9 +45,9 @@ export const usePurchasesStore = create<PurchasesState>()(
 
         // Fetch the created purchase to update state
         const { data, error } = await supabase
-          .from('purchases')
+          .from(TABLES.PURCHASES)
           .select('*')
-          .eq('id', purchaseId)
+          .eq(COLUMNS.PURCHASES.ID, purchaseId)
           .single()
 
         if (error) {
@@ -74,9 +75,9 @@ export const usePurchasesStore = create<PurchasesState>()(
       refreshPurchases: async () => {
         set({ loading: true, error: null })
         const { data, error } = await supabase
-          .from('purchases')
+          .from(TABLES.PURCHASES)
           .select('*')
-          .order('created_at', { ascending: false })
+          .order(COLUMNS.PURCHASES.CREATED_AT, { ascending: false })
           .limit(50)
 
         if (error) {
@@ -95,9 +96,12 @@ export const usePurchasesStore = create<PurchasesState>()(
 
       updateStatus: async (id, status) => {
         const { error } = await supabase
-          .from('purchases')
-          .update({ status: status, updated_at: new Date().toISOString() })
-          .eq('id', id)
+          .from(TABLES.PURCHASES)
+          .update({
+            [COLUMNS.PURCHASES.PAYMENT_STATUS]: status,
+            [COLUMNS.PURCHASES.UPDATED_AT]: new Date().toISOString()
+          })
+          .eq(COLUMNS.PURCHASES.ID, id)
 
         if (error) {
           set({ error: error.message })
@@ -123,7 +127,9 @@ export const usePurchasesStore = create<PurchasesState>()(
 
         // 90% success rate for simulation
         const success = Math.random() > 0.1
-        const status: Purchase['status'] = success ? 'confirmed' : 'failed'
+        const status: Purchase['status'] = success
+          ? ENUMS.PAYMENT_STATUS.SUCCESS
+          : ENUMS.PAYMENT_STATUS.FAILED
 
         await get().updateStatus(purchaseId, status)
         set({ loading: false })

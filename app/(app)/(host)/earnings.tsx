@@ -1,3 +1,4 @@
+import { PAYMENT_STATUS_SUCCESS } from '@/constants/db'
 import { Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 import React, { useCallback, useEffect, useState } from 'react'
@@ -125,8 +126,11 @@ export default function EarningsScreen() {
               </View>
               <View style={{ alignItems: 'flex-end' }}>
                 <Typography variant="body" style={{ fontWeight: '600' }}>+{format.currency(sale.amount)}</Typography>
-                <Typography variant="caption" color={sale.status === 'success' ? 'success' : 'warning'}>
-                  {sale.status === 'success' ? 'Succès' : sale.status}
+                <Typography
+                  variant="caption"
+                color={PAYMENT_STATUS_SUCCESS.includes(sale.status) ? 'success' : 'warning'}
+                >
+                {PAYMENT_STATUS_SUCCESS.includes(sale.status) ? 'Succès' : sale.status}
                 </Typography>
               </View>
             </TouchableOpacity>

@@ -10,24 +10,7 @@ import { Typography } from '../../../src/components/ui/Typography'
 import { format } from '../../../src/lib/format'
 import { useAuthStore } from '../../../src/stores/authStore'
 import { useHostHotspotStore } from '../../../src/stores/hostHotspotStore'
-
-type DashboardStats = {
-  totalEarnings: number
-  todayEarnings: number
-  activeHotspots: number
-  activeSessions: number
-  totalSales: number
-  pendingPayouts: number
-}
-
-// Mock transaction type for the list
-type Transaction = {
-  id: string
-  amount: number
-  status: 'success' | 'pending' | 'failed'
-  created_at: string
-  hotspot: { name: string } | null
-}
+import { PAYMENT_STATUS_SUCCESS } from '@/constants/db'
 
 export default function HostDashboard() {
   const {
@@ -46,10 +29,6 @@ export default function HostDashboard() {
 
   const loadData = React.useCallback(async () => {
     try {
-      if (!refreshing && !storeLoading) {
-        // trigger loading if needed, or rely on store
-      }
-
       await Promise.all([
         fetchDashboardStats(),
         fetchHostSales('week')
@@ -215,30 +194,36 @@ export default function HostDashboard() {
               Aucune transaction récente
             </Typography>
           ) : (
-            recentSales.slice(0, 5).map((tx) => (
-              <Link key={tx.id} href={`/(app)/(shared)/transaction-detail/${tx.id}`} asChild>
-                <Pressable style={[styles.transactionItem, { borderBottomColor: colors.border }]}>
-                  <View style={styles.txIcon}>
-                    <Ionicons
-                      name={tx.status === 'success' ? "arrow-down" : "time"}
-                      size={18}
-                      color={tx.status === 'success' ? colors.success : colors.warning}
-                    />
-                  </View>
-                  <View style={styles.txDetails}>
-                    <Typography variant="body" style={styles.txTitle}>
-                      Vente forfait - {tx.hotspot_name || 'Inconnu'}
+            recentSales.slice(0, 5).map((tx) => {
+              const isSuccess = PAYMENT_STATUS_SUCCESS.includes(tx.status)
+              return (
+                <Link key={tx.id} href={`/(app)/(shared)/transaction-detail/${tx.id}`} asChild>
+                  <Pressable style={[styles.transactionItem, { borderBottomColor: colors.border }]}>
+                    <View style={styles.txIcon}>
+                      <Ionicons
+                        name={isSuccess ? "arrow-down" : "time"}
+                        size={18}
+                        color={isSuccess ? colors.success : colors.warning}
+                      />
+                    </View>
+                    <View style={styles.txDetails}>
+                      <Typography variant="body" style={styles.txTitle}>
+                        Vente forfait - {tx.hotspot_name || 'Inconnu'}
+                      </Typography>
+                      <Typography variant="caption" color="textSecondary">
+                        {format.date(tx.created_at)}
+                      </Typography>
+                    </View>
+                    <Typography
+                      variant="body"
+                      style={[styles.txAmount, { color: isSuccess ? colors.success : colors.text }]}
+                    >
+                      +{format.currency(tx.amount)}
                     </Typography>
-                    <Typography variant="caption" color="textSecondary">
-                      {format.date(tx.created_at)}
-                    </Typography>
-                  </View>
-                  <Typography variant="body" style={[styles.txAmount, { color: tx.status === 'success' ? colors.success : colors.text }]}>
-                    +{format.currency(tx.amount)}
-                  </Typography>
-                </Pressable>
-              </Link>
-            ))
+                  </Pressable>
+                </Link>
+              )
+            })
           )}
         </View>
 

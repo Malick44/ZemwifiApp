@@ -1,0 +1,48 @@
+[96mapp/(app)/(user)/host-dashboard.tsx[0m:[93m68[0m:[93m59[0m - [91merror[0m[90m TS2339: [0mProperty 'status' does not exist on type 'GenericStringError'.
+
+[7m68[0m       const completedPurchases = purchases?.filter(p => p.status === ENUMS.PAYMENT_STATUS.SUCCESS) || []
+[7m  [0m [91m                                                          ~~~~~~[0m
+
+[96mapp/(app)/(user)/host-dashboard.tsx[0m:[93m69[0m:[93m75[0m - [91merror[0m[90m TS2339: [0mProperty 'amount' does not exist on type 'GenericStringError'.
+
+[7m69[0m       const totalEarnings = completedPurchases.reduce((sum, p) => sum + p.amount, 0)
+[7m  [0m [91m                                                                          ~~~~~~[0m
+
+[96mapp/(app)/(user)/host-dashboard.tsx[0m:[93m73[0m:[93m71[0m - [91merror[0m[90m TS2339: [0mProperty 'created_at' does not exist on type 'GenericStringError'.
+
+[7m73[0m       const todayEarnings = completedPurchases.filter(p => new Date(p.created_at) >= today)
+[7m  [0m [91m                                                                      ~~~~~~~~~~[0m
+
+[96mapp/(app)/(user)/host-dashboard.tsx[0m:[93m74[0m:[93m37[0m - [91merror[0m[90m TS2339: [0mProperty 'amount' does not exist on type 'GenericStringError'.
+
+[7m74[0m         .reduce((sum, p) => sum + p.amount, 0)
+[7m  [0m [91m                                    ~~~~~~[0m
+
+[96mapp/(app)/(user)/host-dashboard.tsx[0m:[93m101[0m:[93m15[0m - [91merror[0m[90m TS2339: [0mProperty 'id' does not exist on type 'GenericStringError'.
+
+[7m101[0m         id: p.id,
+[7m   [0m [91m              ~~[0m
+
+[96mapp/(app)/(user)/host-dashboard.tsx[0m:[93m102[0m:[93m19[0m - [91merror[0m[90m TS2339: [0mProperty 'amount' does not exist on type 'GenericStringError'.
+
+[7m102[0m         amount: p.amount,
+[7m   [0m [91m                  ~~~~~~[0m
+
+[96mapp/(app)/(user)/host-dashboard.tsx[0m:[93m103[0m:[93m19[0m - [91merror[0m[90m TS2339: [0mProperty 'status' does not exist on type 'GenericStringError'.
+
+[7m103[0m         status: p.status as any,
+[7m   [0m [91m                  ~~~~~~[0m
+
+[96mapp/(app)/(user)/host-dashboard.tsx[0m:[93m104[0m:[93m23[0m - [91merror[0m[90m TS2339: [0mProperty 'created_at' does not exist on type 'GenericStringError'.
+
+[7m104[0m         created_at: p.created_at,
+[7m   [0m [91m                      ~~~~~~~~~~[0m
+
+[96mapp/(app)/(user)/host-dashboard.tsx[0m:[93m105[0m:[93m20[0m - [91merror[0m[90m TS2339: [0mProperty 'hotspot' does not exist on type 'GenericStringError'.
+
+[7m105[0m         hotspot: p.hotspot as any
+[7m   [0m [91m                   ~~~~~~~[0m
+
+
+Found 9 errors in the same file, starting at: app/(app)/(user)/host-dashboard.tsx[90m:68[0m
+

@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { COLUMNS, ENUMS, RPC, TABLES } from '@/constants/db'
 import { supabase } from '../lib/supabase'
 import { CashInRequest, UUID } from '../types/domain'
 
@@ -18,12 +19,12 @@ export const useCashInStore = create<CashInState>((set) => ({
   createRequest: async (hostId, amount, phone) => {
     set({ loading: true, error: null })
     const { data, error } = await supabase
-      .from('cashin_requests')
+      .from(TABLES.CASHIN_REQUESTS)
       .insert({
-        host_id: hostId,
-        amount,
-        user_phone: phone,
-        expires_at: new Date(Date.now() + 10 * 60000).toISOString()
+        [COLUMNS.CASHIN_REQUESTS.HOST_ID]: hostId,
+        [COLUMNS.CASHIN_REQUESTS.AMOUNT]: amount,
+        [COLUMNS.CASHIN_REQUESTS.USER_PHONE]: phone,
+        [COLUMNS.CASHIN_REQUESTS.EXPIRES_AT]: new Date(Date.now() + 10 * 60000).toISOString()
       })
       .select()
       .single()
@@ -35,17 +36,19 @@ export const useCashInStore = create<CashInState>((set) => ({
     return data
   },
   confirmRequest: async (id) => {
-    const { error } = await supabase.rpc('process_cashin', { p_cashin_request_id: id })
+    const { error } = await supabase.rpc(RPC.PROCESS_CASHIN, { p_cashin_request_id: id })
     if (error) throw error
     set((state) => ({
-      requests: state.requests.map((r) => (r.id === id ? { ...r, status: 'confirmed' } : r)),
+      requests: state.requests.map((r) => (
+        r.id === id ? { ...r, status: ENUMS.CASHIN_STATUS.CONFIRMED } : r
+      )),
     }))
   },
   refresh: async () => {
     const { data, error } = await supabase
-      .from('cashin_requests')
+      .from(TABLES.CASHIN_REQUESTS)
       .select('*')
-      .order('created_at', { ascending: false })
+      .order(COLUMNS.CASHIN_REQUESTS.CREATED_AT, { ascending: false })
     if (error) {
       set({ error: error.message })
       return

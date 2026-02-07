@@ -118,7 +118,7 @@ export default function HotspotDetail() {
                         <View style={styles.planDetail}>
                           <Ionicons name="time-outline" size={16} color={colors.textSecondary} />
                           <Typography variant="caption" color={colors.textSecondary}>
-                            {formatDuration(plan.duration_s || plan.duration_seconds)}
+                            {formatDuration(plan.duration_s)}
                           </Typography>
                         </View>
                         {(plan.data_cap_bytes || 0) > 0 && (

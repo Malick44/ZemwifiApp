@@ -1,6 +1,7 @@
 import { create } from 'zustand'
+import { COLUMNS, ENUMS, PAYMENT_STATUS_SUCCESS, RPC, TABLES, type PaymentStatus } from '@/constants/db'
 import { supabase } from '../lib/supabase'
-import { Hotspot, HotspotStats, Plan, PlanFormData, UUID } from '../types/domain'
+import { Hotspot, HotspotStats, Plan, PlanFormData, UUID, CashInRequest } from '../types/domain'
 
 // New Types for Dashboard
 export interface ActiveSession {
@@ -18,7 +19,7 @@ export interface SaleTransaction {
     id: UUID
     amount: number
     created_at: string
-    status: 'pending' | 'success' | 'failed'
+    status: PaymentStatus
     plan_name: string
     hotspot_name: string
 }
@@ -39,6 +40,7 @@ interface HostHotspotState {
     } | null
     activeSessions: ActiveSession[]
     recentSales: SaleTransaction[]
+    pendingCashIns: CashInRequest[]
     loading: boolean
     error: string | null
 
@@ -47,6 +49,8 @@ interface HostHotspotState {
     fetchActiveSessions: () => Promise<void>
     fetchDashboardStats: () => Promise<void>
     fetchHostSales: (period?: 'week' | 'month' | 'all') => Promise<void>
+    fetchPendingCashIns: () => Promise<void>
+    cancelCashIn: (requestId: UUID) => Promise<void>
     fetchHotspotDetails: (id: UUID) => Promise<void>
     updateHotspotStatus: (id: UUID, isOnline: boolean) => Promise<void>
     updateHotspotRange: (id: UUID, range: number) => Promise<void>
@@ -61,6 +65,7 @@ interface HostHotspotState {
 
     // Cash-In Actions
     createCashInRequest: (phone: string, amount: number) => Promise<{ id: string, expires_at: string }>
+    completeCashIn: (requestId: UUID) => Promise<void>
 }
 
 export const useHostHotspotStore = create<HostHotspotState>((set, get) => ({
@@ -72,6 +77,7 @@ export const useHostHotspotStore = create<HostHotspotState>((set, get) => ({
     dashboardStats: null,
     activeSessions: [],
     recentSales: [],
+    pendingCashIns: [],
     loading: false,
     error: null,
 
@@ -82,10 +88,10 @@ export const useHostHotspotStore = create<HostHotspotState>((set, get) => ({
             if (!user) throw new Error('Not authenticated')
 
             const { data, error } = await supabase
-                .from('hotspots')
+                .from(TABLES.HOTSPOTS)
                 .select('*')
-                .eq('host_id', user.id)
-                .order('created_at', { ascending: false })
+                .eq(COLUMNS.HOTSPOTS.HOST_ID, user.id)
+                .order(COLUMNS.HOTSPOTS.CREATED_AT, { ascending: false })
 
             if (error) throw error
 
@@ -97,11 +103,11 @@ export const useHostHotspotStore = create<HostHotspotState>((set, get) => ({
 
                 // Get all active vouchers for these hotspots
                 const { data: vouchers } = await supabase
-                    .from('vouchers')
-                    .select('hotspot_id')
-                    .in('hotspot_id', hotspotIds)
-                    .not('used_at', 'is', null)
-                    .gt('expires_at', new Date().toISOString())
+                    .from(TABLES.VOUCHERS)
+                    .select(COLUMNS.VOUCHERS.HOTSPOT_ID)
+                    .in(COLUMNS.VOUCHERS.HOTSPOT_ID, hotspotIds)
+                    .not(COLUMNS.VOUCHERS.USED_AT, 'is', null)
+                    .gt(COLUMNS.VOUCHERS.EXPIRES_AT, new Date().toISOString())
 
                 // Count per hotspot
                 const counts: Record<string, number> = {}
@@ -136,9 +142,9 @@ export const useHostHotspotStore = create<HostHotspotState>((set, get) => ({
 
             // Get host's hotspots first
             const { data: hotspots } = await supabase
-                .from('hotspots')
-                .select('id, name')
-                .eq('host_id', user.id)
+                .from(TABLES.HOTSPOTS)
+                .select(`${COLUMNS.HOTSPOTS.ID}, ${COLUMNS.HOTSPOTS.NAME}`)
+                .eq(COLUMNS.HOTSPOTS.HOST_ID, user.id)
 
             if (!hotspots || hotspots.length === 0) {
                 set({ activeSessions: [] })
@@ -147,19 +153,19 @@ export const useHostHotspotStore = create<HostHotspotState>((set, get) => ({
             const hotspotIds = hotspots.map(h => h.id)
 
             const { data, error } = await supabase
-                .from('vouchers')
+                .from(TABLES.VOUCHERS)
                 .select(`
-                    id,
-                    device_mac,
-                    used_at,
-                    expires_at,
-                    plan:plans(name),
-                    hotspot:hotspots(name)
+                    ${COLUMNS.VOUCHERS.ID},
+                    ${COLUMNS.VOUCHERS.DEVICE_MAC},
+                    ${COLUMNS.VOUCHERS.USED_AT},
+                    ${COLUMNS.VOUCHERS.EXPIRES_AT},
+                    plan:${TABLES.PLANS}(${COLUMNS.PLANS.NAME}),
+                    hotspot:${TABLES.HOTSPOTS}(${COLUMNS.HOTSPOTS.NAME})
                 `)
-                .in('hotspot_id', hotspotIds)
-                .not('used_at', 'is', null)
-                .gt('expires_at', new Date().toISOString())
-                .order('used_at', { ascending: false })
+                .in(COLUMNS.VOUCHERS.HOTSPOT_ID, hotspotIds)
+                .not(COLUMNS.VOUCHERS.USED_AT, 'is', null)
+                .gt(COLUMNS.VOUCHERS.EXPIRES_AT, new Date().toISOString())
+                .order(COLUMNS.VOUCHERS.USED_AT, { ascending: false })
 
             if (error) throw error
 
@@ -197,9 +203,9 @@ export const useHostHotspotStore = create<HostHotspotState>((set, get) => ({
 
             // 1. Get Host's Hotspots (needed for filtering)
             const { data: hotspots } = await supabase
-                .from('hotspots')
-                .select('id, is_online')
-                .eq('host_id', user.id)
+                .from(TABLES.HOTSPOTS)
+                .select(`${COLUMNS.HOTSPOTS.ID}, ${COLUMNS.HOTSPOTS.IS_ONLINE}`)
+                .eq(COLUMNS.HOTSPOTS.HOST_ID, user.id)
 
             const hotspotIds = hotspots?.map(h => h.id) || []
             const activeHotspotsCount = hotspots?.filter(h => h.is_online).length || 0
@@ -210,11 +216,11 @@ export const useHostHotspotStore = create<HostHotspotState>((set, get) => ({
             let activeSessionsCount = 0
             if (hotspotIds.length > 0) {
                 const { count } = await supabase
-                    .from('vouchers')
+                    .from(TABLES.VOUCHERS)
                     .select('*', { count: 'exact', head: true })
-                    .in('hotspot_id', hotspotIds)
-                    .not('used_at', 'is', null)
-                    .gt('expires_at', new Date().toISOString())
+                    .in(COLUMNS.VOUCHERS.HOTSPOT_ID, hotspotIds)
+                    .not(COLUMNS.VOUCHERS.USED_AT, 'is', null)
+                    .gt(COLUMNS.VOUCHERS.EXPIRES_AT, new Date().toISOString())
                 activeSessionsCount = count || 0
             }
 
@@ -227,10 +233,10 @@ export const useHostHotspotStore = create<HostHotspotState>((set, get) => ({
                 // Fetch small payload (just amounts and dates) to aggregate in memory
                 // This is safer than RPC for now
                 const { data: sales } = await supabase
-                    .from('purchases')
-                    .select('amount_xof, created_at, status')
-                    .in('hotspot_id', hotspotIds)
-                    .in('status', ['confirmed', 'success'])
+                    .from(TABLES.PURCHASES)
+                    .select(`${COLUMNS.PURCHASES.AMOUNT}, ${COLUMNS.PURCHASES.CREATED_AT}, ${COLUMNS.PURCHASES.PAYMENT_STATUS}`)
+                    .in(COLUMNS.PURCHASES.HOTSPOT_ID, hotspotIds)
+                    .in(COLUMNS.PURCHASES.PAYMENT_STATUS, PAYMENT_STATUS_SUCCESS)
 
                 if (sales) {
                     totalSales = sales.length
@@ -246,10 +252,10 @@ export const useHostHotspotStore = create<HostHotspotState>((set, get) => ({
 
             // 4. Pending Payouts
             const { data: payouts } = await supabase
-                .from('payouts')
-                .select('amount_xof')
-                .eq('host_id', user.id)
-                .eq('status', 'pending')
+                .from(TABLES.PAYOUTS)
+                .select(COLUMNS.PAYOUTS.AMOUNT)
+                .eq(COLUMNS.PAYOUTS.HOST_ID, user.id)
+                .eq(COLUMNS.PAYOUTS.STATUS, ENUMS.PAYOUT_STATUS.PENDING)
 
             const pendingPayouts = payouts?.reduce((sum, p) => sum + (p.amount_xof || 0), 0) || 0
 
@@ -278,9 +284,9 @@ export const useHostHotspotStore = create<HostHotspotState>((set, get) => ({
             if (!user) throw new Error('Not authenticated')
 
             const { data: hotspots } = await supabase
-                .from('hotspots')
-                .select('id')
-                .eq('host_id', user.id)
+                .from(TABLES.HOTSPOTS)
+                .select(COLUMNS.HOTSPOTS.ID)
+                .eq(COLUMNS.HOTSPOTS.HOST_ID, user.id)
 
             const hotspotIds = hotspots?.map(h => h.id) || []
             if (hotspotIds.length === 0) {
@@ -289,25 +295,25 @@ export const useHostHotspotStore = create<HostHotspotState>((set, get) => ({
             }
 
             let query = supabase
-                .from('purchases')
+                .from(TABLES.PURCHASES)
                 .select(`
-                     id,
-                     amount_xof,
-                     created_at,
-                     status,
-                     hotspot:hotspots(name)
+                     ${COLUMNS.PURCHASES.ID},
+                     ${COLUMNS.PURCHASES.AMOUNT},
+                     ${COLUMNS.PURCHASES.CREATED_AT},
+                     status:${COLUMNS.PURCHASES.PAYMENT_STATUS},
+                     hotspot:${TABLES.HOTSPOTS}(${COLUMNS.HOTSPOTS.NAME})
                  `)
-                .in('hotspot_id', hotspotIds)
-                .order('created_at', { ascending: false })
+                .in(COLUMNS.PURCHASES.HOTSPOT_ID, hotspotIds)
+                .order(COLUMNS.PURCHASES.CREATED_AT, { ascending: false })
 
             if (period === 'week') {
                 const date = new Date()
                 date.setDate(date.getDate() - 7)
-                query = query.gte('created_at', date.toISOString())
+                query = query.gte(COLUMNS.PURCHASES.CREATED_AT, date.toISOString())
             } else if (period === 'month') {
                 const date = new Date()
                 date.setDate(date.getDate() - 30)
-                query = query.gte('created_at', date.toISOString())
+                query = query.gte(COLUMNS.PURCHASES.CREATED_AT, date.toISOString())
             }
 
             const { data, error } = await query
@@ -333,24 +339,67 @@ export const useHostHotspotStore = create<HostHotspotState>((set, get) => ({
         }
     },
 
+    fetchPendingCashIns: async () => {
+        // Don't set global loading to avoid flickering
+        try {
+            const { data: { user } } = await supabase.auth.getUser()
+            if (!user) return
+
+            const { data, error } = await supabase
+                .from(TABLES.CASHIN_REQUESTS)
+                .select('*')
+                .eq('host_id', user.id)
+                .in('status', ['pending', 'accepted_by_user'])
+                .gt('expires_at', new Date().toISOString())
+                .order('created_at', { ascending: false })
+
+            if (error) throw error
+            set({ pendingCashIns: (data as any) || [] })
+        } catch (error: any) {
+            console.error('Error fetching pending cashins:', error)
+        }
+    },
+
+    cancelCashIn: async (requestId: UUID) => {
+        set({ loading: true, error: null })
+        try {
+            const { error } = await supabase
+                .from(TABLES.CASHIN_REQUESTS)
+                .update({ status: 'rejected' })
+                .eq('id', requestId)
+            
+            if (error) throw error
+            
+            set(state => ({
+                pendingCashIns: state.pendingCashIns.filter(r => r.id !== requestId)
+            }))
+        } catch (error: any) {
+            console.error('Error cancelling cashin:', error)
+            set({ error: error.message })
+            throw error
+        } finally {
+            set({ loading: false })
+        }
+    },
+
     fetchHotspotDetails: async (id: UUID) => {
         set({ loading: true, error: null })
         try {
             // 1. Fetch Hotspot
             const { data: hotspot, error: hotspotError } = await supabase
-                .from('hotspots')
+                .from(TABLES.HOTSPOTS)
                 .select('*')
-                .eq('id', id)
+                .eq(COLUMNS.HOTSPOTS.ID, id)
                 .single()
 
             if (hotspotError) throw hotspotError
 
             // 2. Fetch Plans
             const { data: plans, error: plansError } = await supabase
-                .from('plans')
+                .from(TABLES.PLANS)
                 .select('*')
-                .eq('hotspot_id', id)
-                .order('price_xof', { ascending: true })
+                .eq(COLUMNS.PLANS.HOTSPOT_ID, id)
+                .order(COLUMNS.PLANS.PRICE_XOF, { ascending: true })
 
             if (plansError) throw plansError
 
@@ -360,24 +409,24 @@ export const useHostHotspotStore = create<HostHotspotState>((set, get) => ({
             today.setHours(0, 0, 0, 0)
 
             const { count: activeSessions } = await supabase
-                .from('vouchers')
+                .from(TABLES.VOUCHERS)
                 .select('*', { count: 'exact', head: true })
-                .eq('hotspot_id', id)
-                .not('used_at', 'is', null)
-                .gt('expires_at', new Date().toISOString())
+                .eq(COLUMNS.VOUCHERS.HOTSPOT_ID, id)
+                .not(COLUMNS.VOUCHERS.USED_AT, 'is', null)
+                .gt(COLUMNS.VOUCHERS.EXPIRES_AT, new Date().toISOString())
 
             const { data: salesToday } = await supabase
-                .from('purchases')
-                .select('amount_xof')
-                .eq('hotspot_id', id)
-                .in('status', ['confirmed', 'success']) // Robust check
-                .gte('created_at', today.toISOString())
+                .from(TABLES.PURCHASES)
+                .select(COLUMNS.PURCHASES.AMOUNT)
+                .eq(COLUMNS.PURCHASES.HOTSPOT_ID, id)
+                .in(COLUMNS.PURCHASES.PAYMENT_STATUS, PAYMENT_STATUS_SUCCESS)
+                .gte(COLUMNS.PURCHASES.CREATED_AT, today.toISOString())
 
             const { data: allSales } = await supabase
-                .from('purchases')
-                .select('amount_xof')
-                .eq('hotspot_id', id)
-                .in('status', ['confirmed', 'success'])
+                .from(TABLES.PURCHASES)
+                .select(COLUMNS.PURCHASES.AMOUNT)
+                .eq(COLUMNS.PURCHASES.HOTSPOT_ID, id)
+                .in(COLUMNS.PURCHASES.PAYMENT_STATUS, PAYMENT_STATUS_SUCCESS)
 
             const stats: HotspotStats = {
                 active_sessions: activeSessions || 0,
@@ -402,9 +451,9 @@ export const useHostHotspotStore = create<HostHotspotState>((set, get) => ({
     updateHotspotStatus: async (id: UUID, isOnline: boolean) => {
         try {
             const { error } = await supabase
-                .from('hotspots')
-                .update({ is_online: isOnline })
-                .eq('id', id)
+                .from(TABLES.HOTSPOTS)
+                .update({ [COLUMNS.HOTSPOTS.IS_ONLINE]: isOnline })
+                .eq(COLUMNS.HOTSPOTS.ID, id)
 
             if (error) throw error
 
@@ -423,9 +472,9 @@ export const useHostHotspotStore = create<HostHotspotState>((set, get) => ({
     updateHotspotRange: async (id: UUID, range: number) => {
         try {
             const { error } = await supabase
-                .from('hotspots')
-                .update({ range_meters: range })
-                .eq('id', id)
+                .from(TABLES.HOTSPOTS)
+                .update({ [COLUMNS.HOTSPOTS.RANGE_METERS]: range })
+                .eq(COLUMNS.HOTSPOTS.ID, id)
 
             if (error) throw error
 
@@ -445,9 +494,9 @@ export const useHostHotspotStore = create<HostHotspotState>((set, get) => ({
         set({ loading: true })
         try {
             const { error } = await supabase
-                .from('hotspots')
+                .from(TABLES.HOTSPOTS)
                 .delete()
-                .eq('id', id)
+                .eq(COLUMNS.HOTSPOTS.ID, id)
 
             if (error) throw error
 
@@ -472,9 +521,9 @@ export const useHostHotspotStore = create<HostHotspotState>((set, get) => ({
             const newStatus = !hotspot.sales_paused
 
             const { error } = await supabase
-                .from('hotspots')
-                .update({ sales_paused: newStatus })
-                .eq('id', id)
+                .from(TABLES.HOTSPOTS)
+                .update({ [COLUMNS.HOTSPOTS.SALES_PAUSED]: newStatus })
+                .eq(COLUMNS.HOTSPOTS.ID, id)
 
             if (error) throw error
 
@@ -494,9 +543,9 @@ export const useHostHotspotStore = create<HostHotspotState>((set, get) => ({
         set({ loading: true })
         try {
             const { data, error } = await supabase
-                .from('plans')
+                .from(TABLES.PLANS)
                 .insert({
-                    hotspot_id: hotspotId,
+                    [COLUMNS.PLANS.HOTSPOT_ID]: hotspotId,
                     ...planData
                 })
                 .select()
@@ -520,9 +569,9 @@ export const useHostHotspotStore = create<HostHotspotState>((set, get) => ({
         set({ loading: true })
         try {
             const { data, error } = await supabase
-                .from('plans')
+                .from(TABLES.PLANS)
                 .update(planData)
-                .eq('id', planId)
+                .eq(COLUMNS.PLANS.ID, planId)
                 .select()
                 .single()
 
@@ -543,9 +592,9 @@ export const useHostHotspotStore = create<HostHotspotState>((set, get) => ({
     togglePlanStatus: async (planId: UUID, isActive: boolean) => {
         try {
             const { error } = await supabase
-                .from('plans')
-                .update({ is_active: isActive })
-                .eq('id', planId)
+                .from(TABLES.PLANS)
+                .update({ [COLUMNS.PLANS.IS_ACTIVE]: isActive })
+                .eq(COLUMNS.PLANS.ID, planId)
 
             if (error) throw error
 
@@ -562,9 +611,9 @@ export const useHostHotspotStore = create<HostHotspotState>((set, get) => ({
         set({ loading: true })
         try {
             const { error } = await supabase
-                .from('plans')
+                .from(TABLES.PLANS)
                 .delete()
-                .eq('id', planId)
+                .eq(COLUMNS.PLANS.ID, planId)
 
             if (error) throw error
 
@@ -583,7 +632,7 @@ export const useHostHotspotStore = create<HostHotspotState>((set, get) => ({
     createCashInRequest: async (phone: string, amount: number) => {
         set({ loading: true, error: null })
         try {
-            const { data, error } = await supabase.rpc('host_create_cashin', {
+            const { data, error } = await supabase.rpc(RPC.HOST_CREATE_CASHIN, {
                 p_user_phone: phone,
                 p_amount_xof: amount
             })
@@ -592,6 +641,23 @@ export const useHostHotspotStore = create<HostHotspotState>((set, get) => ({
             return data // { id, expires_at }
         } catch (error: any) {
             console.error('Error creating cashin:', error)
+            set({ error: error.message })
+            throw error
+        } finally {
+            set({ loading: false })
+        }
+    },
+
+    completeCashIn: async (requestId: UUID) => {
+        set({ loading: true, error: null })
+        try {
+            const { error } = await supabase.rpc(RPC.HOST_COMPLETE_CASHIN, {
+                p_request_id: requestId
+            })
+
+            if (error) throw error
+        } catch (error: any) {
+            console.error('Error completing cashin:', error)
             set({ error: error.message })
             throw error
         } finally {

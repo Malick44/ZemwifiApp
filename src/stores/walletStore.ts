@@ -1,15 +1,22 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
+import { COLUMNS, ENUMS, RPC, TABLES } from '@/constants/db'
 import { supabase } from '../lib/supabase'
 import { CashInRequest, UUID, Voucher } from '../types/domain'
 
 export type WalletTransaction = {
   id: UUID
-  type: 'cashin' | 'purchase' | 'adjustment'
-  amount_xof: number
+  user_id: UUID
+  type: string
+  amount: number
+  balance_before: number
+  balance_after: number
+  reference_id: UUID | null
+  reference_type: string | null
+  description: string | null
+  metadata: Record<string, unknown> | null
   created_at: string
-  ref_type: string | null
 }
 
 export type WalletState = {
@@ -39,39 +46,37 @@ export const useWalletStore = create<WalletState>()(
         try {
           // 1. Get balance
           const { data: profile, error: profileError } = await supabase
-            .from('profiles')
-            .select('wallet_balance_xof')
+            .from(TABLES.PROFILES)
+            .select(COLUMNS.PROFILES.WALLET_BALANCE)
             .single()
-
-          if (profile) set({ balance: profile.wallet_balance_xof || 0 })
+          if (profileError) throw profileError
+          if (profile) {
+            set({ balance: profile[COLUMNS.PROFILES.WALLET_BALANCE] || 0 })
+          }
 
           // 2. Get vouchers
           const { data: vouchers } = await supabase
-            .from('vouchers')
+            .from(TABLES.VOUCHERS)
             .select('*')
-            .order('created_at', { ascending: false })
-
+            .order(COLUMNS.VOUCHERS.CREATED_AT, { ascending: false })
           if (vouchers) set({ vouchers: vouchers as any })
 
           // 3. Get transactions
           const { data: transactions } = await supabase
-            .from('wallet_transactions')
+            .from(TABLES.TRANSACTIONS)
             .select('*')
-            .order('created_at', { ascending: false })
+            .order(COLUMNS.TRANSACTIONS.CREATED_AT, { ascending: false })
             .limit(20)
-
-          if (transactions) set({ transactions: transactions as any })
+          if (transactions) set({ transactions: transactions as WalletTransaction[] })
 
           // 4. Get pending cash-in requests
           const { data: cashins } = await supabase
-            .from('cashin_requests')
+            .from(TABLES.CASHIN_REQUESTS)
             .select('*')
-            .eq('status', 'pending')
-            .gt('expires_at', new Date().toISOString())
-            .order('created_at', { ascending: false })
-
+            .eq(COLUMNS.CASHIN_REQUESTS.STATUS, ENUMS.CASHIN_STATUS.PENDING)
+            .gt(COLUMNS.CASHIN_REQUESTS.EXPIRES_AT, new Date().toISOString())
+            .order(COLUMNS.CASHIN_REQUESTS.CREATED_AT, { ascending: false })
           if (cashins) set({ pendingCashIns: cashins as any })
-
         } catch (err: any) {
           console.error("Wallet refresh error", err)
           set({ error: err.message })
@@ -83,7 +88,7 @@ export const useWalletStore = create<WalletState>()(
       confirmCashIn: async (requestId, decision) => {
         set({ loading: true, error: null })
         try {
-          const { error } = await supabase.rpc('user_confirm_cashin', {
+          const { error } = await supabase.rpc(RPC.USER_CONFIRM_CASHIN, {
             p_request_id: requestId,
             p_decision: decision
           })

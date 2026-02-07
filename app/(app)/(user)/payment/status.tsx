@@ -1,3 +1,4 @@
+import { PAYMENT_STATUS_SUCCESS } from '@/constants/db'
 import { Colors } from '@/constants/theme'
 import { useColors } from '@/hooks/use-colors'
 import { useLocalSearchParams, useRouter } from 'expo-router'
@@ -38,7 +39,7 @@ export default function PaymentStatus() {
       await simulatePayment(purchase.id)
 
       // If wallet payment and successful, just refresh wallet
-      if (provider === 'wallet' && purchase.status === 'confirmed') {
+      if (provider === 'wallet' && PAYMENT_STATUS_SUCCESS.includes(purchase.status)) {
         await wallet.refresh()
       }
 
@@ -57,7 +58,7 @@ export default function PaymentStatus() {
     )
   }
 
-  const success = currentPurchase?.status === 'confirmed'
+  const success = currentPurchase ? PAYMENT_STATUS_SUCCESS.includes(currentPurchase.status) : false
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>

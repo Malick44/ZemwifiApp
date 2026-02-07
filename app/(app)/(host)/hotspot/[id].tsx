@@ -14,6 +14,7 @@ import { Typography } from '../../../../src/components/ui/Typography'
 import { format } from '../../../../src/lib/format'
 import { supabase } from '../../../../src/lib/supabase'
 import { useHostHotspotStore } from '../../../../src/stores/hostHotspotStore'
+import { RPC } from '@/constants/db'
 
 export default function HostHotspotDetail() {
   const { id } = useLocalSearchParams<{ id: string }>()
@@ -48,7 +49,7 @@ export default function HostHotspotDetail() {
 
   const handleRevealSecret = async () => {
     try {
-      const { data, error } = await supabase.rpc('reveal_hotspot_secret', { p_hotspot_id: id })
+      const { data, error } = await supabase.rpc(RPC.REVEAL_HOTSPOT_SECRET, { p_hotspot_id: id })
       if (error) throw error
       setSecret(data)
     } catch (e) {
@@ -222,7 +223,7 @@ export default function HostHotspotDetail() {
                       )}
                     </View>
                     <Typography variant="body" color="textSecondary" style={{ marginTop: 4 }}>
-                      {format.duration(plan.duration_s || plan.duration_seconds)} • {format.dataSize(plan.data_cap_bytes || 0)}
+                      {format.duration(plan.duration_s)} • {format.dataSize(plan.data_cap_bytes || 0)}
                     </Typography>
                   </View>
                   <Typography variant="h3">{plan.price_xof} XOF</Typography>

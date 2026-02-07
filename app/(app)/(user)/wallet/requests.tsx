@@ -57,7 +57,7 @@ export default function WalletRequestsScreen() {
                             <Card variant="outlined" style={styles.requestCard}>
                                 <View style={styles.row}>
                                     <View>
-                                        <Typography variant="h3">{item.amount_xof} XOF</Typography>
+                                        <Typography variant="h3">{item.amount || 0} XOF</Typography>
                                         <Typography variant="caption" color="textSecondary">{format.date(item.created_at)}</Typography>
                                     </View>
                                     <View style={{ alignItems: 'flex-end' }}>

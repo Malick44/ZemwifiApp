@@ -1,3 +1,4 @@
+import { ENUMS } from '@/constants/db'
 import { Colors } from '@/constants/theme'
 import { Ionicons } from '@expo/vector-icons'
 import * as ExpoLocation from 'expo-location'
@@ -108,7 +109,7 @@ export default function MapScreen() {
       {/* Header */}
       <Header
         title="Points Wi-Fi à proximité"
-        subtitle={`${nearbyHotspots.filter(h => h.is_online).length} hotspots en ligne`}
+        subtitle={`${nearbyHotspots.filter(h => h.status === ENUMS.HOTSPOT_STATUS.ONLINE).length} hotspots en ligne`}
         rightAction={
           <View style={[styles.viewToggle, { backgroundColor: colors.textTertiary + '20' }]}>
             <TouchableOpacity
@@ -174,7 +175,7 @@ export default function MapScreen() {
                 <View style={[
                   styles.customMarker,
                   {
-                    backgroundColor: hotspot.is_online ? colors.success : colors.textTertiary,
+                    backgroundColor: hotspot.status === ENUMS.HOTSPOT_STATUS.ONLINE ? colors.success : colors.textTertiary,
                     borderColor: selectedHotspot?.id === hotspot.id ? colors.primary : 'white'
                   }
                 ]}>
@@ -206,7 +207,7 @@ export default function MapScreen() {
             <View style={[styles.bottomCard, { backgroundColor: colors.background }]}>
               <View style={styles.cardHeader}>
                 <Typography variant="h3">{selectedHotspot.name}</Typography>
-                {selectedHotspot.is_online && (
+                {selectedHotspot.status === ENUMS.HOTSPOT_STATUS.ONLINE && (
                   <View style={[styles.badge, { backgroundColor: colors.success + '20' }]}>
                     <View style={[styles.dot, { backgroundColor: colors.success }]} />
                     <Typography variant="caption" color={colors.success}>En ligne</Typography>
@@ -279,7 +280,7 @@ export default function MapScreen() {
               <View style={{ flex: 1 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
                   <Typography variant="h4">{item.name}</Typography>
-                  {item.is_online && (
+                  {item.status === ENUMS.HOTSPOT_STATUS.ONLINE && (
                     <View style={[styles.badge, { backgroundColor: colors.success + '20', marginLeft: 8 }]}>
                       <View style={[styles.dot, { backgroundColor: colors.success }]} />
                       <Typography variant="caption" color={colors.success}>En ligne</Typography>

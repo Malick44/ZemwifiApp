@@ -2,6 +2,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Typography } from '@/components/ui/Typography';
+import { COLUMNS, TABLES } from '@/constants/db';
 import { BrandColors, Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { supabase } from '@/src/lib/supabase';
@@ -27,11 +28,11 @@ export default function DevPanelScreen() {
         { count: vouchersCount },
         { count: purchasesCount },
       ] = await Promise.all([
-        supabase.from('profiles').select('*', { count: 'exact', head: true }),
-        supabase.from('hotspots').select('*', { count: 'exact', head: true }),
-        supabase.from('plans').select('*', { count: 'exact', head: true }),
-        supabase.from('vouchers').select('*', { count: 'exact', head: true }),
-        supabase.from('purchases').select('*', { count: 'exact', head: true }),
+        supabase.from(TABLES.PROFILES).select('*', { count: 'exact', head: true }),
+        supabase.from(TABLES.HOTSPOTS).select('*', { count: 'exact', head: true }),
+        supabase.from(TABLES.PLANS).select('*', { count: 'exact', head: true }),
+        supabase.from(TABLES.VOUCHERS).select('*', { count: 'exact', head: true }),
+        supabase.from(TABLES.PURCHASES).select('*', { count: 'exact', head: true }),
       ]);
 
       setStats({
@@ -87,7 +88,7 @@ export default function DevPanelScreen() {
           landmark: 'Près du marché central',
           lat: 12.3714277,
           lng: -1.5196603,
-          ssid: 'ZemNet-Test-Cafe',
+           ssid: 'ZemNet-Test-Cafe',
           is_online: true,
           sales_paused: false,
         },
@@ -104,7 +105,7 @@ export default function DevPanelScreen() {
       ];
 
       for (const hotspot of testHotspots) {
-        await supabase.from('hotspots').upsert(hotspot);
+        await supabase.from(TABLES.HOTSPOTS).upsert(hotspot);
       }
 
       // Create test plans
@@ -136,7 +137,7 @@ export default function DevPanelScreen() {
       ];
 
       for (const plan of testPlans) {
-        await supabase.from('plans').insert(plan);
+        await supabase.from(TABLES.PLANS).insert(plan);
       }
 
       setSeeded(true);
@@ -161,8 +162,8 @@ export default function DevPanelScreen() {
             setLoading(true);
             try {
               // Delete in reverse order of dependencies
-              await supabase.from('plans').delete().like('hotspot_id', '10000000-%');
-              await supabase.from('hotspots').delete().like('id', '10000000-%');
+              await supabase.from(TABLES.PLANS).delete().like(COLUMNS.PLANS.HOTSPOT_ID, '10000000-%');
+              await supabase.from(TABLES.HOTSPOTS).delete().like(COLUMNS.HOTSPOTS.ID, '10000000-%');
               
               setSeeded(false);
               Alert.alert('Success', 'Test data cleared');

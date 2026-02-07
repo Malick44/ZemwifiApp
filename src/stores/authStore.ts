@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
+import { COLUMNS, TABLES } from '@/constants/db'
 import { supabase } from '../lib/supabase'
 import { Language, UUID } from '../types/domain'
 
@@ -66,9 +67,9 @@ export const useAuthStore = create<AuthState>()(
           try {
             // Check if profile exists
             const { data: existingProfile } = await supabase
-              .from('profiles')
+              .from(TABLES.PROFILES)
               .select('*')
-              .eq('id', data.user.id)
+              .eq(COLUMNS.PROFILES.ID, data.user.id)
               .single()
 
             if (!existingProfile) {
@@ -77,11 +78,11 @@ export const useAuthStore = create<AuthState>()(
               const _userEmail = data.user.email || null
 
               // Create profile manually using service role or authenticated context
-              await supabase.from('profiles').insert({
-                id: data.user.id,
-                phone: userPhone,
-                name: '',
-                role: 'user'
+              await supabase.from(TABLES.PROFILES).insert({
+                [COLUMNS.PROFILES.ID]: data.user.id,
+                [COLUMNS.PROFILES.PHONE]: userPhone,
+                [COLUMNS.PROFILES.NAME]: '',
+                [COLUMNS.PROFILES.ROLE]: 'user'
               })
             }
           } catch (profileError) {
@@ -100,9 +101,9 @@ export const useAuthStore = create<AuthState>()(
 
           // Try to get profile, create if doesn't exist
           const { data: profileData, error: profileError } = await supabase
-            .from('profiles')
+            .from(TABLES.PROFILES)
             .select('*')
-            .eq('id', data.session.user.id)
+            .eq(COLUMNS.PROFILES.ID, data.session.user.id)
             .single()
 
           if (profileData) {
@@ -115,12 +116,12 @@ export const useAuthStore = create<AuthState>()(
               const _email = data.session.user.email || null
 
               const { data: newProfile } = await supabase
-                .from('profiles')
+                .from(TABLES.PROFILES)
                 .insert({
-                  id: data.session.user.id,
-                  phone: phone,
-                  name: '',
-                  role: 'user'
+                  [COLUMNS.PROFILES.ID]: data.session.user.id,
+                  [COLUMNS.PROFILES.PHONE]: phone,
+                  [COLUMNS.PROFILES.NAME]: '',
+                  [COLUMNS.PROFILES.ROLE]: 'user'
                 })
                 .select()
                 .single()
@@ -133,7 +134,7 @@ export const useAuthStore = create<AuthState>()(
         }
       },
       updateProfile: async (input) => {
-        const { data, error } = await supabase.from('profiles').upsert(input).select().single()
+        const { data, error } = await supabase.from(TABLES.PROFILES).upsert(input).select().single()
         if (error) throw error
         set({ profile: data })
       },

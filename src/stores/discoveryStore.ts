@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { COLUMNS, ENUMS, RPC, TABLES } from '@/constants/db'
 import { supabase } from '../lib/supabase'
 import { Hotspot, Plan, UUID } from '../types/domain'
 
@@ -56,11 +57,30 @@ export const useDiscoveryStore = create<DiscoveryState>((set, get) => ({
     set({ loading: true, error: null })
 
     // Call the RPC
-    const { data, error } = await supabase.rpc('nearby_hotspots', {
+    const radiusM = 10000
+    let { data, error } = await supabase.rpc(RPC.NEARBY_HOTSPOTS, {
       p_lat: lat,
       p_lng: lng,
-      p_radius_m: 10000 // 10km default
+      p_radius_m: radiusM // 10km default
     })
+    if (error?.code === 'PGRST202') {
+      const fallback = await supabase.rpc(RPC.NEARBY_HOTSPOTS, {
+        p_lat: lat,
+        p_lng: lng,
+        radius_m: radiusM
+      })
+      data = fallback.data
+      error = fallback.error
+    }
+    if (error?.code === 'PGRST202') {
+      const legacy = await supabase.rpc(RPC.NEARBY_HOTSPOTS, {
+        lat,
+        lng,
+        radius_m: radiusM
+      })
+      data = legacy.data
+      error = legacy.error
+    }
 
     if (error) {
       console.error('RPC Error:', error)
@@ -70,23 +90,27 @@ export const useDiscoveryStore = create<DiscoveryState>((set, get) => ({
 
     if (data) {
       // Map RPC result to Hotspot type
-      const mappedHotspots: Hotspot[] = data.map((item: any) => ({
-        id: item.id,
-        host_id: item.host_id,
-        name: item.name,
-        landmark: item.landmark,
-        address: item.address,
-        ssid: item.ssid,
-        lat: item.lat,
-        lng: item.lng,
-        distance: item.distance_m, // Storing in meters to match UI expectation
-        // Actually, the new UI uses item.distance in meters for display (toFixed(0) + ' m').
-        // So let's store it in meters.
-        is_online: item.online,
-        status: item.online ? 'online' : 'offline',
-        sales_paused: false, // Defaulting as RPC filters active, assuming safe
-        hours: null // Missing from RPC, acceptable
-      }))
+      const mappedHotspots: Hotspot[] = data.map((item: any) => {
+        const isOnline = item.online ?? item.is_online ?? false
+        return {
+          id: item.id ?? item.hotspot_id,
+          host_id: item.host_id ?? '',
+          name: item.name ?? 'Hotspot',
+          landmark: item.landmark ?? '',
+          address: item.address ?? null,
+          ssid: item.ssid ?? null,
+          lat: item.lat ?? item.latitude ?? null,
+          lng: item.lng ?? item.longitude ?? null,
+          distance: item.distance_m, // Storing in meters to match UI expectation
+          // Actually, the new UI uses item.distance in meters for display (toFixed(0) + ' m').
+          // So let's store it in meters.
+          is_online: isOnline,
+          status: isOnline ? ENUMS.HOTSPOT_STATUS.ONLINE : ENUMS.HOTSPOT_STATUS.OFFLINE,
+          sales_paused: item.sales_paused ?? false,
+          created_at: item.created_at ?? new Date().toISOString(),
+          hours: null // Missing from RPC, acceptable
+        }
+      })
 
       // Deduplicate by ID just in case
       const uniqueHotspots = Array.from(new Map(mappedHotspots.map(item => [item.id, item])).values());
@@ -99,8 +123,7 @@ export const useDiscoveryStore = create<DiscoveryState>((set, get) => ({
 
   scanWifi: async () => {
     // Native WiFi scanning on iOS/Android is restricted and unreliable.
-    // relying on 'nearby_hotspots' RPC which returns online status based on Heartbeat.
-    // We can just re-fetch the RPC here.
+    // Rely on the nearby_hotspots RPC which returns online status based on heartbeat.
     const { userLocation } = get()
     if (userLocation) {
       await get().fetchNearbyHotspots(userLocation.lat, userLocation.lng)
@@ -110,11 +133,11 @@ export const useDiscoveryStore = create<DiscoveryState>((set, get) => ({
   fetchPlansForHotspot: async (id) => {
     if (get().plans[id]) return
     const { data, error } = await supabase
-      .from('plans')
+      .from(TABLES.PLANS)
       .select('*')
-      .eq('hotspot_id', id)
-      .eq('is_active', true)
-      .order('price_xof')
+      .eq(COLUMNS.PLANS.HOTSPOT_ID, id)
+      .eq(COLUMNS.PLANS.IS_ACTIVE, true)
+      .order(COLUMNS.PLANS.PRICE_XOF)
     if (error) {
       set({ error: error.message })
       return

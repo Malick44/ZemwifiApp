@@ -10,6 +10,7 @@ import { Typography } from '../../../src/components/ui/Typography'
 import { format } from '../../../src/lib/format'
 import { supabase } from '../../../src/lib/supabase'
 import { useAuthStore } from '../../../src/stores/authStore'
+import { COLUMNS, ENUMS, PAYMENT_STATUS_SUCCESS, TABLES, type PaymentStatus } from '@/constants/db'
 
 type DashboardStats = {
   totalEarnings: number
@@ -20,11 +21,20 @@ type DashboardStats = {
   pendingPayouts: number
 }
 
-// Mock transaction type for the list
+// Transaction type for the list
 type Transaction = {
   id: string
   amount: number
-  status: 'success' | 'pending' | 'failed'
+  status: PaymentStatus
+  created_at: string
+  hotspot: { name: string } | null
+}
+
+// Type for purchase query result with aliased columns
+type PurchaseQueryResult = {
+  id: string
+  amount: number
+  status: string
   created_at: string
   hotspot: { name: string } | null
 }
@@ -45,18 +55,27 @@ export default function HostDashboard() {
       if (!refreshing) setLoading(true)
 
       // 1. Fetch Stats (Same logic as before, consolidated)
-      const { data: hotspots } = await supabase.from('hotspots').select('id, is_online')
+      const { data: hotspots } = await supabase
+        .from(TABLES.HOTSPOTS)
+        .select(`${COLUMNS.HOTSPOTS.ID}, ${COLUMNS.HOTSPOTS.IS_ONLINE}`)
       const hotspotIds = hotspots?.map(h => h.id) || []
       const activeHotspots = hotspots?.filter(h => h.is_online).length || 0
 
-      const { data: purchases } = await supabase
-        .from('purchases')
-        .select('amount, created_at, status:payment_status, id, hotspot:hotspots(name)')
-        .in('hotspot_id', hotspotIds)
-        .order('created_at', { ascending: false })
+      const { data: purchaseData } = await supabase
+        .from(TABLES.PURCHASES)
+        .select(
+          `amount:${COLUMNS.PURCHASES.AMOUNT}, ` +
+          `${COLUMNS.PURCHASES.CREATED_AT}, ` +
+          `status:${COLUMNS.PURCHASES.PAYMENT_STATUS}, ` +
+          `${COLUMNS.PURCHASES.ID}, ` +
+          `hotspot:${TABLES.HOTSPOTS}(${COLUMNS.HOTSPOTS.NAME})`
+        )
+        .in(COLUMNS.PURCHASES.HOTSPOT_ID, hotspotIds)
+        .order(COLUMNS.PURCHASES.CREATED_AT, { ascending: false })
         .limit(5)
 
-      const completedPurchases = purchases?.filter(p => p.status === 'success') || []
+      const purchases = (purchaseData || []) as unknown as PurchaseQueryResult[]
+      const completedPurchases = purchases.filter(p => PAYMENT_STATUS_SUCCESS.includes(p.status as PaymentStatus))
       const totalEarnings = completedPurchases.reduce((sum, p) => sum + p.amount, 0)
 
       const today = new Date()
@@ -65,16 +84,16 @@ export default function HostDashboard() {
         .reduce((sum, p) => sum + p.amount, 0)
 
       const { count: activeSessions } = await supabase
-        .from('vouchers')
+        .from(TABLES.VOUCHERS)
         .select('*', { count: 'exact', head: true })
-        .in('hotspot_id', hotspotIds)
-        .not('used_at', 'is', null)
-        .gt('expires_at', new Date().toISOString())
+        .in(COLUMNS.VOUCHERS.HOTSPOT_ID, hotspotIds)
+        .not(COLUMNS.VOUCHERS.USED_AT, 'is', null)
+        .gt(COLUMNS.VOUCHERS.EXPIRES_AT, new Date().toISOString())
 
       const { data: payouts } = await supabase
-        .from('payout_requests')
-        .select('amount')
-        .eq('status', 'pending')
+        .from(TABLES.PAYOUTS)
+        .select(`amount:${COLUMNS.PAYOUTS.AMOUNT}`)
+        .eq(COLUMNS.PAYOUTS.STATUS, ENUMS.PAYOUT_STATUS.PENDING)
 
       const pendingPayouts = payouts?.reduce((sum, p) => sum + p.amount, 0) || 0
 
@@ -88,13 +107,13 @@ export default function HostDashboard() {
       })
 
       // Set recent transactions
-      setTransactions(purchases?.map(p => ({
+      setTransactions(purchases.map(p => ({
         id: p.id,
         amount: p.amount,
-        status: p.status as any,
+        status: p.status as PaymentStatus,
         created_at: p.created_at,
-        hotspot: p.hotspot as any
-      })) || [])
+        hotspot: p.hotspot
+      })))
 
     } catch (error) {
       console.error('Error loading dashboard:', error)
@@ -245,30 +264,36 @@ export default function HostDashboard() {
               Aucune transaction récente
             </Typography>
           ) : (
-            transactions.map((tx) => (
-              <Link key={tx.id} href={`/(app)/(shared)/transaction-detail/${tx.id}`} asChild>
-                <Pressable style={[styles.transactionItem, { borderBottomColor: colors.border }]}>
-                  <View style={styles.txIcon}>
-                    <Ionicons
-                      name={tx.status === 'success' ? "arrow-down" : "time"}
-                      size={18}
-                      color={tx.status === 'success' ? colors.success : colors.warning}
-                    />
-                  </View>
-                  <View style={styles.txDetails}>
-                    <Typography variant="body" style={styles.txTitle}>
-                      Vente forfait - {tx.hotspot?.name || 'Inconnu'}
+            transactions.map((tx) => {
+              const isSuccess = PAYMENT_STATUS_SUCCESS.includes(tx.status)
+              return (
+                <Link key={tx.id} href={`/(app)/(shared)/transaction-detail/${tx.id}`} asChild>
+                  <Pressable style={[styles.transactionItem, { borderBottomColor: colors.border }]}>
+                    <View style={styles.txIcon}>
+                      <Ionicons
+                        name={isSuccess ? "arrow-down" : "time"}
+                        size={18}
+                        color={isSuccess ? colors.success : colors.warning}
+                      />
+                    </View>
+                    <View style={styles.txDetails}>
+                      <Typography variant="body" style={styles.txTitle}>
+                        Vente forfait - {tx.hotspot?.name || 'Inconnu'}
+                      </Typography>
+                      <Typography variant="caption" color="textSecondary">
+                        {format.date(tx.created_at)}
+                      </Typography>
+                    </View>
+                    <Typography
+                      variant="body"
+                      style={[styles.txAmount, { color: isSuccess ? colors.success : colors.text }]}
+                    >
+                      +{format.currency(tx.amount)}
                     </Typography>
-                    <Typography variant="caption" color="textSecondary">
-                      {format.date(tx.created_at)}
-                    </Typography>
-                  </View>
-                  <Typography variant="body" style={[styles.txAmount, { color: tx.status === 'success' ? colors.success : colors.text }]}>
-                    +{format.currency(tx.amount)}
-                  </Typography>
-                </Pressable>
-              </Link>
-            ))
+                  </Pressable>
+                </Link>
+              )
+            })
           )}
         </View>
 

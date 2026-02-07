@@ -1,3 +1,5 @@
+import { type CashInStatus, type HotspotStatus, type PaymentStatus } from '@/constants/db'
+
 export type Language = 'fr' | 'en'
 
 export type UUID = string
@@ -12,6 +14,7 @@ export type Hotspot = {
   lat?: number
   lng?: number
   is_online: boolean
+  status?: HotspotStatus
   sales_paused: boolean
   last_seen_at?: string
   created_at: string
@@ -26,8 +29,7 @@ export type Plan = {
   id: UUID
   hotspot_id: UUID
   name: string
-  duration_s: number // standard
-  duration_seconds: number // legacy alias
+  duration_s: number
   data_cap_bytes: number | null
   price_xof: number
   is_active: boolean
@@ -35,8 +37,7 @@ export type Plan = {
 
 export type Voucher = {
   id: UUID
-  code?: string // optional distinct code if not token
-  jti: string
+  code: string
   user_id: UUID
   hotspot_id: UUID
   plan_id: UUID
@@ -44,6 +45,7 @@ export type Voucher = {
   expires_at: string
   created_at: string
   used_at: string | null
+  device_mac: string | null
   token: string
 }
 
@@ -54,7 +56,8 @@ export type Purchase = {
   plan_id: UUID
   amount_xof: number
   provider: 'wallet' | 'wave' | 'orange' | 'moov'
-  status: 'pending' | 'confirmed' | 'failed' | 'expired' | 'success'
+  status: PaymentStatus
+  voucher_id?: UUID | null
   created_at: string
 }
 
@@ -63,8 +66,8 @@ export type CashInRequest = {
   host_id: UUID
   user_id: UUID | null
   user_phone: string
-  amount_xof: number
-  status: 'pending' | 'confirmed' | 'denied' | 'expired'
+  amount: number
+  status: CashInStatus
   expires_at: string
   created_at: string
 }

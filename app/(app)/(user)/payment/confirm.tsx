@@ -11,6 +11,7 @@ import { format } from '../../../../src/lib/format'
 import { supabase } from '../../../../src/lib/supabase'
 import { useWalletStore } from '../../../../src/stores/walletStore'
 import { Plan } from '../../../../src/types/domain'
+import { COLUMNS, RPC, TABLES } from '@/constants/db'
 
 export default function PaymentConfirmScreen() {
     const { planId, hotspotId } = useLocalSearchParams<{ planId: string, hotspotId: string }>()
@@ -28,7 +29,11 @@ export default function PaymentConfirmScreen() {
     useEffect(() => {
         async function loadData() {
             if (!planId) return
-            const { data } = await supabase.from('plans').select('*').eq('id', planId).single()
+            const { data } = await supabase
+                .from(TABLES.PLANS)
+                .select('*')
+                .eq(COLUMNS.PLANS.ID, planId)
+                .single()
             setPlan(data as any)
             setLoading(false)
             refresh() // Refresh balance
@@ -40,7 +45,7 @@ export default function PaymentConfirmScreen() {
         if (!plan || !hotspotId) return
         setProcessing(true)
         try {
-            const { data, error } = await supabase.rpc('process_purchase', {
+            const { data, error } = await supabase.rpc(RPC.PROCESS_PURCHASE, {
                 p_hotspot_id: hotspotId,
                 p_plan_id: plan.id,
                 p_provider: 'wallet'
@@ -99,7 +104,7 @@ export default function PaymentConfirmScreen() {
                     <View style={styles.divider} />
                     <View style={styles.row}>
                         <Typography variant="body" color="textSecondary">Durée</Typography>
-                        <Typography variant="body">{format.duration(plan.duration_s || plan.duration_seconds)}</Typography>
+                        <Typography variant="body">{format.duration(plan.duration_s)}</Typography>
                     </View>
                     <View style={styles.row}>
                         <Typography variant="body" color="textSecondary">Data</Typography>

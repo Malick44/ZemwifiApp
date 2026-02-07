@@ -11,6 +11,7 @@ import { TextField } from '../../../src/components/ui/TextField'
 import { Typography } from '../../../src/components/ui/Typography'
 import { supabase } from '../../../src/lib/supabase'
 import { useAuthStore } from '../../../src/stores/authStore'
+import { COLUMNS, ENUMS, TABLES } from '@/constants/db'
 
 export default function KYCScreen() {
   const router = useRouter()
@@ -98,16 +99,16 @@ export default function KYCScreen() {
       const selfiePath = await uploadFile(selfieImage, userId)
 
       // 2. Insert Submission
-      const { error: insertError } = await supabase
-        .from('kyc_submissions')
+    const { error: insertError } = await supabase
+        .from(TABLES.KYC_SUBMISSIONS)
         .insert({
-          user_id: userId,
-          full_name: formData.fullName,
-          id_number: formData.idNumber,
-          address: formData.address, // Added address
-          id_card_url: idCardPath,
-          selfie_url: selfiePath,
-          status: 'pending'
+          [COLUMNS.KYC_SUBMISSIONS.USER_ID]: userId,
+          [COLUMNS.KYC_SUBMISSIONS.FULL_NAME]: formData.fullName,
+          [COLUMNS.KYC_SUBMISSIONS.ID_NUMBER]: formData.idNumber,
+          [COLUMNS.KYC_SUBMISSIONS.ADDRESS]: formData.address, // Added address
+          [COLUMNS.KYC_SUBMISSIONS.ID_CARD_URL]: idCardPath,
+          [COLUMNS.KYC_SUBMISSIONS.SELFIE_URL]: selfiePath,
+          [COLUMNS.KYC_SUBMISSIONS.STATUS]: ENUMS.KYC_STATUS.PENDING
         })
 
       if (insertError) throw insertError

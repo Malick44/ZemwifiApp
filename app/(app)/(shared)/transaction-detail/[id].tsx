@@ -10,6 +10,7 @@ import { Header } from '../../../../src/components/ui/Header'
 import { Typography } from '../../../../src/components/ui/Typography'
 import { supabase } from '../../../../src/lib/supabase'
 import { Purchase } from '../../../../src/types/domain'
+import { COLUMNS, ENUMS, PAYMENT_STATUS_SUCCESS, TABLES } from '@/constants/db'
 
 type ExtendedPurchase = Purchase & {
   hotspot?: { name: string; landmark?: string } | null
@@ -36,9 +37,13 @@ export default function TransactionDetail() {
     try {
       setLoading(true)
       const { data, error } = await supabase
-        .from('purchases')
-        .select('*, hotspot:hotspots(name, landmark), plan:plans(name)')
-        .eq('id', id)
+        .from(TABLES.PURCHASES)
+        .select(
+          `*,
+          hotspot:${TABLES.HOTSPOTS}(${COLUMNS.HOTSPOTS.NAME}, ${COLUMNS.HOTSPOTS.LANDMARK}),
+          plan:${TABLES.PLANS}(${COLUMNS.PLANS.NAME})`
+        )
+        .eq(COLUMNS.PURCHASES.ID, id)
         .single()
 
       if (error) throw error
@@ -51,32 +56,26 @@ export default function TransactionDetail() {
     }
   }
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'confirmed': return colors.success
-      case 'pending': return colors.warning
-      case 'failed': return colors.error
-      default: return colors.textSecondary
-    }
+  const getStatusColor = (status: Purchase['status']) => {
+    if (PAYMENT_STATUS_SUCCESS.includes(status)) return colors.success
+    if (status === ENUMS.PAYMENT_STATUS.PENDING) return colors.warning
+    if (status === ENUMS.PAYMENT_STATUS.FAILED) return colors.error
+    return colors.textSecondary
   }
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'confirmed': return 'checkmark-circle'
-      case 'pending': return 'time'
-      case 'failed': return 'alert-circle'
-      default: return 'help-circle'
-    }
+  const getStatusIcon = (status: Purchase['status']) => {
+    if (PAYMENT_STATUS_SUCCESS.includes(status)) return 'checkmark-circle'
+    if (status === ENUMS.PAYMENT_STATUS.PENDING) return 'time'
+    if (status === ENUMS.PAYMENT_STATUS.FAILED) return 'alert-circle'
+    return 'help-circle'
   }
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'confirmed': return 'Effectué'
-      case 'pending': return 'En attente'
-      case 'failed': return 'Échoué'
-      case 'expired': return 'Expiré'
-      default: return status
-    }
+  const getStatusText = (status: Purchase['status']) => {
+    if (PAYMENT_STATUS_SUCCESS.includes(status)) return 'Effectué'
+    if (status === ENUMS.PAYMENT_STATUS.PENDING) return 'En attente'
+    if (status === ENUMS.PAYMENT_STATUS.FAILED) return 'Échoué'
+    if (status === ENUMS.PAYMENT_STATUS.EXPIRED) return 'Expiré'
+    return status
   }
 
   if (loading) {
